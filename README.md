@@ -5,10 +5,10 @@
 Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggerganov/llama.cpp), The goal is to integrate the capabilities of LLMs into the Java ecosystem, this project has the same functionality as other language versions.
 
 #### Main content
-- 🚀 Built based on Llama.cpp, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
-- 🚀 Developed using JNI, ~~NOT JNA~~
+- 🚀 Built based on Llama.cpp, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp).
+- 🚀 Developed using JNI, ~~NOT JNA~~.
 - 🚀 News:
-  - [X] Multi-user sessions (Beta)
+  - [X] Multi-user sessions (Beta).
 
 
 ## Quick start
@@ -16,11 +16,11 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 #### Maven POM
 
 ```xml
-<dependency>
-    <groupId>chat.octet</groupId>
-    <artifactId>llama-java-core</artifactId>
-    <version>1.1.0</version>
-</dependency>
+    <dependency>
+        <groupId>chat.octet</groupId>
+        <artifactId>llama-java-core</artifactId>
+        <version>1.1.0</version>
+    </dependency>
 ```
 
 #### ConsoleQA
@@ -71,36 +71,36 @@ You can use `LogitsProcessor` and `StoppingCriteria` to customize and control th
 
 - Note: If you need to do matrix calculations in Java, please use [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
 
-> **chat.octet.model.processor.LogitsProcessor**
+**chat.octet.model.processor.LogitsProcessor**
 
 Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
 ```java
-Map<Integer, String> logitBias = Maps.newLinkedHashMap();
-logitBias.put(5546, "false");
-logitBias.put(12113, "5.89");
-LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
-
-ModelParameter modelParams = ModelParameter.builder()
-        .logitsProcessorList(logitsProcessorList)
-        .build();
-
+    Map<Integer, String> logitBias = Maps.newLinkedHashMap();
+    logitBias.put(5546, "false");
+    logitBias.put(12113, "5.89");
+    LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
+    
+    ModelParameter modelParams = ModelParameter.builder()
+            .logitsProcessorList(logitsProcessorList)
+            .build();
+    
     ... ...
 
 ```
 
-> **chat.octet.model.criteria.StoppingCriteria**
+**chat.octet.model.criteria.StoppingCriteria**
 
 Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
 ```java
-long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
-StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
-
-ModelParameter modelParams = ModelParameter.builder()
-        .stoppingCriteriaList(stopCriteriaList)
-        .build();
-
+    long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
+    StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
+    
+    ModelParameter modelParams = ModelParameter.builder()
+            .stoppingCriteriaList(stopCriteriaList)
+            .build();
+    
     ... ...
 
 ```
@@ -124,7 +124,7 @@ Develop using JNI:
 > `LlamaService.samplingXxxx(...)` sampling has been optimized to reduce performance losses caused by data transfer between JVM Native.
 >
 >
-> More information: [`Java Docs`](docs/API.md)。
+> More information: [`Java Docs`](docs/API.md)
 
 #### Build
 

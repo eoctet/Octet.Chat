@@ -5,21 +5,22 @@
 这是一个基于 🦙[`llama.cpp`](https://github.com/ggerganov/llama.cpp)  API开发的Java库，目标是更快速将大语言模型的能力集成到Java生态，本项目和其他语言版本库具有一样的功能。
 
 #### 主要功能
-- 🚀 基于 Llama.cpp 构建，更多细节请关注 **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
-- 🚀 使用JNI开发本地库，~~而不是JNA~~，测试的性能上与其他库无异
+- 🚀 基于 Llama.cpp 构建，更多细节请关注 **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp)。
+- 🚀 使用JNI开发本地库，~~而不是JNA~~，测试的性能上与其他库无异。
 - 🚀 新增:
-  - [X] 多用户会话，你可以使用不同的用户身份进行聊天  (Beta)
+  - [X] 多用户会话，你可以使用不同的用户身份进行聊天 (Beta)。
+
 
 ## 快速开始
 
 #### Maven POM
 
 ```xml
-<dependency>
-    <groupId>chat.octet</groupId>
-    <artifactId>llama-java-core</artifactId>
-    <version>1.1.0</version>
-</dependency>
+    <dependency>
+        <groupId>chat.octet</groupId>
+        <artifactId>llama-java-core</artifactId>
+        <version>1.1.0</version>
+    </dependency>
 ```
 
 #### ConsoleQA
@@ -70,35 +71,35 @@ public class ConsoleQA {
 
 - 注：如果需要在Java中进行矩阵计算请使用 [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
 
-> **chat.octet.model.processor.LogitsProcessor**
+**chat.octet.model.processor.LogitsProcessor**
 
 自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
 ```java
-Map<Integer, String> logitBias = Maps.newLinkedHashMap();
-logitBias.put(5546, "false");
-logitBias.put(12113, "5.89");
-LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
-
-ModelParameter modelParams = ModelParameter.builder()
-        .logitsProcessorList(logitsProcessorList)
-        .build();
+    Map<Integer, String> logitBias = Maps.newLinkedHashMap();
+    logitBias.put(5546, "false");
+    logitBias.put(12113, "5.89");
+    LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
+    
+    ModelParameter modelParams = ModelParameter.builder()
+            .logitsProcessorList(logitsProcessorList)
+            .build();
 
     ... ...
 
 ```
 
-> **chat.octet.model.criteria.StoppingCriteria**
+**chat.octet.model.criteria.StoppingCriteria**
 
 自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
 ```java
-long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
-StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
-
-ModelParameter modelParams = ModelParameter.builder()
-        .stoppingCriteriaList(stopCriteriaList)
-        .build();
+    long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
+    StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
+    
+    ModelParameter modelParams = ModelParameter.builder()
+            .stoppingCriteriaList(stopCriteriaList)
+            .build();
 
     ... ...
 
@@ -112,7 +113,6 @@ ModelParameter modelParams = ModelParameter.builder()
 - 使用 [UserContextManager](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FUserContextManager.java) 创建用户会话、删除用户会话；
 
 - 会话上下文窗口长度为 `Model.contextSize`（默认值：512），当达到窗口长度时，保留最近 `keepContextTokensSize` 个词汇的对话历史。
-
 
 #### [LlamaService](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FLlamaService.java)
 
