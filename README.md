@@ -133,8 +133,6 @@ By default, each system version library is included.
 > If you need to support `GPU` or more flexible compilation methods, please refer to `llama.cpp`
 
 
-----
-
 
 ## Feedback
 

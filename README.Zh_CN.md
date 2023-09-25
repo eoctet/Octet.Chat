@@ -130,8 +130,6 @@ public class ConsoleQA {
 > 如果需要支持`GPU`或更加灵活的编译方式，请参考 `llama.cpp` **Build** 文档。
 
 
-----
-
 
 ## 问题反馈
 
