@@ -69,7 +69,7 @@ public class ConsoleQA {
 
 You can use `LogitsProcessor` and `StoppingCriteria` to customize and control the model inference process.
 
-- Note: If you need to do matrix calculations in Java, please use [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
+> Note: If you need to do matrix calculations in Java, please use [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
 
 **chat.octet.model.processor.LogitsProcessor**
 

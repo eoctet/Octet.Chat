@@ -69,7 +69,7 @@ public class ConsoleQA {
 
 可以使用 `LogitsProcessor` 和 `StoppingCriteria` 对模型推理过程进行自定义控制。
 
-- 注：如果需要在Java中进行矩阵计算请使用 [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
+> 注：如果需要在Java中进行矩阵计算请使用 [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
 
 **chat.octet.model.processor.LogitsProcessor**
 
