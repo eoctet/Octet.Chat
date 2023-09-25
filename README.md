@@ -1,6 +1,6 @@
 # ☕️ Java bindings for [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 
-[**🇨🇳中文**](./README.Zh_CN.md) | [**🌐English**](./README.md) | 🤖 [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-api.git)
+[**🇨🇳中文**](./README.Zh_CN.md) | [**🌐English**](./README.md) | 🤖 [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git)
 
 Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggerganov/llama.cpp), The goal is to integrate the capabilities of LLMs into the Java ecosystem, this project has the same functionality as other language versions.
 
@@ -25,7 +25,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 
 #### ConsoleQA
 
-Here is a simple chat example, and you can also refer to another project 🤖️ [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-api.git) to further enrich your application.
+Here is a simple chat example, and you can also refer to another project 🤖️ [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git) to further enrich your application.
 
 ```java
 public class ConsoleQA {

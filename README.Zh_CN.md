@@ -1,6 +1,6 @@
 # ☕️ Java bindings for [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 
-[**🇨🇳中文**](./README.Zh_CN.md) | [**🌐English**](./README.md) | 🤖 [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-api.git) 
+[**🇨🇳中文**](./README.Zh_CN.md) | [**🌐English**](./README.md) | 🤖 [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git) 
 
 这是一个基于 🦙[`llama.cpp`](https://github.com/ggerganov/llama.cpp)  API开发的Java库，目标是更快速将大语言模型的能力集成到Java生态，本项目和其他语言版本库具有一样的功能。
 
@@ -24,7 +24,7 @@
 
 #### ConsoleQA
 
-这里提供了一个简单的聊天示例，你也可以参考 🤖️ [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-api.git) 进一步丰富你的应用。
+这里提供了一个简单的聊天示例，你也可以参考 🤖️ [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git) 进一步丰富你的应用。
 
 ```java
 public class ConsoleQA {
