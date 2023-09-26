@@ -75,6 +75,15 @@ public class Platform {
     }
 
     public synchronized static void loadLibraryResource() {
+        String libPathEnv = System.getProperty("octet.llama.lib");
+        if (StringUtils.isNotBlank(libPathEnv)) {
+            File libraryFileAbsolutePath = new File(libPathEnv);
+            if (libraryFileAbsolutePath.exists()) {
+                LIB_RESOURCE_PATH = libraryFileAbsolutePath.getAbsolutePath();
+                return;
+            }
+        }
+
         String libraryName;
         if (isMac()) {
             libraryName = "libllama.dylib";

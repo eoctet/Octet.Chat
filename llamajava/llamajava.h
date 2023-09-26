@@ -249,31 +249,11 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_printSystemInfo
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    samplingWithGreedy
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_samplingWithGreedy
-        (JNIEnv *, jclass, jobject, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    samplingWithMirostatV1
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_samplingWithMirostatV1
-        (JNIEnv *, jclass, jobject, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jfloat, jfloat, jfloat, jint, jobject);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    samplingWithMirostatV2
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_samplingWithMirostatV2
-        (JNIEnv *, jclass, jobject, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jfloat, jfloat, jfloat, jobject);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    sampling
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
-        (JNIEnv *, jclass, jobject, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jfloat, jint, jfloat, jfloat, jfloat, jint);
+        (JNIEnv *, jclass, jobject, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jint, jfloat,
+         jfloat, jfloat, jint, jfloat, jfloat, jfloat);
 
 #ifdef __cplusplus
 }

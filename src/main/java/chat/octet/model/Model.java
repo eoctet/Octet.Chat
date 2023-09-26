@@ -144,11 +144,10 @@ public class Model implements AutoCloseable {
     }
 
     public Iterable<Token> generate(GenerateParameter generateParams, UserContext userContext, String text) {
+        Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(userContext, "User context cannot be null");
         Preconditions.checkNotNull(text, "Text cannot be null");
-        Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
 
-        final Model model = this;
         return new Iterable<Token>() {
 
             private Generator generator = null;
@@ -157,7 +156,7 @@ public class Model implements AutoCloseable {
             @Override
             public Iterator<Token> iterator() {
                 if (generator == null) {
-                    generator = new Generator(model, generateParams, userContext, text);
+                    generator = new Generator(Model.this, generateParams, userContext, text);
                 }
                 return generator;
             }
@@ -173,9 +172,7 @@ public class Model implements AutoCloseable {
     public float[] embedding(String text) {
         Preconditions.checkNotNull(text, "Text cannot be null");
         Preconditions.checkArgument(modelParams.isEmbedding(), "Llama model must be created with embedding=True to call this method");
-
         int[] tokens = tokenize(new String(text.getBytes(StandardCharsets.UTF_8)), true);
-        //
         evaluate(tokens, 0, tokens.length);
         float[] embedding = LlamaService.getEmbeddings(llamaContext);
         printTimings();
@@ -194,22 +191,22 @@ public class Model implements AutoCloseable {
 
     protected int evaluate(int[] inputIds, int pastTokensSize, int inputLength) {
         int pastTokensTotal = pastTokensSize;
-        int evaluateTotalSize = 0;
 
-        while (pastTokensTotal < inputLength) {
-            int evaluateSize = inputLength - pastTokensSize;
+        int evaluateTotalSize;
+        int evaluateSize;
+        for (evaluateTotalSize = 0; pastTokensTotal < inputLength; evaluateTotalSize += evaluateSize) {
+            evaluateSize = inputLength - pastTokensSize;
             if (evaluateSize > this.batchSize) {
                 evaluateSize = this.batchSize;
             }
+
             int endIndex = evaluateSize + pastTokensSize;
-            //
             int[] batchTokens = ArrayUtils.subarray(inputIds, pastTokensSize, endIndex);
-            int returnCode = LlamaService.evaluate(llamaContext, batchTokens, evaluateSize, pastTokensSize, modelParams.getThreads());
+            int returnCode = LlamaService.evaluate(this.llamaContext, batchTokens, evaluateSize, pastTokensSize, this.modelParams.getThreads());
             if (returnCode != 0) {
                 throw new ModelException("Llama_eval returned " + returnCode);
             }
             pastTokensTotal += evaluateSize;
-            evaluateTotalSize += evaluateSize;
         }
         return evaluateTotalSize;
     }
@@ -217,79 +214,24 @@ public class Model implements AutoCloseable {
     protected int sampling(GenerateParameter generateParams, float[] logits, int[] inputIds, int inputLength) {
         int startIndex = Math.max(0, inputLength - getLastTokensSize());
         int[] lastTokens = ArrayUtils.subarray(inputIds, startIndex, inputLength);
-
-        int tokenId;
-        if (generateParams.getTemperature() == 0) {
-            tokenId = LlamaService.samplingWithGreedy(
-                    llamaContext,
-                    logits,
-                    lastTokens,
-                    lastTokensSize,
-                    generateParams.getRepeatPenalty(),
-                    generateParams.getFrequencyPenalty(),
-                    generateParams.getPresencePenalty(),
-                    generateParams.isPenalizeNl()
-            );
-        } else {
-            Float mirostatMu = 2.0f * generateParams.getMirostatTAU();
-            switch (generateParams.getMirostatMode()) {
-                case V1:
-                    int mirostatM = 100;
-                    tokenId = LlamaService.samplingWithMirostatV1(
-                            llamaContext,
-                            logits,
-                            lastTokens,
-                            lastTokensSize,
-                            generateParams.getRepeatPenalty(),
-                            generateParams.getFrequencyPenalty(),
-                            generateParams.getPresencePenalty(),
-                            generateParams.isPenalizeNl(),
-                            generateParams.getTemperature(),
-                            generateParams.getMirostatTAU(),
-                            generateParams.getMirostatETA(),
-                            mirostatM,
-                            mirostatMu
-                    );
-                    break;
-                case V2:
-                    tokenId = LlamaService.samplingWithMirostatV2(
-                            llamaContext,
-                            logits,
-                            lastTokens,
-                            lastTokensSize,
-                            generateParams.getRepeatPenalty(),
-                            generateParams.getFrequencyPenalty(),
-                            generateParams.getPresencePenalty(),
-                            generateParams.isPenalizeNl(),
-                            generateParams.getTemperature(),
-                            generateParams.getMirostatTAU(),
-                            generateParams.getMirostatETA(),
-                            mirostatMu
-                    );
-                    break;
-                case DISABLED:
-                default:
-                    int topK = generateParams.getTopK() <= 0 ? getVocabSize() : generateParams.getTopK();
-                    tokenId = LlamaService.sampling(
-                            llamaContext,
-                            logits,
-                            lastTokens,
-                            lastTokensSize,
-                            generateParams.getRepeatPenalty(),
-                            generateParams.getFrequencyPenalty(),
-                            generateParams.getPresencePenalty(),
-                            generateParams.isPenalizeNl(),
-                            generateParams.getTemperature(),
-                            topK,
-                            generateParams.getTopP(),
-                            generateParams.getTsf(),
-                            generateParams.getTypical(),
-                            1
-                    );
-                    break;
-            }
-        }
-        return tokenId;
+        return LlamaService.sampling(
+                llamaContext,
+                logits,
+                lastTokens,
+                lastTokensSize,
+                generateParams.getRepeatPenalty(),
+                generateParams.getFrequencyPenalty(),
+                generateParams.getPresencePenalty(),
+                generateParams.isPenalizeNl(),
+                generateParams.getMirostatMode().ordinal(),
+                generateParams.getMirostatTAU(),
+                generateParams.getMirostatETA(),
+                generateParams.getTemperature(),
+                generateParams.getTopK(),
+                generateParams.getTopP(),
+                generateParams.getTsf(),
+                generateParams.getTypical()
+        );
     }
 
     @Override

@@ -80,8 +80,8 @@ Customize a processor to adjust the probability distribution of words and contro
     logitBias.put(5546, "false");
     logitBias.put(12113, "5.89");
     LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
-    
-    ModelParameter modelParams = ModelParameter.builder()
+
+    GenerateParameter generateParams = GenerateParameter.builder()
             .logitsProcessorList(logitsProcessorList)
             .build();
     
@@ -96,8 +96,8 @@ Customize a controller to implement stop rule control for model inference, such 
 ```java
     long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
     StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
-    
-    ModelParameter modelParams = ModelParameter.builder()
+
+    GenerateParameter generateParams = GenerateParameter.builder()
             .stoppingCriteriaList(stopCriteriaList)
             .build();
     
@@ -121,7 +121,7 @@ Develop using JNI:
 - Same interface as the original project.
 - Optimize JVM Native performance.
 
-> `LlamaService.samplingXxxx(...)` sampling has been optimized to reduce performance losses caused by data transfer between JVM Native.
+> `LlamaService.sampling(...)` sampling has been optimized to reduce performance losses caused by data transfer between JVM Native.
 >
 >
 > More information: [`Java Docs`](docs/API.md)

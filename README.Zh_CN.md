@@ -80,8 +80,8 @@ public class ConsoleQA {
     logitBias.put(5546, "false");
     logitBias.put(12113, "5.89");
     LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
-    
-    ModelParameter modelParams = ModelParameter.builder()
+
+    GenerateParameter generateParams = GenerateParameter.builder()
             .logitsProcessorList(logitsProcessorList)
             .build();
 
@@ -96,8 +96,8 @@ public class ConsoleQA {
 ```java
     long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
     StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
-    
-    ModelParameter modelParams = ModelParameter.builder()
+
+    GenerateParameter generateParams = GenerateParameter.builder()
             .stoppingCriteriaList(stopCriteriaList)
             .build();
 
@@ -118,7 +118,7 @@ public class ConsoleQA {
 
 使用JNI开发，开放与原项目相同的接口并优化JVM Native性能。
 
-> `LlamaService.samplingXxxx(...)` 对采样进行了优化，以减少JVM Native之间数据传递带来的性能损失。
+> `LlamaService.sampling(...)` 对采样进行了优化，以减少JVM Native之间数据传递带来的性能损失。
 >
 >
 > 完整的文档请参考[`Java Docs`](docs/API.md)。

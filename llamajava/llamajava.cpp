@@ -434,7 +434,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenNL
  * Method:    tokenize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jbyteArray buf, jint textLength, jintArray tokensArrays,
+        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jbyteArray buf, jint textLength,
+         jintArray tokensArrays,
          jint maxTokens, jboolean addBos) {
     llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokensArrays, JNI_FALSE);
@@ -442,8 +443,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
     jsize len = env->GetArrayLength(buf);
     jbyte *buffer = new jbyte[len];
     env->GetByteArrayRegion(buf, 0, len, buffer);
-    char * text = (char *) buffer;
-    
+    char *text = (char *) buffer;
+
     int t = llama_tokenize(context, text, textLength, tokens, maxTokens, ToCBool(addBos));
     env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
     env->ReleaseByteArrayElements(buf, buffer, 0);
@@ -456,7 +457,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
  * Method:    tokenizeWithModel
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenizeWithModel
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer, jbyteArray buf, jint textLength, jintArray tokensArrays,
+        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer, jbyteArray buf, jint textLength,
+         jintArray tokensArrays,
          jint maxTokens, jboolean addBos) {
     llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokensArrays, JNI_FALSE);
@@ -464,7 +466,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenizeWithModel
     jsize len = env->GetArrayLength(buf);
     jbyte *buffer = new jbyte[len];
     env->GetByteArrayRegion(buf, 0, len, buffer);
-    char * text = (char *) buffer;
+    char *text = (char *) buffer;
 
     int t = llama_tokenize_with_model(model, text, textLength, tokens, maxTokens, ToCBool(addBos));
     env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
@@ -531,202 +533,6 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_printSystemInfo
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    samplingWithGreedy
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_samplingWithGreedy
-        (JNIEnv *env,
-         jclass thisClass,
-         jobject llama_context_pointer,
-         jfloatArray jLogits,
-         jintArray lastTokensArray,
-         jint lastTokensSize,
-         jfloat penalty,
-         jfloat alphaFrequency,
-         jfloat alphaPresence,
-         jboolean penalizeNL) {
-    //parse Java data types
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    llama_token *lastTokens = (llama_token *) env->GetIntArrayElements(lastTokensArray, JNI_FALSE);
-
-    //create token candidates
-    float *logits = env->GetFloatArrayElements(jLogits, JNI_FALSE);
-
-    int tokenNL = llama_token_nl(context);
-    float defaultNlLogit = logits[tokenNL];
-
-    llama_token_data_array *candidates = new llama_token_data_array();
-
-    int len = env->GetArrayLength(jLogits);
-    candidates->data = new llama_token_data[len];
-    candidates->size = len;
-    candidates->sorted = false;
-
-    for (int i = 0; i < len; ++i) {
-        candidates->data[i].id = i;
-        candidates->data[i].logit = logits[i];
-        candidates->data[i].p = 0.0;
-    }
-
-    //step 1: repetition_penalty
-    llama_sample_repetition_penalty(context, candidates, lastTokens, lastTokensSize, penalty);
-
-    //step 2: frequency_and_presence_penalties
-    llama_sample_frequency_and_presence_penalties(context, candidates, lastTokens, lastTokensSize, alphaFrequency,
-                                                  alphaPresence);
-
-    //step 3: process penalize_nl
-    if(!penalizeNL) {
-        candidates->data[tokenNL].logit = defaultNlLogit;
-    }
-
-    //step 4: llama_sample_token_greedy
-    int token = llama_sample_token_greedy(context, candidates);
-
-    //clear all resources
-    env->ReleaseIntArrayElements(lastTokensArray, lastTokens, 0);
-    env->ReleaseFloatArrayElements(jLogits, logits, 0);
-
-    return token;
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    samplingWithMirostatV1
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_samplingWithMirostatV1
-        (JNIEnv *env,
-         jclass thisClass,
-         jobject llama_context_pointer,
-         jfloatArray jLogits,
-         jintArray lastTokensArray,
-         jint lastTokensSize,
-         jfloat penalty,
-         jfloat alphaFrequency,
-         jfloat alphaPresence,
-         jboolean penalizeNL,
-         jfloat temperature,
-         jfloat mirostatTAU,
-         jfloat mirostatETA,
-         jint mirostatM,
-         jobject mirostatMu) {
-    //parse Java data types
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    llama_token *lastTokens = (llama_token *) env->GetIntArrayElements(lastTokensArray, JNI_FALSE);
-
-    //create token candidates
-    float *logits = env->GetFloatArrayElements(jLogits, JNI_FALSE);
-
-    int tokenNL = llama_token_nl(context);
-    float defaultNlLogit = logits[tokenNL];
-
-    llama_token_data_array *candidates = new llama_token_data_array();
-
-    int len = env->GetArrayLength(jLogits);
-    candidates->data = new llama_token_data[len];
-    candidates->size = len;
-    candidates->sorted = false;
-
-    for (int i = 0; i < len; ++i) {
-        candidates->data[i].id = i;
-        candidates->data[i].logit = logits[i];
-        candidates->data[i].p = 0.0;
-    }
-
-    //step 1: repetition_penalty
-    llama_sample_repetition_penalty(context, candidates, lastTokens, lastTokensSize, penalty);
-
-    //step 2: frequency_and_presence_penalties
-    llama_sample_frequency_and_presence_penalties(context, candidates, lastTokens, lastTokensSize, alphaFrequency,
-                                                  alphaPresence);
-
-    //step 3: process penalize_nl
-    if(!penalizeNL) {
-        candidates->data[tokenNL].logit = defaultNlLogit;
-    }
-
-    //step 4: llama_sample_temperature
-    llama_sample_temperature(context, candidates, temperature);
-
-    //step 5: llama_sample_token_mirostat
-    int token = llama_sample_token_mirostat(context, candidates, mirostatTAU, mirostatETA, mirostatM,
-                                            (float *) mirostatMu);
-
-    //clear all resources
-    env->ReleaseIntArrayElements(lastTokensArray, lastTokens, 0);
-    env->ReleaseFloatArrayElements(jLogits, logits, 0);
-
-    return token;
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    samplingWithMirostatV2
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_samplingWithMirostatV2
-        (JNIEnv *env,
-         jclass thisClass,
-         jobject llama_context_pointer,
-         jfloatArray jLogits,
-         jintArray lastTokensArray,
-         jint lastTokensSize,
-         jfloat penalty,
-         jfloat alphaFrequency,
-         jfloat alphaPresence,
-         jboolean penalizeNL,
-         jfloat temperature,
-         jfloat mirostatTAU,
-         jfloat mirostatETA,
-         jobject mirostatMu) {
-    //parse Java data types
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    llama_token *lastTokens = (llama_token *) env->GetIntArrayElements(lastTokensArray, JNI_FALSE);
-
-    //create token candidates
-    float *logits = env->GetFloatArrayElements(jLogits, JNI_FALSE);
-
-    int tokenNL = llama_token_nl(context);
-    float defaultNlLogit = logits[tokenNL];
-
-    llama_token_data_array *candidates = new llama_token_data_array();
-
-    int len = env->GetArrayLength(jLogits);
-    candidates->data = new llama_token_data[len];
-    candidates->size = len;
-    candidates->sorted = false;
-
-    for (int i = 0; i < len; ++i) {
-        candidates->data[i].id = i;
-        candidates->data[i].logit = logits[i];
-        candidates->data[i].p = 0.0;
-    }
-
-    //step 1: repetition_penalty
-    llama_sample_repetition_penalty(context, candidates, lastTokens, lastTokensSize, penalty);
-
-    //step 2: frequency_and_presence_penalties
-    llama_sample_frequency_and_presence_penalties(context, candidates, lastTokens, lastTokensSize, alphaFrequency,
-                                                  alphaPresence);
-
-    //step 3: process penalize_nl
-    if(!penalizeNL) {
-        candidates->data[tokenNL].logit = defaultNlLogit;
-    }
-
-    //step 4: llama_sample_temperature
-    llama_sample_temperature(context, candidates, temperature);
-
-    //step 5: llama_sample_token_mirostat_v2
-    int token = llama_sample_token_mirostat_v2(context, candidates, mirostatTAU, mirostatETA, (float *) mirostatMu);
-
-    //clear all resources
-    env->ReleaseIntArrayElements(lastTokensArray, lastTokens, 0);
-    env->ReleaseFloatArrayElements(jLogits, logits, 0);
-
-    return token;
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    sampling
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
@@ -740,12 +546,14 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
          jfloat alphaFrequency,
          jfloat alphaPresence,
          jboolean penalizeNL,
+         jint mirostatMode,
+         jfloat mirostatTAU,
+         jfloat mirostatETA,
          jfloat temperature,
          jint topK,
          jfloat topP,
          jfloat tsf,
-         jfloat typicalP,
-         jint minKeep) {
+         jfloat typical) {
     //parse Java data types
     llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
     llama_token *lastTokens = (llama_token *) env->GetIntArrayElements(lastTokensArray, JNI_FALSE);
@@ -769,36 +577,40 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         candidates->data[i].p = 0.0;
     }
 
-    //step 1: repetition_penalty
+    //repetition penalty
     llama_sample_repetition_penalty(context, candidates, lastTokens, lastTokensSize, penalty);
-
-    //step 2: frequency_and_presence_penalties
     llama_sample_frequency_and_presence_penalties(context, candidates, lastTokens, lastTokensSize, alphaFrequency,
                                                   alphaPresence);
 
-    //step 3: process penalize_nl
-    if(!penalizeNL) {
+    if (!penalizeNL) {
         candidates->data[tokenNL].logit = defaultNlLogit;
     }
 
-    //step 4: llama_sample_top_k
-    llama_sample_top_k(context, candidates, topK, minKeep);
-
-    //step 5: llama_sample_tail_free
-    llama_sample_tail_free(context, candidates, tsf, minKeep);
-
-    //step 6: llama_sample_typical
-    llama_sample_typical(context, candidates, typicalP, minKeep);
-
-    //step 7: llama_sample_top_p
-    llama_sample_top_p(context, candidates, topP, minKeep);
-
-    //step 8: llama_sample_temperature
-    llama_sample_temperature(context, candidates, temperature);
-
-    //step 9: llama_sample_token
-    int token = llama_sample_token(context, candidates);
-
+    int token;
+    if (temperature == 0) {
+        token = llama_sample_token_greedy(context, candidates);
+    } else {
+        float mu = 2.0 * mirostatTAU;
+        float *mirostatMu = &mu;
+        if (mirostatMode == 1) {
+            int mirostatM = 100;
+            llama_sample_temperature(context, candidates, temperature);
+            token = llama_sample_token_mirostat(context, candidates, mirostatTAU, mirostatETA, mirostatM,
+                                                mirostatMu);
+        } else if (mirostatMode == 2) {
+            llama_sample_temperature(context, candidates, temperature);
+            token = llama_sample_token_mirostat_v2(context, candidates, mirostatTAU, mirostatETA,
+                                                   mirostatMu);
+        } else {
+            int top_k = topK <= 0 ? llama_n_vocab(context) : topK;
+            llama_sample_top_k(context, candidates, top_k, 1);
+            llama_sample_tail_free(context, candidates, tsf, 1);
+            llama_sample_typical(context, candidates, typical, 1);
+            llama_sample_top_p(context, candidates, topP, 1);
+            llama_sample_temperature(context, candidates, temperature);
+            token = llama_sample_token(context, candidates);
+        }
+    }
     //clear all resources
     env->ReleaseIntArrayElements(lastTokensArray, lastTokens, 0);
     env->ReleaseFloatArrayElements(jLogits, logits, 0);

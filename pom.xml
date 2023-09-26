@@ -7,7 +7,28 @@
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
+
+    <name>llama-java-core</name>
+    <description>Another simple Java bindings for llama.cpp, The goal is to integrate the capabilities of LLMs into the
+        Java ecosystem.
+    </description>
+    <url>https://github.com/eoctet/llama-java-core</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>William</name>
+            <url>https://github.com/eoctet</url>
+            <organization>Stacks Tech</organization>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -15,26 +36,23 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <maven-compiler.version>3.8.1</maven-compiler.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
-        <lombok.version>1.18.22</lombok.version>
-        <guava.version>31.1-jre</guava.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3.version}</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+            <version>1.18.26</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
+            <version>31.1-jre</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -49,7 +67,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.11.4</version>
+            <version>2.15.1</version>
         </dependency>
     </dependencies>
 
