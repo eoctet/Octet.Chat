@@ -19,7 +19,7 @@
     <dependency>
         <groupId>chat.octet</groupId>
         <artifactId>llama-java-core</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
     </dependency>
 ```
 
@@ -129,6 +129,11 @@ public class ConsoleQA {
 
 > 如果需要支持`GPU`或更加灵活的编译方式，请参考 `llama.cpp` **Build** 文档。
 
+```ini
+# 加载外部库文件
+
+-Doctet.llama.lib=<YOUR_LIB_PATH>
+```
 
 
 ## 问题反馈

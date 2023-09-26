@@ -19,7 +19,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
     <dependency>
         <groupId>chat.octet</groupId>
         <artifactId>llama-java-core</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
     </dependency>
 ```
 
@@ -132,7 +132,11 @@ By default, each system version library is included.
 
 > If you need to support `GPU` or more flexible compilation methods, please refer to `llama.cpp`
 
+```ini
+# (Optional) Load the external library file
 
+-Doctet.llama.lib=<YOUR_LIB_PATH>
+```
 
 ## Feedback
 
