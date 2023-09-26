@@ -26,7 +26,7 @@ public final class Generator implements Iterator<Token> {
         this.model = model;
         this.generateParams = generateParams;
         this.userContext = userContext;
-        this.decoder = new AutoDecoder(model);
+        this.decoder = new AutoDecoder();
 
         int[] tokens = StringUtils.isNotBlank(text) ? model.tokenize(text, true) : new int[]{model.getTokenBOS()};
         if (tokens.length >= model.getContextSize()) {
@@ -88,7 +88,7 @@ public final class Generator implements Iterator<Token> {
                 userContext.getInputLength()
         );
         userContext.addPastTokensSize(evaluateTotalSize);
-        userContext.saveScores(model.getLogits(), evaluateTotalSize);
+        userContext.saveScores(LlamaService.getLogits(), evaluateTotalSize);
 
         float[] logits = userContext.getScores();
         // execute logits processor

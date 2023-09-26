@@ -40,29 +40,22 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree
  * Class:     chat_octet_model_LlamaService
  * Method:    loadLlamaModelFromFile
  */
-JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
         (JNIEnv *, jclass, jstring, jobject);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    createNewContextWithModel
  */
-JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_createNewContextWithModel
-        (JNIEnv *, jclass, jobject, jobject);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    releaseLlamaModel
- */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_releaseLlamaModel
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_createNewContextWithModel
         (JNIEnv *, jclass, jobject);
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    releaseLlamaContext
+ * Method:    release
  */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_releaseLlamaContext
-        (JNIEnv *, jclass, jobject);
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
@@ -90,155 +83,154 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
  * Method:    getVocabSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getEmbeddingSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getEmbeddingSize
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getVocabType
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getModelVocabSize
- * Signature: (Lchat/octet/llama/LlamaLibService/LlamaModel;)I
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelVocabSize
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getModelContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelContextSize
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getModelEmbeddingSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelEmbeddingSize
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    loadLoraModelFromFile
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
-        (JNIEnv *, jclass, jobject, jstring, jstring, jint);
+        (JNIEnv *, jclass, jstring, jstring, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    evaluate
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_evaluate
-        (JNIEnv *, jclass, jobject, jintArray, jint, jint, jint);
+        (JNIEnv *, jclass, jintArray, jint, jint, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getLogits
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getEmbeddings
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenText
  */
 JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getTokenText
-        (JNIEnv *, jclass, jobject, jint);
+        (JNIEnv *, jclass, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenScore
  */
 JNIEXPORT jfloat JNICALL Java_chat_octet_model_LlamaService_getTokenScore
-        (JNIEnv *, jclass, jobject, jint);
+        (JNIEnv *, jclass, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenType
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
-        (JNIEnv *, jclass, jobject, jint);
+        (JNIEnv *, jclass, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenBOS
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenEOS
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenNL
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenNL
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    tokenize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
-        (JNIEnv *, jclass, jobject, jbyteArray, jint, jintArray, jint, jboolean);
+        (JNIEnv *, jclass, jbyteArray, jint, jintArray, jint, jboolean);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    tokenizeWithModel
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenizeWithModel
-        (JNIEnv *, jclass, jobject, jbyteArray, jint, jintArray, jint, jboolean);
+        (JNIEnv *, jclass, jbyteArray, jint, jintArray, jint, jboolean);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenToPiece
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPiece
-        (JNIEnv *, jclass, jobject, jint, jbyteArray, jint);
+        (JNIEnv *, jclass, jint, jbyteArray, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    getTokenToPieceWithModel
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPieceWithModel
-        (JNIEnv *, jclass, jobject, jint, jbyteArray, jint);
+        (JNIEnv *, jclass, jint, jbyteArray, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    printTimings
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_printTimings
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass);
 
 /*
  * Class:     chat_octet_model_LlamaService
@@ -252,7 +244,7 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_printSystemInfo
  * Method:    sampling
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
-        (JNIEnv *, jclass, jobject, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jint, jfloat,
+        (JNIEnv *, jclass, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jint, jfloat,
          jfloat, jfloat, jint, jfloat, jfloat, jfloat);
 
 #ifdef __cplusplus

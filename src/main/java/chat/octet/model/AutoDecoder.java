@@ -8,19 +8,17 @@ import java.util.Arrays;
 
 public class AutoDecoder {
 
-    private final Model model;
     private final byte[] tokenBytesBuffer;
     private int length;
     private int index;
 
-    public AutoDecoder(Model model) {
-        this.model = model;
+    public AutoDecoder() {
         this.tokenBytesBuffer = new byte[8];
     }
 
     public String decodeToken(int token) {
         byte[] buffer = new byte[64];
-        int size = LlamaService.getTokenToPiece(model.getLlamaContext(), token, buffer, buffer.length);
+        int size = LlamaService.getTokenToPiece(token, buffer, buffer.length);
         byte code = buffer[0];
 
         if (size == 1 && !Character.isValidCodePoint(code)) {
@@ -46,7 +44,7 @@ public class AutoDecoder {
         int length = 0;
         for (int token : tokens) {
             byte[] bytes = new byte[64];
-            int size = LlamaService.getTokenToPiece(model.getLlamaContext(), token, bytes, bytes.length);
+            int size = LlamaService.getTokenToPiece(token, bytes, bytes.length);
             System.arraycopy(bytes, 0, buffer, length, size);
             length += size;
         }

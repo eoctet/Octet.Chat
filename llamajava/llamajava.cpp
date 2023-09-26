@@ -5,6 +5,12 @@
 
 #include "llamajava.h"
 
+//Global ref
+llama_model *llama_model_global;
+llama_context *llama_context_global;
+
+jclass MODEL_EXCEPTION;
+
 //Class LlamaContextParams:
 jclass LLAMA_CONTEXT_PARAMS_CLASS;
 jmethodID METHOD_INIT_CONTEXT_PARAMS;
@@ -79,6 +85,8 @@ struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject context_p
 */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initLocal
         (JNIEnv *env, jclass thisClass) {
+
+    MODEL_EXCEPTION = env->FindClass("chat/octet/model/exceptions/ModelException");
 
     //Class LlamaContextParams
     LLAMA_CONTEXT_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaContextParams");
@@ -156,57 +164,42 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree
  * Class:     chat_octet_model_LlamaService
  * Method:    loadLlamaModelFromFile
  */
-JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
         (JNIEnv *env, jclass thisClass, jstring modelPath, jobject llamaContextParams) {
     struct llama_context_params params = GetLlamaContextParams(env, llamaContextParams);
+    llama_model_global = llama_load_model_from_file(ToCString(env, modelPath), params);
 
-    llama_model *model = llama_load_model_from_file(ToCString(env, modelPath), params);
-    if (!model) {
-        return nullptr;
+    if (!llama_model_global) {
+        env->ThrowNew(MODEL_EXCEPTION, "Load model failed");
     }
-    jobject llama_model_pointer = NewObjectPointer(env, model);
-    return llama_model_pointer;
 }
 
 /*
  * Class:     chat_octet_model_LlamaService
  * Method:    createNewContextWithModel
  */
-JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_createNewContextWithModel
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer, jobject llamaContextParams) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_createNewContextWithModel
+        (JNIEnv *env, jclass thisClass, jobject llamaContextParams) {
+    struct llama_context_params params = GetLlamaContextParams(env, llamaContextParams);
+    llama_context_global = llama_new_context_with_model(llama_model_global, params);
 
-    llama_context_params params = GetLlamaContextParams(env, llamaContextParams);
-
-    llama_context *context = llama_new_context_with_model(model, params);
-
-    if (!context) {
-        return nullptr;
+    if (!llama_context_global) {
+        env->ThrowNew(MODEL_EXCEPTION, "Create llama context failed");
     }
-    jobject llama_context_pointer = NewObjectPointer(env, context);
-    return llama_context_pointer;
 }
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    releaseLlamaModel
+ * Method:    release
  */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_releaseLlamaModel
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
-    llama_free_model(model);
-    env->DeleteLocalRef(llama_model_pointer);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    releaseLlamaContext
- */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_releaseLlamaContext
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    llama_free(context);
-    env->DeleteLocalRef(llama_context_pointer);
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
+        (JNIEnv *env, jclass thisClass) {
+    if (NULL != llama_model_global) {
+        llama_free_model(llama_model_global);
+    }
+    if (NULL != llama_context_global) {
+        llama_free(llama_context_global);
+    }
 }
 
 /*
@@ -241,9 +234,8 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
  * Method:    getVocabSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_n_vocab(context);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_n_vocab(llama_context_global);
 }
 
 /*
@@ -251,9 +243,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
  * Method:    getContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_n_ctx(context);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_n_ctx(llama_context_global);
 }
 
 /*
@@ -261,9 +252,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
  * Method:    getEmbeddingSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getEmbeddingSize
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_n_embd(context);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_n_embd(llama_context_global);
 }
 
 /*
@@ -271,9 +261,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getEmbeddingSize
  * Method:    getVocabType
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_vocab_type(context);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_vocab_type(llama_context_global);
 }
 
 /*
@@ -281,9 +270,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
  * Method:    getModelVocabSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelVocabSize
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
-    return llama_model_n_vocab(model);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_model_n_vocab(llama_model_global);
 }
 
 /*
@@ -291,9 +279,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelVocabSize
  * Method:    getModelContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelContextSize
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
-    return llama_model_n_ctx(model);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_model_n_ctx(llama_model_global);
 }
 
 /*
@@ -301,9 +288,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelContextSize
  * Method:    getModelEmbeddingSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelEmbeddingSize
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
-    return llama_model_n_embd(model);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_model_n_embd(llama_model_global);
 }
 
 /*
@@ -311,10 +297,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelEmbeddingSize
  * Method:    loadLoraModelFromFile
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer, jstring loraPath, jstring baseModelPath,
+        (JNIEnv *env, jclass thisClass, jstring loraPath, jstring baseModelPath,
          jint threads) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
-    return llama_model_apply_lora_from_file(model, ToCString(env, loraPath), ToCString(env, baseModelPath),
+    if (!llama_model_global) {
+        env->ThrowNew(MODEL_EXCEPTION, "llama model cannot be null");
+        return -1;
+    }
+    return llama_model_apply_lora_from_file(llama_model_global, ToCString(env, loraPath), ToCString(env, baseModelPath),
                                             threads);
 }
 
@@ -323,12 +312,11 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
  * Method:    evaluate
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_evaluate
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jintArray tokensArrays, jint nTokens, jint nPast,
+        (JNIEnv *env, jclass thisClass, jintArray tokensArrays, jint nTokens, jint nPast,
          jint threads) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokensArrays, JNI_FALSE);
 
-    int code = llama_eval(context, tokens, nTokens, nPast, threads);
+    int code = llama_eval(llama_context_global, tokens, nTokens, nPast, threads);
     env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
 
     return code;
@@ -339,11 +327,9 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_evaluate
  * Method:    getLogits
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-
-    float *logits = llama_get_logits(context);
-    int vocab_size = llama_n_vocab(context);
+        (JNIEnv *env, jclass thisClass) {
+    float *logits = llama_get_logits(llama_context_global);
+    int vocab_size = llama_n_vocab(llama_context_global);
 
     jfloatArray arrays = env->NewFloatArray(vocab_size);
     env->SetFloatArrayRegion(arrays, 0, vocab_size, logits);
@@ -356,11 +342,9 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
  * Method:    getEmbeddings
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-
-    float *embeddings = llama_get_embeddings(context);
-    int embd_size = llama_n_embd(context);
+        (JNIEnv *env, jclass thisClass) {
+    float *embeddings = llama_get_embeddings(llama_context_global);
+    int embd_size = llama_n_embd(llama_context_global);
 
     jfloatArray arrays = env->NewFloatArray(embd_size);
     env->SetFloatArrayRegion(arrays, 0, embd_size, embeddings);
@@ -373,10 +357,8 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
  * Method:    getTokenText
  */
 JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getTokenText
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jint token) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    jstring result = ToJString(env, llama_token_get_text(context, token));
-    return result;
+        (JNIEnv *env, jclass thisClass, jint token) {
+    return ToJString(env, llama_token_get_text(llama_context_global, token));
 }
 
 /*
@@ -384,9 +366,8 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getTokenText
  * Method:    getTokenScore
  */
 JNIEXPORT jfloat JNICALL Java_chat_octet_model_LlamaService_getTokenScore
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jint token) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_token_get_score(context, token);
+        (JNIEnv *env, jclass thisClass, jint token) {
+    return llama_token_get_score(llama_context_global, token);
 }
 
 /*
@@ -394,9 +375,8 @@ JNIEXPORT jfloat JNICALL Java_chat_octet_model_LlamaService_getTokenScore
  * Method:    getTokenType
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jint token) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_token_get_type(context, token);
+        (JNIEnv *env, jclass thisClass, jint token) {
+    return llama_token_get_type(llama_context_global, token);
 }
 
 /*
@@ -404,9 +384,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
  * Method:    getTokenBOS
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_token_bos(context);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_token_bos(llama_context_global);
 }
 
 /*
@@ -414,9 +393,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
  * Method:    getTokenEOS
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_token_eos(context);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_token_eos(llama_context_global);
 }
 
 /*
@@ -424,9 +402,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
  * Method:    getTokenNL
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenNL
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    return llama_token_nl(context);
+        (JNIEnv *env, jclass thisClass) {
+    return llama_token_nl(llama_context_global);
 }
 
 /*
@@ -434,10 +411,9 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenNL
  * Method:    tokenize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jbyteArray buf, jint textLength,
+        (JNIEnv *env, jclass thisClass, jbyteArray buf, jint textLength,
          jintArray tokensArrays,
          jint maxTokens, jboolean addBos) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokensArrays, JNI_FALSE);
 
     jsize len = env->GetArrayLength(buf);
@@ -445,7 +421,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
     env->GetByteArrayRegion(buf, 0, len, buffer);
     char *text = (char *) buffer;
 
-    int t = llama_tokenize(context, text, textLength, tokens, maxTokens, ToCBool(addBos));
+    int t = llama_tokenize(llama_context_global, text, textLength, tokens, maxTokens, ToCBool(addBos));
     env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
     env->ReleaseByteArrayElements(buf, buffer, 0);
 
@@ -457,10 +433,9 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
  * Method:    tokenizeWithModel
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenizeWithModel
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer, jbyteArray buf, jint textLength,
+        (JNIEnv *env, jclass thisClass, jbyteArray buf, jint textLength,
          jintArray tokensArrays,
          jint maxTokens, jboolean addBos) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokensArrays, JNI_FALSE);
 
     jsize len = env->GetArrayLength(buf);
@@ -468,7 +443,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenizeWithModel
     env->GetByteArrayRegion(buf, 0, len, buffer);
     char *text = (char *) buffer;
 
-    int t = llama_tokenize_with_model(model, text, textLength, tokens, maxTokens, ToCBool(addBos));
+    int t = llama_tokenize_with_model(llama_model_global, text, textLength, tokens, maxTokens, ToCBool(addBos));
     env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
     env->ReleaseByteArrayElements(buf, buffer, 0);
 
@@ -480,13 +455,11 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenizeWithModel
  * Method:    getTokenToPiece
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPiece
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer, jint token, jbyteArray buf, jint length) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-
+        (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint length) {
     jsize len = env->GetArrayLength(buf);
     jbyte *buffer = new jbyte[len];
 
-    int size = llama_token_to_piece(context, token, (char *) buffer, length);
+    int size = llama_token_to_piece(llama_context_global, token, (char *) buffer, length);
     env->ReleaseByteArrayElements(buf, buffer, 0);
 
     return size;
@@ -497,13 +470,11 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPiece
  * Method:    getTokenToPieceWithModel
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPieceWithModel
-        (JNIEnv *env, jclass thisClass, jobject llama_model_pointer, jint token, jbyteArray buf, jint length) {
-    llama_model *model = (llama_model *) GetObjectPointer(env, llama_model_pointer);
-
+        (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint length) {
     jsize len = env->GetArrayLength(buf);
     jbyte *buffer = new jbyte[len];
 
-    int size = llama_token_to_piece_with_model(model, token, (char *) buffer, length);
+    int size = llama_token_to_piece_with_model(llama_model_global, token, (char *) buffer, length);
     env->ReleaseByteArrayElements(buf, buffer, 0);
 
     return size;
@@ -514,10 +485,9 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPieceWithMod
  * Method:    printTimings
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_printTimings
-        (JNIEnv *env, jclass thisClass, jobject llama_context_pointer) {
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
-    llama_print_timings(context);
-    llama_reset_timings(context);
+        (JNIEnv *env, jclass thisClass) {
+    llama_print_timings(llama_context_global);
+    llama_reset_timings(llama_context_global);
 }
 
 /*
@@ -527,8 +497,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_printTimings
 JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_printSystemInfo
         (JNIEnv *env, jclass thisClass) {
     const char *system_info = llama_print_system_info();
-    jstring info = env->NewStringUTF(system_info);
-    return info;
+    return env->NewStringUTF(system_info);
 }
 
 /*
@@ -538,7 +507,6 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_printSystemInfo
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         (JNIEnv *env,
          jclass thisClass,
-         jobject llama_context_pointer,
          jfloatArray jLogits,
          jintArray lastTokensArray,
          jint lastTokensSize,
@@ -555,13 +523,12 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
          jfloat tsf,
          jfloat typical) {
     //parse Java data types
-    llama_context *context = (llama_context *) GetObjectPointer(env, llama_context_pointer);
     llama_token *lastTokens = (llama_token *) env->GetIntArrayElements(lastTokensArray, JNI_FALSE);
 
     //create token candidates
     float *logits = env->GetFloatArrayElements(jLogits, JNI_FALSE);
 
-    int tokenNL = llama_token_nl(context);
+    int tokenNL = llama_token_nl(llama_context_global);
     float defaultNlLogit = logits[tokenNL];
 
     llama_token_data_array *candidates = new llama_token_data_array();
@@ -578,8 +545,9 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     }
 
     //repetition penalty
-    llama_sample_repetition_penalty(context, candidates, lastTokens, lastTokensSize, penalty);
-    llama_sample_frequency_and_presence_penalties(context, candidates, lastTokens, lastTokensSize, alphaFrequency,
+    llama_sample_repetition_penalty(llama_context_global, candidates, lastTokens, lastTokensSize, penalty);
+    llama_sample_frequency_and_presence_penalties(llama_context_global, candidates, lastTokens, lastTokensSize,
+                                                  alphaFrequency,
                                                   alphaPresence);
 
     if (!penalizeNL) {
@@ -588,27 +556,27 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
 
     int token;
     if (temperature == 0) {
-        token = llama_sample_token_greedy(context, candidates);
+        token = llama_sample_token_greedy(llama_context_global, candidates);
     } else {
         float mu = 2.0 * mirostatTAU;
         float *mirostatMu = &mu;
         if (mirostatMode == 1) {
             int mirostatM = 100;
-            llama_sample_temperature(context, candidates, temperature);
-            token = llama_sample_token_mirostat(context, candidates, mirostatTAU, mirostatETA, mirostatM,
+            llama_sample_temperature(llama_context_global, candidates, temperature);
+            token = llama_sample_token_mirostat(llama_context_global, candidates, mirostatTAU, mirostatETA, mirostatM,
                                                 mirostatMu);
         } else if (mirostatMode == 2) {
-            llama_sample_temperature(context, candidates, temperature);
-            token = llama_sample_token_mirostat_v2(context, candidates, mirostatTAU, mirostatETA,
+            llama_sample_temperature(llama_context_global, candidates, temperature);
+            token = llama_sample_token_mirostat_v2(llama_context_global, candidates, mirostatTAU, mirostatETA,
                                                    mirostatMu);
         } else {
-            int top_k = topK <= 0 ? llama_n_vocab(context) : topK;
-            llama_sample_top_k(context, candidates, top_k, 1);
-            llama_sample_tail_free(context, candidates, tsf, 1);
-            llama_sample_typical(context, candidates, typical, 1);
-            llama_sample_top_p(context, candidates, topP, 1);
-            llama_sample_temperature(context, candidates, temperature);
-            token = llama_sample_token(context, candidates);
+            int top_k = topK <= 0 ? llama_n_vocab(llama_context_global) : topK;
+            llama_sample_top_k(llama_context_global, candidates, top_k, 1);
+            llama_sample_tail_free(llama_context_global, candidates, tsf, 1);
+            llama_sample_typical(llama_context_global, candidates, typical, 1);
+            llama_sample_top_p(llama_context_global, candidates, topP, 1);
+            llama_sample_temperature(llama_context_global, candidates, temperature);
+            token = llama_sample_token(llama_context_global, candidates);
         }
     }
     //clear all resources

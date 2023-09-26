@@ -1,9 +1,7 @@
 package chat.octet.model;
 
 
-import chat.octet.model.beans.LlamaContext;
 import chat.octet.model.beans.LlamaContextParams;
-import chat.octet.model.beans.LlamaModel;
 import chat.octet.model.beans.Token;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
@@ -27,35 +25,23 @@ import java.util.Iterator;
  * @author william
  * @since 1.0
  */
+@Getter
 @Slf4j
 public class Model implements AutoCloseable {
-
-    private final LlamaModel llamaModel;
-    @Getter
-    private final LlamaContext llamaContext;
-    private final LlamaContextParams llamaContextParams;
-
-    //llama context parameters
-    @Getter
     private final ModelParameter modelParams;
-    @Getter
     private final int contextSize;
-    @Getter
     private final int embeddingSize;
-    @Getter
     private final int vocabSize;
-    @Getter
     private final int tokenBOS;
-    @Getter
     private final int tokenEOS;
-    @Getter
     private final int tokenNL;
-    @Getter
     private final int batchSize;
-    @Getter
     private final int lastTokensSize;
-    @Getter
     private final String modelName;
+
+    public Model(String modelPath) {
+        this(ModelParameter.builder().modelPath(modelPath).build());
+    }
 
     public Model(ModelParameter modelParams) {
         Preconditions.checkNotNull(modelParams, "Model parameters cannot be null");
@@ -68,32 +54,27 @@ public class Model implements AutoCloseable {
         this.modelParams = modelParams;
         this.modelName = modelParams.getModelName();
         //setting context parameters
-        this.llamaContextParams = LlamaService.getLlamaContextDefaultParams();
-        settingLlamaContextParameters(modelParams);
-
-        this.llamaModel = LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), this.llamaContextParams);
-        if (this.llamaModel == null) {
-            throw new ModelException("Load model failed");
-        }
+        LlamaContextParams llamaContextParams = settingLlamaContextParameters(modelParams);
+        LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaContextParams);
 
         //apple lora from file
         if (StringUtils.isNotBlank(modelParams.getLoraPath())) {
             if (!Files.exists(new File(modelParams.getLoraPath()).toPath())) {
                 throw new ModelException("Lora model file is not exists, please check the file path");
             }
-            int status = LlamaService.loadLoraModelFromFile(llamaModel, modelParams.getLoraPath(), modelParams.getLoraBase(), modelParams.getThreads());
+            int status = LlamaService.loadLoraModelFromFile(modelParams.getLoraPath(), modelParams.getLoraBase(), modelParams.getThreads());
             if (status != 0) {
                 throw new ModelException(String.format("Failed to apply LoRA from lora path: %s to base path: %s", modelParams.getLoraPath(), modelParams.getLoraBase()));
             }
         }
 
-        this.llamaContext = LlamaService.createNewContextWithModel(llamaModel, this.llamaContextParams);
-        this.contextSize = LlamaService.getContextSize(llamaContext);
-        this.embeddingSize = LlamaService.getEmbeddingSize(llamaContext);
-        this.vocabSize = LlamaService.getVocabSize(llamaContext);
-        this.tokenBOS = LlamaService.getTokenBOS(llamaContext);
-        this.tokenEOS = LlamaService.getTokenEOS(llamaContext);
-        this.tokenNL = LlamaService.getTokenNL(llamaContext);
+        LlamaService.createNewContextWithModel(llamaContextParams);
+        this.contextSize = LlamaService.getContextSize();
+        this.embeddingSize = LlamaService.getEmbeddingSize();
+        this.vocabSize = LlamaService.getVocabSize();
+        this.tokenBOS = LlamaService.getTokenBOS();
+        this.tokenEOS = LlamaService.getTokenEOS();
+        this.tokenNL = LlamaService.getTokenNL();
         this.batchSize = modelParams.getBatchSize();
         this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? contextSize : modelParams.getLastNTokensSize();
 
@@ -104,38 +85,36 @@ public class Model implements AutoCloseable {
         log.info(MessageFormat.format("model parameters: {0}", modelParams));
     }
 
-    private void settingLlamaContextParameters(ModelParameter modelParams) {
-        this.llamaContextParams.ctx = modelParams.getContextSize();
-        this.llamaContextParams.seed = modelParams.getSeed();
-        this.llamaContextParams.gpuLayers = modelParams.getGpuLayers();
-        this.llamaContextParams.f16KV = modelParams.isF16KV();
-        this.llamaContextParams.logitsAll = modelParams.isLogitsAll();
-        this.llamaContextParams.vocabOnly = modelParams.isVocabOnly();
-        this.llamaContextParams.embedding = modelParams.isEmbedding();
-        this.llamaContextParams.lowVram = modelParams.isLowVram();
-        this.llamaContextParams.ropeFreqBase = modelParams.getRopeFreqBase();
-        this.llamaContextParams.ropeFreqScale = modelParams.getRopeFreqScale();
+    private LlamaContextParams settingLlamaContextParameters(ModelParameter modelParams) {
+        LlamaContextParams llamaContextParams = LlamaService.getLlamaContextDefaultParams();
+        llamaContextParams.ctx = modelParams.getContextSize();
+        llamaContextParams.seed = modelParams.getSeed();
+        llamaContextParams.gpuLayers = modelParams.getGpuLayers();
+        llamaContextParams.f16KV = modelParams.isF16KV();
+        llamaContextParams.logitsAll = modelParams.isLogitsAll();
+        llamaContextParams.vocabOnly = modelParams.isVocabOnly();
+        llamaContextParams.embedding = modelParams.isEmbedding();
+        llamaContextParams.lowVram = modelParams.isLowVram();
+        llamaContextParams.ropeFreqBase = modelParams.getRopeFreqBase();
+        llamaContextParams.ropeFreqScale = modelParams.getRopeFreqScale();
         boolean mmap = (StringUtils.isBlank(modelParams.getLoraPath()) && modelParams.isMmap());
         if (mmap && LlamaService.isMmapSupported()) {
-            this.llamaContextParams.mmap = true;
+            llamaContextParams.mmap = true;
         }
         boolean mlock = modelParams.isMlock();
         if (mlock && LlamaService.isMlockSupported()) {
-            this.llamaContextParams.mlock = true;
+            llamaContextParams.mlock = true;
         }
         if (modelParams.getMainGpu() != null) {
-            this.llamaContextParams.mainGpu = modelParams.getMainGpu();
+            llamaContextParams.mainGpu = modelParams.getMainGpu();
         }
         if (modelParams.getTensorSplit() != null) {
-            this.llamaContextParams.tensorSplit = modelParams.getTensorSplit();
+            llamaContextParams.tensorSplit = modelParams.getTensorSplit();
         }
         if (modelParams.getMulMatQ() != null) {
-            this.llamaContextParams.mulMatQ = modelParams.getMulMatQ();
+            llamaContextParams.mulMatQ = modelParams.getMulMatQ();
         }
-    }
-
-    public float[] getLogits() {
-        return LlamaService.getLogits(llamaContext);
+        return llamaContextParams;
     }
 
     public Iterable<Token> generate(GenerateParameter generateParams, String text) {
@@ -165,7 +144,7 @@ public class Model implements AutoCloseable {
 
     public void printTimings() {
         if (modelParams.isVerbose()) {
-            LlamaService.printTimings(llamaContext);
+            LlamaService.printTimings();
         }
     }
 
@@ -174,15 +153,16 @@ public class Model implements AutoCloseable {
         Preconditions.checkArgument(modelParams.isEmbedding(), "Llama model must be created with embedding=True to call this method");
         int[] tokens = tokenize(new String(text.getBytes(StandardCharsets.UTF_8)), true);
         evaluate(tokens, 0, tokens.length);
-        float[] embedding = LlamaService.getEmbeddings(llamaContext);
+        float[] embedding = LlamaService.getEmbeddings();
         printTimings();
         return embedding;
     }
 
     public int[] tokenize(String text, boolean addBos) {
+        Preconditions.checkNotNull(text, "Text cannot be null");
         int[] tokens = new int[getContextSize()];
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-        int nextTokens = LlamaService.tokenizeWithModel(llamaModel, textBytes, textBytes.length, tokens, getContextSize(), addBos);
+        int nextTokens = LlamaService.tokenizeWithModel(textBytes, textBytes.length, tokens, getContextSize(), addBos);
         if (nextTokens < 0) {
             throw new ModelException(String.format("failed to tokenize: %s, next_tokens: %s", text, nextTokens));
         }
@@ -202,7 +182,7 @@ public class Model implements AutoCloseable {
 
             int endIndex = evaluateSize + pastTokensSize;
             int[] batchTokens = ArrayUtils.subarray(inputIds, pastTokensSize, endIndex);
-            int returnCode = LlamaService.evaluate(this.llamaContext, batchTokens, evaluateSize, pastTokensSize, this.modelParams.getThreads());
+            int returnCode = LlamaService.evaluate(batchTokens, evaluateSize, pastTokensSize, this.modelParams.getThreads());
             if (returnCode != 0) {
                 throw new ModelException("Llama_eval returned " + returnCode);
             }
@@ -215,7 +195,6 @@ public class Model implements AutoCloseable {
         int startIndex = Math.max(0, inputLength - getLastTokensSize());
         int[] lastTokens = ArrayUtils.subarray(inputIds, startIndex, inputLength);
         return LlamaService.sampling(
-                llamaContext,
                 logits,
                 lastTokens,
                 lastTokensSize,
@@ -236,8 +215,7 @@ public class Model implements AutoCloseable {
 
     @Override
     public void close() {
-        LlamaService.releaseLlamaContext(llamaContext);
-        LlamaService.releaseLlamaModel(llamaModel);
+        LlamaService.release();
     }
 
     @Override
