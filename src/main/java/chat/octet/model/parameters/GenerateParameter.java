@@ -9,10 +9,10 @@ import lombok.ToString;
 import javax.annotation.Nullable;
 
 /**
- * Sampling parameters<br/>
- * <b>Llama cpp<b/>
+ * Sampling parameters
+ * Llama cpp
  * <a href="https://github.com/ggerganov/llama.cpp/blob/master/examples/main/README.md">Llama cpp docs</a>.
- * <b>transformers documentation<b/>
+ * transformers documentation
  * <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">Transformers docs</a>.
  *
  * @author william
