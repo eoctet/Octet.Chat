@@ -57,7 +57,7 @@ elif [ "$OS_VER" == "Linux" ]; then
 
   cd "$LLAMA_CPP_DIR"
   make clean
-  make libllama.so
+  make LLAMA_OPENBLAS=1 libllama.so
   if [ -f "libllama.so" ]; then
     mv libllama.so "$LLAMA_LIBS_DIR"
 #    rm -rf "$LLAMA_CPP_DIR"

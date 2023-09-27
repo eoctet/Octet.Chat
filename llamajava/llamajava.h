@@ -10,9 +10,9 @@ extern "C" {
 
 /*
 * Class:     chat_octet_model_LlamaService
-* Method:    initLocal
+* Method:    initNative
 */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initLocal
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
         (JNIEnv *, jclass);
 
 /*
@@ -227,16 +227,16 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPieceWithMod
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    printTimings
+ * Method:    getSamplingMetrics
  */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_printTimings
-        (JNIEnv *, jclass);
+JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getSamplingMetrics
+        (JNIEnv *, jclass, jboolean);
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    printSystemInfo
+ * Method:    getSystemInfo
  */
-JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_printSystemInfo
+JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getSystemInfo
         (JNIEnv *, jclass);
 
 /*

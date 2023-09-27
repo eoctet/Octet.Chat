@@ -35,7 +35,7 @@ public class ConsoleQA {
                 }
                 String question = PromptBuilder.toPrompt(system, input);
                 model.generate(generateParams, question).forEach(e -> System.out.print(e.getText()));
-                model.printTimings();
+                model.metrics();
             }
         } catch (Exception e) {
             System.err.println("Error: " + e);

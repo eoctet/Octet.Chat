@@ -2,21 +2,23 @@ package chat.octet.model;
 
 
 import chat.octet.model.beans.LlamaContextParams;
+import chat.octet.model.beans.Metrics;
 
 public class LlamaService {
 
     static {
         System.load(Platform.LIB_RESOURCE_PATH);
-        initLocal();
+        initNative();
         llamaBackendInit(true);
     }
 
-    public static native void initLocal();
+    public static native void initNative();
 
     public static native LlamaContextParams getLlamaContextDefaultParams();
 
     public static native void llamaBackendInit(boolean numa);
 
+    @Deprecated
     public static native void llamaBackendFree();
 
     public static native void loadLlamaModelFromFile(String modelPath, LlamaContextParams params);
@@ -65,17 +67,17 @@ public class LlamaService {
 
     public static native int getTokenNL();
 
-    public static native int tokenize(byte[] buf, int textLength, int[] tokens, int maxTokens, boolean addBos);
+    public static native int tokenize(byte[] buf, int bufferLength, int[] tokens, int maxTokens, boolean addBos);
 
-    public static native int tokenizeWithModel(byte[] buf, int textLength, int[] tokens, int maxTokens, boolean addBos);
+    public static native int tokenizeWithModel(byte[] buf, int bufferLength, int[] tokens, int maxTokens, boolean addBos);
 
-    public static native int getTokenToPiece(int token, byte[] buf, int length);
+    public static native int getTokenToPiece(int token, byte[] buf, int bufferLength);
 
-    public static native int getTokenToPieceWithModel(int token, byte[] buf, int length);
+    public static native int getTokenToPieceWithModel(int token, byte[] buf, int bufferLength);
 
-    public static native void printTimings();
+    public static native Metrics getSamplingMetrics(boolean reset);
 
-    public static native String printSystemInfo();
+    public static native String getSystemInfo();
 
     public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical);
 

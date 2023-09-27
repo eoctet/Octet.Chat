@@ -79,8 +79,7 @@ public class Model implements AutoCloseable {
         this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? contextSize : modelParams.getLastNTokensSize();
 
         if (modelParams.isVerbose()) {
-            String systemInfo = LlamaService.printSystemInfo();
-            log.info(MessageFormat.format("system info: {0}", systemInfo));
+            log.info(MessageFormat.format("system info: {0}", LlamaService.getSystemInfo()));
         }
         log.info(MessageFormat.format("model parameters: {0}", modelParams));
     }
@@ -117,6 +116,13 @@ public class Model implements AutoCloseable {
         return llamaContextParams;
     }
 
+    public String completions(GenerateParameter generateParams, String text) {
+        Iterable<Token> tokenIterable = generate(generateParams, text);
+        StringBuilder content = new StringBuilder();
+        tokenIterable.forEach(token -> content.append(token.getText()));
+        return content.toString();
+    }
+
     public Iterable<Token> generate(GenerateParameter generateParams, String text) {
         UserContext userContext = UserContextManager.getInstance().getDefaultUserContext(this);
         return generate(generateParams, userContext, text);
@@ -142,9 +148,9 @@ public class Model implements AutoCloseable {
         };
     }
 
-    public void printTimings() {
+    public void metrics() {
         if (modelParams.isVerbose()) {
-            LlamaService.printTimings();
+            log.info("Metrics: " + LlamaService.getSamplingMetrics(true).toString());
         }
     }
 
@@ -154,7 +160,7 @@ public class Model implements AutoCloseable {
         int[] tokens = tokenize(new String(text.getBytes(StandardCharsets.UTF_8)), true);
         evaluate(tokens, 0, tokens.length);
         float[] embedding = LlamaService.getEmbeddings();
-        printTimings();
+        metrics();
         return embedding;
     }
 
@@ -164,7 +170,7 @@ public class Model implements AutoCloseable {
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
         int nextTokens = LlamaService.tokenizeWithModel(textBytes, textBytes.length, tokens, getContextSize(), addBos);
         if (nextTokens < 0) {
-            throw new ModelException(String.format("failed to tokenize: %s, next_tokens: %s", text, nextTokens));
+            throw new ModelException(MessageFormat.format("failed to tokenize: {0}, next_tokens: {1}", text, nextTokens));
         }
         return ArrayUtils.subarray(tokens, 0, nextTokens);
     }
