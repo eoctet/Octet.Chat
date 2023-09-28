@@ -7,7 +7,9 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,13 +22,15 @@ public final class Generator implements Iterator<Token> {
     private final List<Token> generateTokens;
     private boolean finished = false;
     private final UserContext userContext;
-    private final AutoDecoder decoder;
+    private final byte[] multiByteTokenBuffer;
+    private int multiByteTokenLength;
+    private int multiByteTokenIndex;
 
     public Generator(Model model, GenerateParameter generateParams, UserContext userContext, String text) {
         this.model = model;
         this.generateParams = generateParams;
         this.userContext = userContext;
-        this.decoder = new AutoDecoder();
+        this.multiByteTokenBuffer = new byte[8];
 
         int[] tokens = StringUtils.isNotBlank(text) ? model.tokenize(text, true) : new int[]{model.getTokenBOS()};
         if (tokens.length >= model.getContextSize()) {
@@ -74,6 +78,29 @@ public final class Generator implements Iterator<Token> {
         return false;
     }
 
+    private String decode(int token) {
+        byte[] buffer = new byte[64];
+        int length = LlamaService.getTokenToPiece(token, buffer, buffer.length);
+        byte code = buffer[0];
+
+        if (length == 1 && !Character.isValidCodePoint(code)) {
+            if (multiByteTokenLength == 0) {
+                multiByteTokenLength = TokenDecoder.getUtf8ByteLength(code);
+            }
+            multiByteTokenBuffer[multiByteTokenIndex] = code;
+            ++multiByteTokenIndex;
+            if (multiByteTokenIndex == multiByteTokenLength) {
+                String text = new String(multiByteTokenBuffer, 0, multiByteTokenLength, StandardCharsets.UTF_8);
+                multiByteTokenIndex = 0;
+                multiByteTokenLength = 0;
+                Arrays.fill(multiByteTokenBuffer, (byte) 0);
+                return text;
+            }
+            return StringUtils.EMPTY;
+        }
+        return new String(buffer, 0, length, StandardCharsets.UTF_8);
+    }
+
     @Override
     public boolean hasNext() {
         return !finished;
@@ -82,15 +109,15 @@ public final class Generator implements Iterator<Token> {
     @Override
     public Token next() {
         //evaluation tokens
-        int evaluateTotalSize = model.evaluate(
+        int evaluateTokenSize = model.evaluate(
                 userContext.getInput(),
                 userContext.getPastTokensSize(),
                 userContext.getInputLength()
         );
-        userContext.addPastTokensSize(evaluateTotalSize);
-        userContext.saveScores(LlamaService.getLogits(), evaluateTotalSize);
+        userContext.addPastTokensSize(evaluateTokenSize);
+        float[] logits = LlamaService.getLogits();
+        userContext.saveScores(logits, evaluateTokenSize);
 
-        float[] logits = userContext.getScores();
         // execute logits processor
         if (generateParams.getLogitsProcessorList() != null) {
             logits = generateParams.getLogitsProcessorList().processor(userContext.getInputCopy(), logits);
@@ -99,7 +126,7 @@ public final class Generator implements Iterator<Token> {
         //do sampling
         long timestamp = System.currentTimeMillis();
         int tokenId = model.sampling(generateParams, logits, userContext.getInput(), userContext.getInputLength());
-        Token token = new Token(tokenId, timestamp, decoder.decodeToken(tokenId));
+        Token token = new Token(tokenId, timestamp, decode(tokenId));
         //Save new token to the list
         generateTokens.add(token);
         if (userContext.getInputLength() + 1 > model.getContextSize()) {

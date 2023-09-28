@@ -75,6 +75,14 @@ public class UserContext implements Serializable {
         if (keepSize <= 0 || keepSize >= contextSize) {
             keepSize = contextSize / 2;
         }
+        //check multibyte token
+        for (int truncateIndex = keepSize; truncateIndex > 0; truncateIndex--) {
+            int size = TokenDecoder.isMultiByte(inputIds[truncateIndex]);
+            if (size >= 0) {
+                keepSize -= size;
+                break;
+            }
+        }
         int[] newTokensBuffer = ArrayUtils.subarray(inputIds, keepSize, inputIds.length);
         Arrays.fill(inputIds, 0);
         System.arraycopy(newTokensBuffer, 0, inputIds, 0, newTokensBuffer.length);
