@@ -19,7 +19,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
     <dependency>
         <groupId>chat.octet</groupId>
         <artifactId>llama-java-core</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
     </dependency>
 ```
 
@@ -53,7 +53,8 @@ public class ConsoleQA {
                 }
                 String question = PromptBuilder.toPrompt(system, input);
                 model.generate(generateParams, question).forEach(e -> System.out.print(e.getText()));
-                model.printTimings();
+                System.out.print("\n");
+                model.metrics();
             }
         } catch (Exception e) {
             System.err.println("Error: " + e);
