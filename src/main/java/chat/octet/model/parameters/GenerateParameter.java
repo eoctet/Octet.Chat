@@ -46,12 +46,14 @@ public final class GenerateParameter {
 
     /**
      * <b>frequency-penalty</b><br/>
+     * Repeat alpha frequency penalty (default: 0.0, 0.0 = disabled)
      */
     @Builder.Default
     private float frequencyPenalty = 0.0f;
 
     /**
      * <b>presence-penalty</b><br/>
+     * Repeat alpha presence penalty (default: 0.0, 0.0 = disabled)")
      */
     @Builder.Default
     private float presencePenalty = 0.0f;
@@ -105,16 +107,16 @@ public final class GenerateParameter {
      * Set the Mirostat target entropy, parameter tau (default: 5.0).
      */
     @Builder.Default
-    private Float mirostatTAU = 5.0f;
+    private float mirostatTAU = 5.0f;
 
-    /**
-     * <b>grammars</b><br/>
-     * Specify a grammar (defined inline or in a file) to constrain model output to a specific format.
-     * For example, you could force the model to output JSON or to speak only in emojis
-     * <b>TODO Not yet realized<b/>
-     */
-    @Nullable
-    private Object grammar;
+//    /**
+//     * <b>grammars</b><br/>
+//     * Specify a grammar (defined inline or in a file) to constrain model output to a specific format.
+//     * For example, you could force the model to output JSON or to speak only in emojis
+//     * <b>TODO Not yet realized<b/>
+//     */
+//    @Nullable
+//    private Object grammar;
 
     /**
      * <b>max-new-tokens</b><br/>
