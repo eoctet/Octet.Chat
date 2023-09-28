@@ -87,9 +87,8 @@ public class UserContext implements Serializable {
         Arrays.fill(inputIds, 0);
         System.arraycopy(newTokensBuffer, 0, inputIds, 0, newTokensBuffer.length);
 
-        float[][] newScores = ArrayUtils.subarray(scores, keepSize, scores.length);
-        int length = isLogitsAll ? contextSize : 1;
-        scores = new float[length][vocabSize];
+        float[][] newScores = ArrayUtils.subarray(scores, isLogitsAll ? keepSize : 0, scores.length);
+        Arrays.fill(scores, new float[vocabSize]);
         System.arraycopy(newScores, 0, scores, 0, newScores.length);
 
         pastTokensSize.set(keepSize);
