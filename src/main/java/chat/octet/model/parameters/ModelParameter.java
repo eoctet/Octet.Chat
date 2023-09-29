@@ -106,14 +106,17 @@ public class ModelParameter {
 
     /**
      * <b>threads</b><br/>
-     * Set the number of threads to use during computation.
+     * Set the number of threads used for generation (single token).
      */
     @Builder.Default
     private int threads = 4;
 
-
+    /**
+     * <b>threads-batch</b><br/>
+     * Set the number of threads used for prompt and batch processing (multiple tokens).
+     */
     @Builder.Default
-    private int threadsBatch = 4;
+    private int threadsBatch = threads;
 
     /**
      * <b>batch-size</b><br/>
@@ -142,6 +145,12 @@ public class ModelParameter {
      */
     @Nullable
     private String loraPath;
+
+    /**
+     * <b>lora_scale</b><br/>
+     * apply LoRA adapter with user defined scaling S (implies --no-mmap).
+     */
+    private float loraScale;
 
     /**
      * <b>tensor-split</b><br/>
@@ -184,7 +193,10 @@ public class ModelParameter {
      */
     private boolean mulMatQ = true;
 
-
+    /**
+     * <b>keep</b><br/>
+     * Set the length for keep conversation histories.
+     */
     private int keep;
 
     /**

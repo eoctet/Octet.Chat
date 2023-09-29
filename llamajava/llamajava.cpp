@@ -346,7 +346,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
         env->ThrowNew(MODEL_EXCEPTION, "llama model cannot be null");
         return -1;
     }
-    //TODO  float scale
     return llama_model_apply_lora_from_file(model, ToCString(env, loraPath), scale, ToCString(env, baseModelPath),
                                             threads);
 }

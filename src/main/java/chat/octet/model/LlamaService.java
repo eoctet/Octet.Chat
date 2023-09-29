@@ -55,7 +55,7 @@ public class LlamaService {
 
     public static native int getVocabType();
 
-    public static native int loadLoraModelFromFile(String loraPath, float scale, String baseModelPath, int threads);
+    public static native int loadLoraModelFromFile(String loraPath, float loraScale, String baseModelPath, int threads);
 
     //public static native int evaluate(int[] tokens, int nTokens, int nPast, int threads);
 

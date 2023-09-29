@@ -70,7 +70,7 @@ public class Model implements AutoCloseable {
             if (!Files.exists(new File(modelParams.getLoraPath()).toPath())) {
                 throw new ModelException("Lora model file is not exists, please check the file path");
             }
-            int status = LlamaService.loadLoraModelFromFile(modelParams.getLoraPath(), 0.0f, modelParams.getLoraBase(), modelParams.getThreads());
+            int status = LlamaService.loadLoraModelFromFile(modelParams.getLoraPath(), modelParams.getLoraScale(), modelParams.getLoraBase(), modelParams.getThreads());
             if (status != 0) {
                 throw new ModelException(String.format("Failed to apply LoRA from lora path: %s to base path: %s", modelParams.getLoraPath(), modelParams.getLoraBase()));
             }
