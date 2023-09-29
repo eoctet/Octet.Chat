@@ -116,7 +116,7 @@ public class ModelParameter {
      * Set the number of threads used for prompt and batch processing (multiple tokens).
      */
     @Builder.Default
-    private int threadsBatch = threads;
+    private int threadsBatch = 4;
 
     /**
      * <b>batch-size</b><br/>
