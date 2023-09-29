@@ -57,8 +57,6 @@ public class LlamaService {
 
     public static native int loadLoraModelFromFile(String loraPath, float loraScale, String baseModelPath, int threads);
 
-    //public static native int evaluate(int[] tokens, int nTokens, int nPast, int threads);
-
     public static native int decode(int[] tokens, int nTokens, int nPast);
 
     public static native float[] getLogits();
@@ -129,9 +127,8 @@ public class LlamaService {
     }
 
     public static int sampling(GenerateParameter generateParams, float[] logits, int[] inputIds, int inputLength, int lastTokensSize) {
-        //int startIndex = Math.max(0, inputLength - getLastTokensSize());
-        //int[] lastTokens = ArrayUtils.subarray(inputIds, startIndex, inputLength);
-        int[] lastTokens = ArrayUtils.subarray(inputIds, 0, inputLength);
+        int startIndex = Math.max(0, inputLength - lastTokensSize);
+        int[] lastTokens = ArrayUtils.subarray(inputIds, startIndex, inputLength);
         return sampling(
                 logits,
                 lastTokens,
