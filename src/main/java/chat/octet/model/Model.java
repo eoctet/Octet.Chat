@@ -218,6 +218,10 @@ public class Model implements AutoCloseable {
         return chat(GenerateParameter.builder().build(), null, question);
     }
 
+    public Iterable<Token> chat(String system, String question) {
+        return chat(GenerateParameter.builder().build(), system, question);
+    }
+
     public Iterable<Token> chat(GenerateParameter generateParams, String question) {
         return chat(generateParams, null, question);
     }
