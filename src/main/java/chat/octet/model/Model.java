@@ -253,6 +253,12 @@ public class Model implements AutoCloseable {
         }
     }
 
+    public void removeConversationMemory() {
+        if (conversation != null && !conversation.isEmpty()) {
+            conversation.clear();
+        }
+    }
+
     @Override
     public void close() {
         LlamaService.release();

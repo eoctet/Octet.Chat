@@ -41,7 +41,7 @@ public class ConversationExample {
                     continue;
                 }
                 if (StringUtils.trimToEmpty(input).equalsIgnoreCase("FORGET_ME")) {
-                    model.clearConversationMemory();
+                    model.removeConversationMemory();
                     System.err.println("\n=> DONE!");
                     continue;
                 }
