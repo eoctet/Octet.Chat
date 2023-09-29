@@ -1,6 +1,6 @@
-package chat.octet.model.criteria.impl;
+package chat.octet.model.components.criteria.impl;
 
-import chat.octet.model.criteria.StoppingCriteria;
+import chat.octet.model.components.criteria.StoppingCriteria;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

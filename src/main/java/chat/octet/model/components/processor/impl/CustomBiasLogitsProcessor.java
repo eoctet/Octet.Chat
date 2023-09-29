@@ -1,7 +1,7 @@
-package chat.octet.model.processor.impl;
+package chat.octet.model.components.processor.impl;
 
 
-import chat.octet.model.processor.LogitsProcessor;
+import chat.octet.model.components.processor.LogitsProcessor;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
