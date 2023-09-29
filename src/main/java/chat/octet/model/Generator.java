@@ -5,6 +5,7 @@ import chat.octet.model.beans.Token;
 import chat.octet.model.parameters.GenerateParameter;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -15,63 +16,59 @@ import java.util.List;
 
 
 @Slf4j
-public final class Generator implements Iterator<Token> {
-
-    private final Model model;
+public class Generator implements Iterator<Token> {
     private final GenerateParameter generateParams;
     private final List<Token> generateTokens;
-    private boolean finished = false;
-    private final UserContext userContext;
+    private final int[] inputIds;
     private final byte[] multiByteTokenBuffer;
     private int multiByteTokenLength;
     private int multiByteTokenIndex;
+    private boolean finished = false;
+    private int maxNewTokensSize;
+    private int inputLength;
+    private int pastTokensSize;
+    private final int contextSize;
+    private final int lastTokensSize;
 
-    public Generator(Model model, GenerateParameter generateParams, UserContext userContext, String text) {
-        this.model = model;
+    protected Generator(GenerateParameter generateParams, String text, int lastTokensSize) {
         this.generateParams = generateParams;
-        this.userContext = userContext;
+        this.contextSize = LlamaService.getContextSize();
+        this.inputIds = new int[contextSize];
         this.multiByteTokenBuffer = new byte[8];
+        this.lastTokensSize = lastTokensSize;
 
-        int[] tokens = StringUtils.isNotBlank(text) ? model.tokenize(text, true) : new int[]{model.getTokenBOS()};
-        if (tokens.length >= model.getContextSize()) {
-            throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}", tokens.length, model.getContextSize()));
+        int[] tokens = StringUtils.isNotBlank(text) ? LlamaService.tokenize(text, true) : new int[]{LlamaService.getTokenBOS()};
+        if (tokens.length >= contextSize) {
+            throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}", tokens.length, contextSize));
         }
         if (generateParams.isVerbosePrompt()) {
             log.info(MessageFormat.format("Print prompt text:\n{0}", text));
         }
-        if (userContext.getInputLength() + tokens.length > model.getContextSize()) {
-            userContext.truncate(generateParams.getKeepContextTokensSize());
-        }
-        userContext.appendInput(tokens);
+        System.arraycopy(tokens, 0, inputIds, 0, tokens.length);
+        inputLength += tokens.length;
 
-        int maxNewTokensSize = (generateParams.getMaxNewTokensSize() <= 0) ? model.getContextSize() - tokens.length : generateParams.getMaxNewTokensSize();
-        if (maxNewTokensSize + tokens.length > model.getContextSize()) {
-            maxNewTokensSize = model.getContextSize() - tokens.length;
+        maxNewTokensSize = (generateParams.getMaxNewTokensSize() <= 0) ? contextSize - tokens.length : generateParams.getMaxNewTokensSize();
+        if (maxNewTokensSize + tokens.length > contextSize) {
+            maxNewTokensSize = contextSize - tokens.length;
         }
-        userContext.setMaxNewTokensSize(maxNewTokensSize);
 
         generateTokens = Lists.newArrayList();
-
-        log.debug(MessageFormat.format("Generate starting, User id: {0}, context buffer size: {1}, input tokens size: {2}.",
-                userContext.getId(),
-                userContext.getInputLength(),
-                tokens.length
-        ));
+        log.debug(MessageFormat.format("Generate starting, input tokens size: {0}.", tokens.length));
     }
 
-    private boolean breakOrContinue(Token token) {
-        if (token.getId() == model.getTokenEOS()) {
+    private boolean breakOrContinue(Token token, float[] logits) {
+        if (token.getId() == LlamaService.getTokenEOS()) {
             token.updateFinishReason(FinishReason.FINISHED);
             return true;
         }
         if (generateParams.getStoppingCriteriaList() != null) {
-            boolean matched = generateParams.getStoppingCriteriaList().criteria(userContext.getInputCopy(), userContext.getScores());
+            boolean matched = generateParams.getStoppingCriteriaList().criteria(inputIds, logits);
             if (matched) {
                 token.updateFinishReason(FinishReason.STOP);
                 return true;
             }
         }
-        if (generateTokens.size() > userContext.getMaxNewTokensSize()) {
+        if (generateTokens.size() > maxNewTokensSize) {
             token.updateFinishReason(FinishReason.LENGTH);
             return true;
         }
@@ -101,6 +98,26 @@ public final class Generator implements Iterator<Token> {
         return new String(buffer, 0, length, StandardCharsets.UTF_8);
     }
 
+    private void truncate(int keepSize) {
+        if (keepSize <= 0 || keepSize >= contextSize) {
+            keepSize = contextSize / 2;
+        }
+        //check multibyte token
+        for (int truncateIndex = keepSize; truncateIndex > 0; truncateIndex--) {
+            int size = TokenDecoder.isMultiByte(inputIds[truncateIndex]);
+            if (size >= 0) {
+                keepSize -= size;
+                break;
+            }
+        }
+        int[] newTokensBuffer = ArrayUtils.subarray(inputIds, keepSize, inputIds.length);
+        Arrays.fill(inputIds, 0);
+        System.arraycopy(newTokensBuffer, 0, inputIds, 0, newTokensBuffer.length);
+
+        pastTokensSize = keepSize;
+        inputLength = keepSize;
+    }
+
     @Override
     public boolean hasNext() {
         return !finished;
@@ -109,33 +126,30 @@ public final class Generator implements Iterator<Token> {
     @Override
     public Token next() {
         //evaluation tokens
-        int evaluateTokenSize = model.evaluate(
-                userContext.getInput(),
-                userContext.getPastTokensSize(),
-                userContext.getInputLength()
-        );
-        userContext.addPastTokensSize(evaluateTokenSize);
+        int evaluateTokenSize = LlamaService.evaluate(inputIds, pastTokensSize, inputLength);
+        pastTokensSize += evaluateTokenSize;
         float[] logits = LlamaService.getLogits();
-        userContext.saveScores(logits, evaluateTokenSize);
 
         // execute logits processor
         if (generateParams.getLogitsProcessorList() != null) {
-            logits = generateParams.getLogitsProcessorList().processor(userContext.getInputCopy(), logits);
-            userContext.updateScores(logits);
+            logits = generateParams.getLogitsProcessorList().processor(inputIds, logits);
         }
         //do sampling
         long timestamp = System.currentTimeMillis();
-        int tokenId = model.sampling(generateParams, logits, userContext.getInput(), userContext.getInputLength());
+        int tokenId = LlamaService.sampling(generateParams, logits, inputIds, inputLength, lastTokensSize);
         Token token = new Token(tokenId, timestamp, decode(tokenId));
         //Save new token to the list
         generateTokens.add(token);
-        if (userContext.getInputLength() + 1 > model.getContextSize()) {
-            userContext.truncate(generateParams.getKeepContextTokensSize());
+
+        if (inputLength + 1 > contextSize) {
+            truncate(generateParams.getKeepContextTokensSize());
         }
-        userContext.appendInput(token.getId());
-        if (breakOrContinue(token)) {
+        inputIds[inputLength] = tokenId;
+        ++inputLength;
+
+        if (breakOrContinue(token, logits)) {
             finished = true;
-            userContext.addPastTokensSize(1);
+            ++pastTokensSize;
         }
         return token;
     }
@@ -145,4 +159,10 @@ public final class Generator implements Iterator<Token> {
         generateTokens.forEach(token -> builder.append(token.getText()));
         return builder.toString();
     }
+
+    public FinishReason getFinishReason() {
+        return (generateTokens == null || generateTokens.isEmpty()) ? FinishReason.UNKNOWN : generateTokens.get(generateTokens.size() - 1).getFinishReason();
+
+    }
+
 }

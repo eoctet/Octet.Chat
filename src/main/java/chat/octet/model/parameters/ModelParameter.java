@@ -189,6 +189,9 @@ public class ModelParameter {
     @Nullable
     private Boolean mulMatQ;
 
+
+    private int keep;
+
     /**
      * <b>verbose</b><br/>
      * Print verbose output to stderr

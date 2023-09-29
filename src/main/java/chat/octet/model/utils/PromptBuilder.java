@@ -1,4 +1,4 @@
-package chat.octet.model;
+package chat.octet.model.utils;
 
 import org.apache.commons.lang3.StringUtils;
 

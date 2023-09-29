@@ -1,4 +1,4 @@
-package chat.octet.model;
+package chat.octet.model.utils;
 
 import chat.octet.model.exceptions.ModelException;
 import org.apache.commons.lang3.StringUtils;

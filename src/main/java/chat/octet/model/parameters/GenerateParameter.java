@@ -1,7 +1,7 @@
 package chat.octet.model.parameters;
 
-import chat.octet.model.criteria.StoppingCriteriaList;
-import chat.octet.model.processor.LogitsProcessorList;
+import chat.octet.model.components.criteria.StoppingCriteriaList;
+import chat.octet.model.components.processor.LogitsProcessorList;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -150,6 +150,14 @@ public final class GenerateParameter {
      */
     @Nullable
     private StoppingCriteriaList stoppingCriteriaList;
+
+
+    @Builder.Default
+    private String user = "User";
+
+
+    @Builder.Default
+    private String assistant = "Assistant";
 
     /**
      * Mirostat sampling mode define

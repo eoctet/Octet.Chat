@@ -7,7 +7,7 @@ package chat.octet.model.beans;
  * @version 1.0
  */
 public enum FinishReason {
-    FINISHED, LENGTH, STOP, NONE;
+    FINISHED, LENGTH, STOP, NONE, UNKNOWN;
 
     public boolean isFinished() {
         return this == FINISHED || this == LENGTH || this == STOP;

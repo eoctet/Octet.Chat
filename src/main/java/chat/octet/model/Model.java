@@ -1,23 +1,31 @@
 package chat.octet.model;
 
 
+import chat.octet.model.beans.ChatMessage;
+import chat.octet.model.beans.FinishReason;
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.Token;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
+import chat.octet.model.utils.PromptBuilder;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Llama model
@@ -25,19 +33,22 @@ import java.util.Iterator;
  * @author william
  * @since 1.0
  */
-@Getter
+
 @Slf4j
 public class Model implements AutoCloseable {
+    private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final int DEFAULT_KEEP_SIZE = 5;
+    private final static String LINE_CHAR = "\n";
+
+    @Getter
     private final ModelParameter modelParams;
-    private final int contextSize;
-    private final int embeddingSize;
-    private final int vocabSize;
-    private final int tokenBOS;
-    private final int tokenEOS;
-    private final int tokenNL;
-    private final int batchSize;
-    private final int lastTokensSize;
+    @Getter
     private final String modelName;
+    private final int lastTokensSize;
+    private final int keepSize;
+    private final Map<Integer, List<ChatMessage>> conversation;
+    private int conversationTimes = 1;
+    private Generator chatGenerator;
 
     public Model(String modelPath) {
         this(ModelParameter.builder().modelPath(modelPath).build());
@@ -53,6 +64,7 @@ public class Model implements AutoCloseable {
 
         this.modelParams = modelParams;
         this.modelName = modelParams.getModelName();
+        this.conversation = Maps.newConcurrentMap();
         //setting context parameters
         LlamaContextParams llamaContextParams = settingLlamaContextParameters(modelParams);
         LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaContextParams);
@@ -69,14 +81,10 @@ public class Model implements AutoCloseable {
         }
 
         LlamaService.createNewContextWithModel(llamaContextParams);
-        this.contextSize = LlamaService.getContextSize();
-        this.embeddingSize = LlamaService.getEmbeddingSize();
-        this.vocabSize = LlamaService.getVocabSize();
-        this.tokenBOS = LlamaService.getTokenBOS();
-        this.tokenEOS = LlamaService.getTokenEOS();
-        this.tokenNL = LlamaService.getTokenNL();
-        this.batchSize = modelParams.getBatchSize();
-        this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? contextSize : modelParams.getLastNTokensSize();
+        LlamaService.batchSize = modelParams.getBatchSize();
+        LlamaService.threads = modelParams.getThreads();
+        this.keepSize = (modelParams.getKeep() > 0 && modelParams.getKeep() <= DEFAULT_KEEP_SIZE) ? modelParams.getKeep() : DEFAULT_KEEP_SIZE;
+        this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastNTokensSize();
 
         if (modelParams.isVerbose()) {
             log.info(MessageFormat.format("system info: {0}", LlamaService.getSystemInfo()));
@@ -116,21 +124,58 @@ public class Model implements AutoCloseable {
         return llamaContextParams;
     }
 
-    public String completions(GenerateParameter generateParams, String text) {
+    private String getPromptByConversation(GenerateParameter generateParams) {
+        //get the first system prompt in the conversation
+        StringBuilder systemPrompts = new StringBuilder();
+        String firstSystemPrompt = StringUtils.EMPTY;
+        ChatMessage firstMessage = conversation.get(1).get(0);
+        if (ChatMessage.ChatRole.SYSTEM == firstMessage.getRole()) {
+            firstSystemPrompt = firstMessage.getContent();
+            systemPrompts.append(firstSystemPrompt).append(LINE_CHAR);
+        }
+        //injecting historical dialogue
+        int startIndex = Math.max(conversation.size() - keepSize, 1);
+        List<ChatMessage> historyMessages = Lists.newArrayList();
+        conversation.forEach((index, messages) -> {
+            if (index >= startIndex) {
+                historyMessages.addAll(messages);
+            }
+        });
+        ChatMessage question = historyMessages.remove(historyMessages.size() - 1);
+
+        StringBuilder history = new StringBuilder();
+        history.append(MessageFormat.format("The following is a sequentially numbered historical dialogue, where {0} is the user and {1} is you:", generateParams.getUser(), generateParams.getAssistant())).append(LINE_CHAR);
+        int order = 1;
+        for (ChatMessage msg : historyMessages) {
+            if (ChatMessage.ChatRole.USER == msg.getRole()) {
+                history.append("(").append(order).append(") ").append(generateParams.getUser()).append(": ").append(StringUtils.replaceChars(msg.getContent(), LINE_CHAR, "")).append(LINE_CHAR);
+            } else if (ChatMessage.ChatRole.ASSISTANT == msg.getRole()) {
+                history.append("(").append(order).append(") ").append(generateParams.getAssistant()).append(": ").append(StringUtils.replaceChars(msg.getContent(), LINE_CHAR, "")).append(LINE_CHAR);
+                ++order;
+            } else if (ChatMessage.ChatRole.SYSTEM == msg.getRole()) {
+                if (!msg.getContent().equalsIgnoreCase(firstSystemPrompt)) {
+                    systemPrompts.append(msg.getContent()).append(LINE_CHAR);
+                }
+            }
+        }
+        String now = "Current time: " + DATETIME_FORMATTER.format(ZonedDateTime.now());
+        //format final prompts
+        String finalSystemPrompts = systemPrompts.append(LINE_CHAR).append(history).append(LINE_CHAR).append(now).toString();
+        return PromptBuilder.toPrompt(finalSystemPrompts, question.getContent());
+    }
+
+    public Pair<String, FinishReason> completions(GenerateParameter generateParams, String text) {
         Iterable<Token> tokenIterable = generate(generateParams, text);
-        StringBuilder content = new StringBuilder();
-        tokenIterable.forEach(token -> content.append(token.getText()));
-        return content.toString();
+        tokenIterable.forEach(e -> {
+        });
+        Generator generator = (Generator) tokenIterable.iterator();
+        String context = generator.getFullGenerateText();
+        FinishReason reason = generator.getFinishReason();
+        return Pair.of(context, reason);
     }
 
     public Iterable<Token> generate(GenerateParameter generateParams, String text) {
-        UserContext userContext = UserContextManager.getInstance().getDefaultUserContext(this);
-        return generate(generateParams, userContext, text);
-    }
-
-    public Iterable<Token> generate(GenerateParameter generateParams, UserContext userContext, String text) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
-        Preconditions.checkNotNull(userContext, "User context cannot be null");
         Preconditions.checkNotNull(text, "Text cannot be null");
 
         return new Iterable<Token>() {
@@ -141,82 +186,60 @@ public class Model implements AutoCloseable {
             @Override
             public Iterator<Token> iterator() {
                 if (generator == null) {
-                    generator = new Generator(Model.this, generateParams, userContext, text);
+                    generator = new Generator(generateParams, text, lastTokensSize);
                 }
                 return generator;
             }
         };
     }
 
+    public Pair<String, FinishReason> chatCompletions(GenerateParameter generateParams, String question) {
+        return chatCompletions(generateParams, null, question);
+    }
+
+    public Pair<String, FinishReason> chatCompletions(GenerateParameter generateParams, String system, String question) {
+        Iterable<Token> tokenIterable = chat(generateParams, system, question);
+        tokenIterable.forEach(e -> {
+        });
+        Generator generator = (Generator) tokenIterable.iterator();
+        String context = generator.getFullGenerateText();
+        FinishReason reason = generator.getFinishReason();
+        return Pair.of(context, reason);
+    }
+
+    public Iterable<Token> chat(GenerateParameter generateParams, String question) {
+        return chat(generateParams, null, question);
+    }
+
+    public Iterable<Token> chat(GenerateParameter generateParams, String system, String question) {
+        Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
+        Preconditions.checkNotNull(question, "question cannot be null");
+
+        //append last response
+        if (chatGenerator != null) {
+            conversation.get(conversationTimes).add(ChatMessage.assistant(chatGenerator.getFullGenerateText()));
+            ++conversationTimes;
+            chatGenerator = null;
+        }
+        //create new conversation messages
+        List<ChatMessage> messages = Lists.newArrayList();
+        if (StringUtils.isNotBlank(system)) {
+            messages.add(ChatMessage.system(system));
+        }
+        messages.add(ChatMessage.user(question));
+        conversation.put(conversationTimes, messages);
+        //
+        String prompt = getPromptByConversation(generateParams);
+        //System.err.println(prompt);
+        Iterable<Token> tokenIterable = generate(generateParams, prompt);
+        chatGenerator = (Generator) tokenIterable.iterator();
+        return tokenIterable;
+    }
+
     public void metrics() {
         if (modelParams.isVerbose()) {
             log.info("Metrics: " + LlamaService.getSamplingMetrics(true).toString());
         }
-    }
-
-    public float[] embedding(String text) {
-        Preconditions.checkNotNull(text, "Text cannot be null");
-        Preconditions.checkArgument(modelParams.isEmbedding(), "Llama model must be created with embedding=True to call this method");
-        int[] tokens = tokenize(new String(text.getBytes(StandardCharsets.UTF_8)), true);
-        evaluate(tokens, 0, tokens.length);
-        float[] embedding = LlamaService.getEmbeddings();
-        metrics();
-        return embedding;
-    }
-
-    public int[] tokenize(String text, boolean addBos) {
-        Preconditions.checkNotNull(text, "Text cannot be null");
-        int[] tokens = new int[getContextSize()];
-        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-        int nextTokens = LlamaService.tokenizeWithModel(textBytes, textBytes.length, tokens, getContextSize(), addBos);
-        if (nextTokens < 0) {
-            throw new ModelException(MessageFormat.format("failed to tokenize: {0}, next_tokens: {1}", text, nextTokens));
-        }
-        return ArrayUtils.subarray(tokens, 0, nextTokens);
-    }
-
-    protected int evaluate(int[] inputIds, int pastTokensSize, int inputLength) {
-        int pastTokensTotal = pastTokensSize;
-
-        int evaluateTotalSize;
-        int evaluateSize;
-        for (evaluateTotalSize = 0; pastTokensTotal < inputLength; evaluateTotalSize += evaluateSize) {
-            evaluateSize = inputLength - pastTokensSize;
-            if (evaluateSize > this.batchSize) {
-                evaluateSize = this.batchSize;
-            }
-
-            int endIndex = evaluateSize + pastTokensSize;
-            int[] batchTokens = ArrayUtils.subarray(inputIds, pastTokensSize, endIndex);
-            int returnCode = LlamaService.evaluate(batchTokens, evaluateSize, pastTokensSize, this.modelParams.getThreads());
-            if (returnCode != 0) {
-                throw new ModelException("Llama_eval returned " + returnCode);
-            }
-            pastTokensTotal += evaluateSize;
-        }
-        return evaluateTotalSize;
-    }
-
-    protected int sampling(GenerateParameter generateParams, float[] logits, int[] inputIds, int inputLength) {
-        int startIndex = Math.max(0, inputLength - getLastTokensSize());
-        int[] lastTokens = ArrayUtils.subarray(inputIds, startIndex, inputLength);
-        return LlamaService.sampling(
-                logits,
-                lastTokens,
-                lastTokensSize,
-                generateParams.getRepeatPenalty(),
-                generateParams.getFrequencyPenalty(),
-                generateParams.getPresencePenalty(),
-                generateParams.isPenalizeNl(),
-                generateParams.getMirostatMode().ordinal(),
-                generateParams.getMirostatTAU(),
-                generateParams.getMirostatETA(),
-                generateParams.getTemperature(),
-                generateParams.getTopK(),
-                generateParams.getTopP(),
-                generateParams.getTsf(),
-                generateParams.getTypical()
-        );
     }
 
     @Override
