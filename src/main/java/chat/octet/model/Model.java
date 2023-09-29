@@ -2,7 +2,7 @@ package chat.octet.model;
 
 
 import chat.octet.model.beans.ChatMessage;
-import chat.octet.model.beans.FinishReason;
+import chat.octet.model.beans.CompletionResult;
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.Token;
 import chat.octet.model.exceptions.ModelException;
@@ -15,7 +15,6 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -28,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Llama model
+ * LLama model, which provides functions for generating and chatting conversations.
  *
  * @author william
  * @since 1.0
@@ -164,14 +163,20 @@ public class Model implements AutoCloseable {
         return PromptBuilder.toPrompt(finalSystemPrompts, question.getContent());
     }
 
-    public Pair<String, FinishReason> completions(GenerateParameter generateParams, String text) {
+    public CompletionResult completions(String text) {
+        return completions(GenerateParameter.builder().build(), text);
+    }
+
+    public CompletionResult completions(GenerateParameter generateParams, String text) {
         Iterable<Token> tokenIterable = generate(generateParams, text);
         tokenIterable.forEach(e -> {
         });
         Generator generator = (Generator) tokenIterable.iterator();
-        String context = generator.getFullGenerateText();
-        FinishReason reason = generator.getFinishReason();
-        return Pair.of(context, reason);
+        return CompletionResult.builder().content(generator.getFullGenerateText()).finishReason(generator.getFinishReason()).build();
+    }
+
+    public Iterable<Token> generate(String text) {
+        return generate(GenerateParameter.builder().build(), text);
     }
 
     public Iterable<Token> generate(GenerateParameter generateParams, String text) {
@@ -193,18 +198,24 @@ public class Model implements AutoCloseable {
         };
     }
 
-    public Pair<String, FinishReason> chatCompletions(GenerateParameter generateParams, String question) {
+    public CompletionResult chatCompletions(String question) {
+        return chatCompletions(GenerateParameter.builder().build(), null, question);
+    }
+
+    public CompletionResult chatCompletions(GenerateParameter generateParams, String question) {
         return chatCompletions(generateParams, null, question);
     }
 
-    public Pair<String, FinishReason> chatCompletions(GenerateParameter generateParams, String system, String question) {
+    public CompletionResult chatCompletions(GenerateParameter generateParams, String system, String question) {
         Iterable<Token> tokenIterable = chat(generateParams, system, question);
         tokenIterable.forEach(e -> {
         });
         Generator generator = (Generator) tokenIterable.iterator();
-        String context = generator.getFullGenerateText();
-        FinishReason reason = generator.getFinishReason();
-        return Pair.of(context, reason);
+        return CompletionResult.builder().content(generator.getFullGenerateText()).finishReason(generator.getFinishReason()).build();
+    }
+
+    public Iterable<Token> chat(String question) {
+        return chat(GenerateParameter.builder().build(), null, question);
     }
 
     public Iterable<Token> chat(GenerateParameter generateParams, String question) {
