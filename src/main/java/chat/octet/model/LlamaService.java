@@ -2,6 +2,7 @@ package chat.octet.model;
 
 
 import chat.octet.model.beans.LlamaContextParams;
+import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.beans.Metrics;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
@@ -25,6 +26,8 @@ public class LlamaService {
 
     public static native void initNative();
 
+    public static native LlamaModelParams getLlamaModelDefaultParams();
+
     public static native LlamaContextParams getLlamaContextDefaultParams();
 
     public static native void llamaBackendInit(boolean numa);
@@ -32,7 +35,7 @@ public class LlamaService {
     @Deprecated
     public static native void llamaBackendFree();
 
-    public static native void loadLlamaModelFromFile(String modelPath, LlamaContextParams params);
+    public static native void loadLlamaModelFromFile(String modelPath, LlamaModelParams params);
 
     public static native void createNewContextWithModel(LlamaContextParams params);
 
@@ -52,15 +55,11 @@ public class LlamaService {
 
     public static native int getVocabType();
 
-    public static native int getModelVocabSize();
+    public static native int loadLoraModelFromFile(String loraPath, float scale, String baseModelPath, int threads);
 
-    public static native int getModelContextSize();
+    //public static native int evaluate(int[] tokens, int nTokens, int nPast, int threads);
 
-    public static native int getModelEmbeddingSize();
-
-    public static native int loadLoraModelFromFile(String loraPath, String baseModelPath, int threads);
-
-    public static native int evaluate(int[] tokens, int nTokens, int nPast, int threads);
+    public static native int decode(int[] tokens, int nTokens, int nPast);
 
     public static native float[] getLogits();
 
@@ -80,11 +79,7 @@ public class LlamaService {
 
     public static native int tokenize(byte[] buf, int bufferLength, int[] tokens, int maxTokens, boolean addBos);
 
-    public static native int tokenizeWithModel(byte[] buf, int bufferLength, int[] tokens, int maxTokens, boolean addBos);
-
-    public static native int getTokenToPiece(int token, byte[] buf, int bufferLength);
-
-    public static native int getTokenToPieceWithModel(int token, byte[] buf, int bufferLength);
+    public static native int tokenToPiece(int token, byte[] buf, int bufferLength);
 
     public static native Metrics getSamplingMetrics(boolean reset);
 
@@ -96,7 +91,7 @@ public class LlamaService {
     public static float[] embedding(String text) {
         Preconditions.checkNotNull(text, "Text cannot be null");
         int[] tokens = tokenize(new String(text.getBytes(StandardCharsets.UTF_8)), true);
-        evaluate(tokens, 0, tokens.length);
+        decodeTokens(tokens, 0, tokens.length);
         return getEmbeddings();
     }
 
@@ -104,33 +99,33 @@ public class LlamaService {
         Preconditions.checkNotNull(text, "Text cannot be null");
         int[] tokens = new int[getContextSize()];
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-        int nextTokens = tokenizeWithModel(textBytes, textBytes.length, tokens, getContextSize(), addBos);
+        int nextTokens = tokenize(textBytes, textBytes.length, tokens, getContextSize(), addBos);
         if (nextTokens < 0) {
             throw new ModelException(MessageFormat.format("failed to tokenize: {0}, next_tokens: {1}", text, nextTokens));
         }
         return ArrayUtils.subarray(tokens, 0, nextTokens);
     }
 
-    public static int evaluate(int[] inputIds, int pastTokensSize, int inputLength) {
+    public static int decodeTokens(int[] inputIds, int pastTokensSize, int inputLength) {
         int pastTokens = pastTokensSize;
 
-        int evaluateTokenSize;
-        int evaluateSize;
-        for (evaluateTokenSize = 0; pastTokens < inputLength; evaluateTokenSize += evaluateSize) {
-            evaluateSize = inputLength - pastTokens;
-            if (evaluateSize > batchSize) {
-                evaluateSize = batchSize;
+        int decodeTokenSize;
+        int decodeSize;
+        for (decodeTokenSize = 0; pastTokens < inputLength; decodeTokenSize += decodeSize) {
+            decodeSize = inputLength - pastTokens;
+            if (decodeSize > batchSize) {
+                decodeSize = batchSize;
             }
 
-            int endIndex = evaluateSize + pastTokens;
+            int endIndex = decodeSize + pastTokens;
             int[] batchTokens = ArrayUtils.subarray(inputIds, pastTokens, endIndex);
-            int returnCode = evaluate(batchTokens, evaluateSize, pastTokens, threads);
+            int returnCode = decode(batchTokens, decodeSize, pastTokens);
             if (returnCode != 0) {
-                throw new ModelException("Llama_eval returned " + returnCode);
+                throw new ModelException("failed to decode, return code: " + returnCode);
             }
-            pastTokens += evaluateSize;
+            pastTokens += decodeSize;
         }
-        return evaluateTokenSize;
+        return decodeTokenSize;
     }
 
     public static int sampling(GenerateParameter generateParams, float[] logits, int[] inputIds, int inputLength, int lastTokensSize) {

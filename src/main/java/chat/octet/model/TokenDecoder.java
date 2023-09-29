@@ -13,7 +13,7 @@ public class TokenDecoder {
         int length = 0;
         for (int token : tokens) {
             byte[] bytes = new byte[64];
-            int size = LlamaService.getTokenToPiece(token, bytes, bytes.length);
+            int size = LlamaService.tokenToPiece(token, bytes, bytes.length);
             System.arraycopy(bytes, 0, buffer, length, size);
             length += size;
         }
@@ -22,7 +22,7 @@ public class TokenDecoder {
 
     public static int isMultiByte(int token) {
         byte[] buffer = new byte[64];
-        int size = LlamaService.getTokenToPiece(token, buffer, buffer.length);
+        int size = LlamaService.tokenToPiece(token, buffer, buffer.length);
         byte code = buffer[0];
         if (size == 1 && !Character.isValidCodePoint(code)) {
             try {

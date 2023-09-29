@@ -17,17 +17,13 @@ public class LlamaContextParams {
      */
     public int batch;
     /**
-     * number of layers to store in VRAM
+     * n_threads
      */
-    public int gpuLayers;
+    public int threads;
     /**
-     * the GPU that is used for scratch and small tensors
+     * n_threads_batch
      */
-    public int mainGpu;
-    /**
-     * how to split layers across multiple GPUs (size: LLAMA_MAX_DEVICES)
-     */
-    public float[] tensorSplit;
+    public int threadsBatch;
     /**
      * RoPE base frequency
      */
@@ -36,10 +32,6 @@ public class LlamaContextParams {
      * RoPE frequency scaling factor
      */
     public float ropeFreqScale;
-    /**
-     * if true, reduce VRAM usage at the cost of performance
-     */
-    public boolean lowVram;
     /**
      * if true, use experimental mul_mat_q kernels
      */
@@ -52,18 +44,6 @@ public class LlamaContextParams {
      * the llama_eval() call computes all logits, not just the last one
      */
     public boolean logitsAll;
-    /**
-     * only load the vocabulary, no weights
-     */
-    public boolean vocabOnly;
-    /**
-     * use mmap if possible
-     */
-    public boolean mmap;
-    /**
-     * force system to keep model in RAM
-     */
-    public boolean mlock;
     /**
      * embedding mode only
      */

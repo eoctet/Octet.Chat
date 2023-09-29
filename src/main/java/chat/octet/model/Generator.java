@@ -75,9 +75,9 @@ public class Generator implements Iterator<Token> {
         return false;
     }
 
-    private String decode(int token) {
+    private String tokenToPiece(int token) {
         byte[] buffer = new byte[64];
-        int length = LlamaService.getTokenToPiece(token, buffer, buffer.length);
+        int length = LlamaService.tokenToPiece(token, buffer, buffer.length);
         byte code = buffer[0];
 
         if (length == 1 && !Character.isValidCodePoint(code)) {
@@ -126,8 +126,8 @@ public class Generator implements Iterator<Token> {
     @Override
     public Token next() {
         //evaluation tokens
-        int evaluateTokenSize = LlamaService.evaluate(inputIds, pastTokensSize, inputLength);
-        pastTokensSize += evaluateTokenSize;
+        int decodeTokenSize = LlamaService.decodeTokens(inputIds, pastTokensSize, inputLength);
+        pastTokensSize += decodeTokenSize;
         float[] logits = LlamaService.getLogits();
 
         // execute logits processor
@@ -137,7 +137,7 @@ public class Generator implements Iterator<Token> {
         //do sampling
         long timestamp = System.currentTimeMillis();
         int tokenId = LlamaService.sampling(generateParams, logits, inputIds, inputLength, lastTokensSize);
-        Token token = new Token(tokenId, timestamp, decode(tokenId));
+        Token token = new Token(tokenId, timestamp, tokenToPiece(tokenId));
         //Save new token to the list
         generateTokens.add(token);
 

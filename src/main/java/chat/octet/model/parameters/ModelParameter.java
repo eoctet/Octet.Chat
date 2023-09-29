@@ -109,7 +109,11 @@ public class ModelParameter {
      * Set the number of threads to use during computation.
      */
     @Builder.Default
-    private int threads = 8;
+    private int threads = 4;
+
+
+    @Builder.Default
+    private int threadsBatch = 4;
 
     /**
      * <b>batch-size</b><br/>
@@ -138,14 +142,6 @@ public class ModelParameter {
      */
     @Nullable
     private String loraPath;
-
-    /**
-     * <b>low-vram</b><br/>
-     * Do not allocate a VRAM scratch buffer for holding temporary results.
-     * Reduces VRAM usage at the cost of performance, particularly prompt processing speed. Requires cuBLAS.
-     */
-    @Builder.Default
-    private boolean lowVram = false;
 
     /**
      * <b>tensor-split</b><br/>
@@ -186,8 +182,7 @@ public class ModelParameter {
      * <b>mul-mat-q</b><br/>
      * If true, use experimental mul_mat_q kernels.
      */
-    @Nullable
-    private Boolean mulMatQ;
+    private boolean mulMatQ = true;
 
 
     private int keep;

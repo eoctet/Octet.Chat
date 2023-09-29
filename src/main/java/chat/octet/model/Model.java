@@ -1,10 +1,7 @@
 package chat.octet.model;
 
 
-import chat.octet.model.beans.ChatMessage;
-import chat.octet.model.beans.CompletionResult;
-import chat.octet.model.beans.LlamaContextParams;
-import chat.octet.model.beans.Token;
+import chat.octet.model.beans.*;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
@@ -64,21 +61,22 @@ public class Model implements AutoCloseable {
         this.modelParams = modelParams;
         this.modelName = modelParams.getModelName();
         this.conversation = Maps.newConcurrentMap();
-        //setting context parameters
-        LlamaContextParams llamaContextParams = settingLlamaContextParameters(modelParams);
-        LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaContextParams);
+        //setting model parameters
+        LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
+        LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);
 
         //apple lora from file
         if (StringUtils.isNotBlank(modelParams.getLoraPath())) {
             if (!Files.exists(new File(modelParams.getLoraPath()).toPath())) {
                 throw new ModelException("Lora model file is not exists, please check the file path");
             }
-            int status = LlamaService.loadLoraModelFromFile(modelParams.getLoraPath(), modelParams.getLoraBase(), modelParams.getThreads());
+            int status = LlamaService.loadLoraModelFromFile(modelParams.getLoraPath(), 0.0f, modelParams.getLoraBase(), modelParams.getThreads());
             if (status != 0) {
                 throw new ModelException(String.format("Failed to apply LoRA from lora path: %s to base path: %s", modelParams.getLoraPath(), modelParams.getLoraBase()));
             }
         }
-
+        //setting context parameters
+        LlamaContextParams llamaContextParams = getLlamaContextParameters(modelParams);
         LlamaService.createNewContextWithModel(llamaContextParams);
         LlamaService.batchSize = modelParams.getBatchSize();
         LlamaService.threads = modelParams.getThreads();
@@ -91,35 +89,40 @@ public class Model implements AutoCloseable {
         log.info(MessageFormat.format("model parameters: {0}", modelParams));
     }
 
-    private LlamaContextParams settingLlamaContextParameters(ModelParameter modelParams) {
-        LlamaContextParams llamaContextParams = LlamaService.getLlamaContextDefaultParams();
-        llamaContextParams.ctx = modelParams.getContextSize();
-        llamaContextParams.seed = modelParams.getSeed();
-        llamaContextParams.gpuLayers = modelParams.getGpuLayers();
-        llamaContextParams.f16KV = modelParams.isF16KV();
-        llamaContextParams.logitsAll = modelParams.isLogitsAll();
-        llamaContextParams.vocabOnly = modelParams.isVocabOnly();
-        llamaContextParams.embedding = modelParams.isEmbedding();
-        llamaContextParams.lowVram = modelParams.isLowVram();
-        llamaContextParams.ropeFreqBase = modelParams.getRopeFreqBase();
-        llamaContextParams.ropeFreqScale = modelParams.getRopeFreqScale();
+    private LlamaModelParams getLlamaModelParameters(ModelParameter modelParams) {
+        LlamaModelParams llamaModelParams = LlamaService.getLlamaModelDefaultParams();
+        llamaModelParams.gpuLayers = modelParams.getGpuLayers();
+        llamaModelParams.vocabOnly = modelParams.isVocabOnly();
         boolean mmap = (StringUtils.isBlank(modelParams.getLoraPath()) && modelParams.isMmap());
         if (mmap && LlamaService.isMmapSupported()) {
-            llamaContextParams.mmap = true;
+            llamaModelParams.mmap = true;
         }
         boolean mlock = modelParams.isMlock();
         if (mlock && LlamaService.isMlockSupported()) {
-            llamaContextParams.mlock = true;
+            llamaModelParams.mlock = true;
         }
         if (modelParams.getMainGpu() != null) {
-            llamaContextParams.mainGpu = modelParams.getMainGpu();
+            llamaModelParams.mainGpu = modelParams.getMainGpu();
         }
         if (modelParams.getTensorSplit() != null) {
-            llamaContextParams.tensorSplit = modelParams.getTensorSplit();
+            llamaModelParams.tensorSplit = modelParams.getTensorSplit();
         }
-        if (modelParams.getMulMatQ() != null) {
-            llamaContextParams.mulMatQ = modelParams.getMulMatQ();
-        }
+        return llamaModelParams;
+    }
+
+    private LlamaContextParams getLlamaContextParameters(ModelParameter modelParams) {
+        LlamaContextParams llamaContextParams = LlamaService.getLlamaContextDefaultParams();
+        llamaContextParams.seed = modelParams.getSeed();
+        llamaContextParams.ctx = modelParams.getContextSize();
+        llamaContextParams.batch = modelParams.getBatchSize();
+        llamaContextParams.threads = modelParams.getThreads();
+        llamaContextParams.threadsBatch = modelParams.getThreadsBatch();
+        llamaContextParams.ropeFreqBase = modelParams.getRopeFreqBase();
+        llamaContextParams.ropeFreqScale = modelParams.getRopeFreqScale();
+        llamaContextParams.mulMatQ = modelParams.isMulMatQ();
+        llamaContextParams.f16KV = modelParams.isF16KV();
+        llamaContextParams.logitsAll = modelParams.isLogitsAll();
+        llamaContextParams.embedding = modelParams.isEmbedding();
         return llamaContextParams;
     }
 

@@ -19,18 +19,22 @@ jclass LLAMA_CONTEXT_PARAMS_CLASS;
 jfieldID FIELD_SEED;
 jfieldID FIELD_CTX;
 jfieldID FIELD_BATCH;
-jfieldID FIELD_GPU_LAYERS;
-jfieldID FIELD_MAIN_GPU;
+jfieldID FIELD_THREADS;
+jfieldID FIELD_THREADS_BATCH;
 jfieldID FIELD_ROPE_FREQ_BASE;
 jfieldID FIELD_ROPE_FREQ_SCALE;
-jfieldID FIELD_LOW_VRAM;
 jfieldID FIELD_MUL_MAT_Q;
 jfieldID FIELD_F16_KV;
 jfieldID FIELD_LOGITS_ALL;
+jfieldID FIELD_EMBEDDING;
+
+//Class LlamaModelParams:
+jclass LLAMA_MODEL_PARAMS_CLASS;
+jfieldID FIELD_GPU_LAYERS;
+jfieldID FIELD_MAIN_GPU;
 jfieldID FIELD_VOCAB_ONLY;
 jfieldID FIELD_USE_MMAP;
 jfieldID FIELD_USE_MLOCK;
-jfieldID FIELD_EMBEDDING;
 
 //Class Metrics
 jclass METRICS_CLASS;
@@ -60,26 +64,33 @@ bool ToCBool(jboolean value) {
     return value == JNI_TRUE;
 }
 
+struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject model_params) {
+    struct llama_model_params params = {
+            /*.n_gpu_layers                =*/ env->GetIntField(model_params, FIELD_GPU_LAYERS),
+            /*.main_gpu                    =*/ env->GetIntField(model_params, FIELD_MAIN_GPU),
+            /*.tensor_split                =*/ nullptr,
+            /*.progress_callback           =*/ nullptr,
+            /*.progress_callback_user_data =*/ nullptr,
+            /*.vocab_only                  =*/ ToCBool(env->GetBooleanField(model_params, FIELD_VOCAB_ONLY)),
+            /*.use_mmap                    =*/ ToCBool(env->GetBooleanField(model_params, FIELD_USE_MMAP)),
+            /*.use_mlock                   =*/ ToCBool(env->GetBooleanField(model_params, FIELD_USE_MLOCK)),
+    };
+    return params;
+}
+
 struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject context_params) {
     llama_context_params params = {
-            /*.seed                        =*/  (uint32_t) env->GetIntField(context_params, FIELD_SEED),
-            /*.n_ctx                       =*/  env->GetIntField(context_params, FIELD_CTX),
-            /*.n_batch                     =*/  env->GetIntField(context_params, FIELD_BATCH),
-            /*.n_gpu_layers                =*/  env->GetIntField(context_params, FIELD_GPU_LAYERS),
-            /*.main_gpu                    =*/  env->GetIntField(context_params, FIELD_MAIN_GPU),
-            /*.tensor_split                =*/  nullptr,
-            /*.rope_freq_base              =*/  env->GetFloatField(context_params, FIELD_ROPE_FREQ_BASE),
-            /*.rope_freq_scale             =*/  env->GetFloatField(context_params, FIELD_ROPE_FREQ_SCALE),
-            /*.progress_callback           =*/  nullptr,
-            /*.progress_callback_user_data =*/  nullptr,
-            /*.low_vram                    =*/  ToCBool(env->GetBooleanField(context_params, FIELD_LOW_VRAM)),
-            /*.mul_mat_q                   =*/  ToCBool(env->GetBooleanField(context_params, FIELD_MUL_MAT_Q)),
-            /*.f16_kv                      =*/  ToCBool(env->GetBooleanField(context_params, FIELD_F16_KV)),
-            /*.logits_all                  =*/  ToCBool(env->GetBooleanField(context_params, FIELD_LOGITS_ALL)),
-            /*.vocab_only                  =*/  ToCBool(env->GetBooleanField(context_params, FIELD_VOCAB_ONLY)),
-            /*.use_mmap                    =*/  ToCBool(env->GetBooleanField(context_params, FIELD_USE_MMAP)),
-            /*.use_mlock                   =*/  ToCBool(env->GetBooleanField(context_params, FIELD_USE_MLOCK)),
-            /*.embedding                   =*/  ToCBool(env->GetBooleanField(context_params, FIELD_EMBEDDING))
+            /*.seed                        =*/ (uint32_t) env->GetIntField(context_params, FIELD_SEED),
+            /*.n_ctx                       =*/ (uint32_t) env->GetIntField(context_params, FIELD_CTX),
+            /*.n_batch                     =*/ (uint32_t) env->GetIntField(context_params, FIELD_BATCH),
+            /*.n_threads                   =*/ (uint32_t) env->GetIntField(context_params, FIELD_THREADS),
+            /*.n_threads_batch             =*/ (uint32_t) env->GetIntField(context_params, FIELD_THREADS_BATCH),
+            /*.rope_freq_base              =*/ env->GetFloatField(context_params, FIELD_ROPE_FREQ_BASE),
+            /*.rope_freq_scale             =*/ env->GetFloatField(context_params, FIELD_ROPE_FREQ_SCALE),
+            /*.mul_mat_q                   =*/ ToCBool(env->GetBooleanField(context_params, FIELD_MUL_MAT_Q)),
+            /*.f16_kv                      =*/ ToCBool(env->GetBooleanField(context_params, FIELD_F16_KV)),
+            /*.logits_all                  =*/ ToCBool(env->GetBooleanField(context_params, FIELD_LOGITS_ALL)),
+            /*.embedding                   =*/ ToCBool(env->GetBooleanField(context_params, FIELD_EMBEDDING))
     };
     return params;
 }
@@ -119,18 +130,22 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_SEED = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "seed", "I");
     FIELD_CTX = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ctx", "I");
     FIELD_BATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "batch", "I");
-    FIELD_GPU_LAYERS = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "gpuLayers", "I");
-    FIELD_MAIN_GPU = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "mainGpu", "I");
+    FIELD_THREADS = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "threads", "I");
+    FIELD_THREADS_BATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "threadsBatch", "I");
     FIELD_ROPE_FREQ_BASE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqBase", "F");
     FIELD_ROPE_FREQ_SCALE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqScale", "F");
-    FIELD_LOW_VRAM = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "lowVram", "Z");
     FIELD_MUL_MAT_Q = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "mulMatQ", "Z");
     FIELD_F16_KV = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "f16KV", "Z");
     FIELD_LOGITS_ALL = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "logitsAll", "Z");
-    FIELD_VOCAB_ONLY = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "vocabOnly", "Z");
-    FIELD_USE_MMAP = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "mmap", "Z");
-    FIELD_USE_MLOCK = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "mlock", "Z");
     FIELD_EMBEDDING = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "embedding", "Z");
+
+    //Class LlamaContextParams
+    LLAMA_MODEL_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelParams");
+    FIELD_GPU_LAYERS = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "gpuLayers", "I");
+    FIELD_MAIN_GPU = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mainGpu", "I");
+    FIELD_VOCAB_ONLY = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "vocabOnly", "Z");
+    FIELD_USE_MMAP = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mmap", "Z");
+    FIELD_USE_MLOCK = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mlock", "Z");
 
     //Class Metrics
     METRICS_CLASS = env->FindClass("chat/octet/model/beans/Metrics");
@@ -145,6 +160,26 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_EVAL_COUNT = env->GetFieldID(METRICS_CLASS, "evalCount", "I");
 
     init_native = true;
+}
+
+/*
+* Class:     chat_octet_model_LlamaService
+* Method:    getLlamaModelDefaultParams
+*/
+JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelDefaultParams
+        (JNIEnv *env, jclass thisClass) {
+    llama_model_params defaults = llama_model_default_params();
+
+    jclass llama_model_params_class = env->FindClass("chat/octet/model/beans/LlamaModelParams");
+    jmethodID method_init_model_params = env->GetMethodID(llama_model_params_class, "<init>", "()V");
+    jobject llama_model_params = env->NewObject(llama_model_params_class, method_init_model_params);
+
+    env->SetIntField(llama_model_params, FIELD_GPU_LAYERS, defaults.n_gpu_layers);
+    env->SetIntField(llama_model_params, FIELD_MAIN_GPU, defaults.main_gpu);
+    env->SetBooleanField(llama_model_params, FIELD_VOCAB_ONLY, ToJBoolean(defaults.vocab_only));
+    env->SetBooleanField(llama_model_params, FIELD_USE_MMAP, ToJBoolean(defaults.use_mmap));
+    env->SetBooleanField(llama_model_params, FIELD_USE_MLOCK, ToJBoolean(defaults.use_mlock));
+    return llama_model_params;
 }
 
 /*
@@ -164,19 +199,14 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
     env->SetIntField(llama_context_params, FIELD_SEED, defaults.seed);
     env->SetIntField(llama_context_params, FIELD_CTX, defaults.n_ctx);
     env->SetIntField(llama_context_params, FIELD_BATCH, defaults.n_batch);
-    env->SetIntField(llama_context_params, FIELD_GPU_LAYERS, defaults.n_gpu_layers);
-    env->SetIntField(llama_context_params, FIELD_MAIN_GPU, defaults.main_gpu);
+    env->SetIntField(llama_context_params, FIELD_THREADS, defaults.n_threads);
+    env->SetIntField(llama_context_params, FIELD_THREADS_BATCH, defaults.n_threads_batch);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_BASE, defaults.rope_freq_base);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_SCALE, defaults.rope_freq_scale);
-    env->SetBooleanField(llama_context_params, FIELD_LOW_VRAM, ToJBoolean(defaults.low_vram));
     env->SetBooleanField(llama_context_params, FIELD_MUL_MAT_Q, ToJBoolean(defaults.mul_mat_q));
     env->SetBooleanField(llama_context_params, FIELD_F16_KV, ToJBoolean(defaults.f16_kv));
     env->SetBooleanField(llama_context_params, FIELD_LOGITS_ALL, ToJBoolean(defaults.logits_all));
-    env->SetBooleanField(llama_context_params, FIELD_VOCAB_ONLY, ToJBoolean(defaults.vocab_only));
-    env->SetBooleanField(llama_context_params, FIELD_USE_MMAP, ToJBoolean(defaults.use_mmap));
-    env->SetBooleanField(llama_context_params, FIELD_USE_MLOCK, ToJBoolean(defaults.use_mlock));
     env->SetBooleanField(llama_context_params, FIELD_EMBEDDING, ToJBoolean(defaults.embedding));
-
     return llama_context_params;
 }
 
@@ -203,8 +233,8 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree
  * Method:    loadLlamaModelFromFile
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
-        (JNIEnv *env, jclass thisClass, jstring modelPath, jobject llamaContextParams) {
-    struct llama_context_params params = GetLlamaContextParams(env, llamaContextParams);
+        (JNIEnv *env, jclass thisClass, jstring modelPath, jobject llamaModelParams) {
+    struct llama_model_params params = GetLlamaModelParams(env, llamaModelParams);
     model = llama_load_model_from_file(ToCString(env, modelPath), params);
 
     if (!model) {
@@ -275,7 +305,7 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
         (JNIEnv *env, jclass thisClass) {
-    return llama_n_vocab(llama_ctx);
+    return llama_n_vocab(model);
 }
 
 /*
@@ -293,7 +323,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getEmbeddingSize
         (JNIEnv *env, jclass thisClass) {
-    return llama_n_embd(llama_ctx);
+    return llama_n_embd(model);
 }
 
 /*
@@ -302,34 +332,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getEmbeddingSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
         (JNIEnv *env, jclass thisClass) {
-    return llama_vocab_type(llama_ctx);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getModelVocabSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelVocabSize
-        (JNIEnv *env, jclass thisClass) {
-    return llama_model_n_vocab(model);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getModelContextSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelContextSize
-        (JNIEnv *env, jclass thisClass) {
-    return llama_model_n_ctx(model);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getModelEmbeddingSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelEmbeddingSize
-        (JNIEnv *env, jclass thisClass) {
-    return llama_model_n_embd(model);
+    return llama_vocab_type(model);
 }
 
 /*
@@ -337,26 +340,28 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getModelEmbeddingSize
  * Method:    loadLoraModelFromFile
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
-        (JNIEnv *env, jclass thisClass, jstring loraPath, jstring baseModelPath,
+        (JNIEnv *env, jclass thisClass, jstring loraPath, jfloat scale, jstring baseModelPath,
          jint threads) {
     if (!model) {
         env->ThrowNew(MODEL_EXCEPTION, "llama model cannot be null");
         return -1;
     }
-    return llama_model_apply_lora_from_file(model, ToCString(env, loraPath), ToCString(env, baseModelPath),
+    //TODO  float scale
+    return llama_model_apply_lora_from_file(model, ToCString(env, loraPath), scale, ToCString(env, baseModelPath),
                                             threads);
 }
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    evaluate
+ * Method:    decode
  */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_evaluate
-        (JNIEnv *env, jclass thisClass, jintArray tokensArrays, jint nTokens, jint nPast,
-         jint threads) {
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_decode
+        (JNIEnv *env, jclass thisClass, jintArray tokensArrays, jint nTokens, jint nPast) {
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokensArrays, JNI_FALSE);
 
-    int code = llama_eval(llama_ctx, tokens, nTokens, nPast, threads);
+    llama_batch batch = llama_batch_get_one(tokens, nTokens, nPast, 0);
+
+    int code = llama_decode(llama_ctx, batch);
     env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
     return code;
 }
@@ -368,7 +373,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_evaluate
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
         (JNIEnv *env, jclass thisClass) {
     float *logits = llama_get_logits(llama_ctx);
-    const int vocab_size = llama_n_vocab(llama_ctx);
+    const int vocab_size = llama_n_vocab(model);
 
     jfloatArray arrays = env->NewFloatArray(vocab_size);
     env->SetFloatArrayRegion(arrays, 0, vocab_size, logits);
@@ -382,7 +387,7 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
         (JNIEnv *env, jclass thisClass) {
     float *embeddings = llama_get_embeddings(llama_ctx);
-    const int embd_size = llama_n_embd(llama_ctx);
+    const int embd_size = llama_n_embd(model);
 
     jfloatArray arrays = env->NewFloatArray(embd_size);
     env->SetFloatArrayRegion(arrays, 0, embd_size, embeddings);
@@ -457,7 +462,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
     env->GetByteArrayRegion(buf, 0, bufferLength, buffer);
     const char *text = (char *) buffer;
 
-    int code = llama_tokenize(llama_ctx, text, bufferLength, tokens, maxTokens, ToCBool(addBos));
+    int code = llama_tokenize(model, text, bufferLength, tokens, maxTokens, ToCBool(addBos));
     env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
     env->ReleaseByteArrayElements(buf, buffer, 0);
     return code;
@@ -465,44 +470,12 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    tokenizeWithModel
+ * Method:    tokenToPiece
  */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenizeWithModel
-        (JNIEnv *env, jclass thisClass, jbyteArray buf, jint bufferLength,
-         jintArray tokensArrays,
-         jint maxTokens, jboolean addBos) {
-    llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokensArrays, JNI_FALSE);
-
-    jbyte *buffer = new jbyte[bufferLength];
-    env->GetByteArrayRegion(buf, 0, bufferLength, buffer);
-    const char *text = (char *) buffer;
-
-    int code = llama_tokenize_with_model(model, text, bufferLength, tokens, maxTokens, ToCBool(addBos));
-    env->ReleaseIntArrayElements(tokensArrays, tokens, 0);
-    env->ReleaseByteArrayElements(buf, buffer, 0);
-    return code;
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenToPiece
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPiece
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenToPiece
         (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint bufferLength) {
     jbyte *buffer = new jbyte[bufferLength];
-    int size = llama_token_to_piece(llama_ctx, token, (char *) buffer, bufferLength);
-    env->ReleaseByteArrayElements(buf, buffer, 0);
-    return size;
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenToPieceWithModel
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenToPieceWithModel
-        (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint bufferLength) {
-    jbyte *buffer = new jbyte[bufferLength];
-    int size = llama_token_to_piece_with_model(model, token, (char *) buffer, bufferLength);
+    int size = llama_token_to_piece(model, token, (char *) buffer, bufferLength);
     env->ReleaseByteArrayElements(buf, buffer, 0);
     return size;
 }
@@ -555,7 +528,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
          jfloat typical) {
 
     float *logits = env->GetFloatArrayElements(jLogits, JNI_FALSE);
-    const int n_vocab = llama_n_vocab(llama_ctx);
+    const int n_vocab = llama_n_vocab(model);
     const int token_nl = llama_token_nl(llama_ctx);
     const float nl_logit = logits[token_nl];
     const int32_t top_k = topK <= 0 ? n_vocab : topK;
@@ -587,12 +560,12 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         if (mirostatMode == 1) {
             const int mirostatM = 100;
             static float mirostatMu = 2.0f * mirostatTAU;
-            llama_sample_temperature(llama_ctx, &candidates_p, temperature);
+            llama_sample_temp(llama_ctx, &candidates_p, temperature);
             token = llama_sample_token_mirostat(llama_ctx, &candidates_p, mirostatTAU, mirostatETA, mirostatM,
                                                 &mirostatMu);
         } else if (mirostatMode == 2) {
             static float mirostatMu = 2.0f * mirostatTAU;
-            llama_sample_temperature(llama_ctx, &candidates_p, temperature);
+            llama_sample_temp(llama_ctx, &candidates_p, temperature);
             token = llama_sample_token_mirostat_v2(llama_ctx, &candidates_p, mirostatTAU, mirostatETA,
                                                    &mirostatMu);
         } else {
@@ -600,7 +573,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
             llama_sample_tail_free(llama_ctx, &candidates_p, tsf, 1);
             llama_sample_typical(llama_ctx, &candidates_p, typical, 1);
             llama_sample_top_p(llama_ctx, &candidates_p, topP, 1);
-            llama_sample_temperature(llama_ctx, &candidates_p, temperature);
+            llama_sample_temp(llama_ctx, &candidates_p, temperature);
             token = llama_sample_token(llama_ctx, &candidates_p);
         }
     }
