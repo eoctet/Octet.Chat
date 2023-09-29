@@ -113,7 +113,7 @@ You can use `LogitsProcessor` and `StoppingCriteria` to customize and control th
 
 **chat.octet.model.components.processor.LogitsProcessor**
 
-Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
+Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor.java](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
 ```java
     Map<Integer, String> logitBias = Maps.newLinkedHashMap();
@@ -131,7 +131,7 @@ Customize a processor to adjust the probability distribution of words and contro
 
 **chat.octet.model.components.criteria.StoppingCriteria**
 
-Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
+Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
 ```java
     long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));

@@ -113,7 +113,7 @@ public class CompletionsExample {
 
 **chat.octet.model.components.processor.LogitsProcessor**
 
-自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
+自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor.java](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
 ```java
     Map<Integer, String> logitBias = Maps.newLinkedHashMap();
@@ -131,7 +131,7 @@ public class CompletionsExample {
 
 **chat.octet.model.components.criteria.StoppingCriteria**
 
-自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
+自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
 ```java
     long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
