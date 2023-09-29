@@ -8,7 +8,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 - 🚀 Built based on Llama.cpp, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp).
 - 🚀 Developed using JNI, ~~NOT JNA~~.
 - 🚀 News:
-  - [X] Multi-user sessions (Beta).
+  - [X] Conversation Memory.
 
 
 ## Quick start
@@ -23,13 +23,15 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
     </dependency>
 ```
 
-#### ConsoleQA
+#### Examples
+
+- **Chat Console Example**
 
 Here is a simple chat example, and you can also refer to another project 🤖️ [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git) to further enrich your application.
 
 ```java
-public class ConsoleQA {
-    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+public class ConsoleExample {
+    private static final String MODEL_PATH = "/Users/william/development/llm/tools/zh-models/chinese-alpaca-2-7b/ggml-model-7b-q6_k.gguf";
 
     public static void main(String[] args) {
         ModelParameter modelParams = ModelParameter.builder()
@@ -51,8 +53,7 @@ public class ConsoleQA {
                 if (StringUtils.trimToEmpty(input).equalsIgnoreCase("exit")) {
                     break;
                 }
-                String question = PromptBuilder.toPrompt(system, input);
-                model.generate(generateParams, question).forEach(e -> System.out.print(e.getText()));
+                model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
                 System.out.print("\n");
                 model.metrics();
             }
@@ -64,15 +65,53 @@ public class ConsoleQA {
 }
 ```
 
+- **Chat Completions Example**
+
+```java
+public class ChatCompletionsExample {
+    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+
+    public static void main(String[] args) {
+        GenerateParameter generateParams = GenerateParameter.builder().build();
+
+        try (Model model = new Model(MODEL_PATH)) {
+            CompletionResult result = model.chatCompletions(generateParams, "Who are you?");
+            System.out.println(result);
+        }
+    }
+}
+```
+
+- **Completions Example**
+
+```java
+public class CompletionsExample {
+    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+
+    public static void main(String[] args) {
+        GenerateParameter generateParams = GenerateParameter.builder().build();
+
+        try (Model model = new Model(MODEL_PATH)) {
+            CompletionResult result = model.completions(generateParams, "long time a ago");
+            System.out.println(result);
+        }
+    }
+}
+```
+
 ## Development
 
 #### Customize inference
+
+- **Components**
+  - LogitsProcessor
+  - StoppingCriteria
 
 You can use `LogitsProcessor` and `StoppingCriteria` to customize and control the model inference process.
 
 > Note: If you need to do matrix calculations in Java, please use [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
 
-**chat.octet.model.processor.LogitsProcessor**
+**chat.octet.model.components.processor.LogitsProcessor**
 
 Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
@@ -90,7 +129,7 @@ Customize a processor to adjust the probability distribution of words and contro
 
 ```
 
-**chat.octet.model.criteria.StoppingCriteria**
+**chat.octet.model.components.criteria.StoppingCriteria**
 
 Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
@@ -105,15 +144,6 @@ Customize a controller to implement stop rule control for model inference, such 
     ... ...
 
 ```
-
-#### Multi-user Session (Beta)
-
-The language model is stateless, and when multiple users are chatting at the same time, the language model will experience memory confusion.
-So, I have added support for multi-user sessions, which is currently an experimental feature. Welcome to submit an issue.
-
-- This is user context manager: [UserContextManager](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FUserContextManager.java) 
-
-- The session context window length is `Model.contextSize` (default: 512). When the window length is reached, the conversation history of the most recent `keepContextTokensSize` tokens is retained.
 
 #### [LlamaService](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FLlamaService.java)
 

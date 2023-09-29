@@ -8,7 +8,7 @@
 - 🚀 基于 Llama.cpp 构建，更多细节请关注 **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp)。
 - 🚀 使用JNI开发本地库，~~而不是JNA~~，测试的性能上与其他库无异。
 - 🚀 新增:
-  - [X] 多用户会话，你可以使用不同的用户身份进行聊天 (Beta)。
+  - [X] 对话历史记忆。
 
 
 ## 快速开始
@@ -23,13 +23,15 @@
     </dependency>
 ```
 
-#### ConsoleQA
+#### Examples
+
+- **Chat Console Example**
 
 这里提供了一个简单的聊天示例，你也可以参考 🤖️ [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git) 进一步丰富你的应用。
 
 ```java
-public class ConsoleQA {
-    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+public class ConsoleExample {
+    private static final String MODEL_PATH = "/Users/william/development/llm/tools/zh-models/chinese-alpaca-2-7b/ggml-model-7b-q6_k.gguf";
 
     public static void main(String[] args) {
         ModelParameter modelParams = ModelParameter.builder()
@@ -51,8 +53,7 @@ public class ConsoleQA {
                 if (StringUtils.trimToEmpty(input).equalsIgnoreCase("exit")) {
                     break;
                 }
-                String question = PromptBuilder.toPrompt(system, input);
-                model.generate(generateParams, question).forEach(e -> System.out.print(e.getText()));
+                model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
                 System.out.print("\n");
                 model.metrics();
             }
@@ -64,15 +65,53 @@ public class ConsoleQA {
 }
 ```
 
+- **Chat Completions Example**
+
+```java
+public class ChatCompletionsExample {
+    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+
+    public static void main(String[] args) {
+        GenerateParameter generateParams = GenerateParameter.builder().build();
+
+        try (Model model = new Model(MODEL_PATH)) {
+            CompletionResult result = model.chatCompletions(generateParams, "Who are you?");
+            System.out.println(result);
+        }
+    }
+}
+```
+
+- **Completions Example**
+
+```java
+public class CompletionsExample {
+    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+
+    public static void main(String[] args) {
+        GenerateParameter generateParams = GenerateParameter.builder().build();
+
+        try (Model model = new Model(MODEL_PATH)) {
+            CompletionResult result = model.completions(generateParams, "long time a ago");
+            System.out.println(result);
+        }
+    }
+}
+```
+
 ## 开发手册
 
 #### 自定义推理
+
+- **Components**
+  - LogitsProcessor
+  - StoppingCriteria
 
 可以使用 `LogitsProcessor` 和 `StoppingCriteria` 对模型推理过程进行自定义控制。
 
 > 注：如果需要在Java中进行矩阵计算请使用 [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
 
-**chat.octet.model.processor.LogitsProcessor**
+**chat.octet.model.components.processor.LogitsProcessor**
 
 自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
@@ -90,7 +129,7 @@ public class ConsoleQA {
 
 ```
 
-**chat.octet.model.criteria.StoppingCriteria**
+**chat.octet.model.components.criteria.StoppingCriteria**
 
 自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
@@ -105,15 +144,6 @@ public class ConsoleQA {
     ... ...
 
 ```
-
-#### 多用户会话（Beta）
-
-语言模型本身是无状态的，当多个用户同时进行聊天时，语言模型会记忆混乱。
-因此，我增加了多用户会话的功能支持，目前这是一个实验性的功能，欢迎提交Issue。
-
-- 使用 [UserContextManager](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FUserContextManager.java) 创建用户会话、删除用户会话；
-
-- 会话上下文窗口长度为 `Model.contextSize`（默认值：512），当达到窗口长度时，保留最近 `keepContextTokensSize` 个词汇的对话历史。
 
 #### [LlamaService](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FLlamaService.java)
 
