@@ -1,4 +1,4 @@
-package chat.octet.model.criteria;
+package chat.octet.model.components.criteria;
 
 
 import javax.annotation.Nonnull;

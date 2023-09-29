@@ -1,4 +1,4 @@
-package chat.octet.model.processor;
+package chat.octet.model.components.processor;
 
 
 import com.google.common.base.Preconditions;
