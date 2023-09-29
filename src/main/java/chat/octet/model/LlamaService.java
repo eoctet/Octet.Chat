@@ -32,6 +32,7 @@ public class LlamaService {
 
     public static native void llamaBackendInit(boolean numa);
 
+    // Note: Call once at the end of the program - currently only used for MPI
     @Deprecated
     public static native void llamaBackendFree();
 
