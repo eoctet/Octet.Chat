@@ -15,7 +15,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-
+/**
+ * Generation iterator,
+ * which outputs tokens one by one in a stream format.
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ */
 @Slf4j
 public class Generator implements Iterator<Token> {
     private final GenerateParameter generateParams;
@@ -40,7 +45,7 @@ public class Generator implements Iterator<Token> {
 
         int[] tokens = StringUtils.isNotBlank(text) ? LlamaService.tokenize(text, true) : new int[]{LlamaService.getTokenBOS()};
         if (tokens.length >= contextSize) {
-            throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}", tokens.length, contextSize));
+            throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
         }
         if (generateParams.isVerbosePrompt()) {
             log.info(MessageFormat.format("Print prompt text:\n{0}", text));
@@ -119,7 +124,7 @@ public class Generator implements Iterator<Token> {
         int[] newTokensBuffer = ArrayUtils.subarray(inputIds, keepSize, inputIds.length);
         Arrays.fill(inputIds, 0);
         System.arraycopy(newTokensBuffer, 0, inputIds, 0, newTokensBuffer.length);
-
+        //reset size position
         pastTokensSize = keepSize;
         inputLength = keepSize;
     }
@@ -129,6 +134,12 @@ public class Generator implements Iterator<Token> {
         return !finished;
     }
 
+    /**
+     * Output next token.
+     *
+     * @return Token
+     * @see Token
+     */
     @Override
     public Token next() {
         //evaluation tokens
@@ -136,7 +147,7 @@ public class Generator implements Iterator<Token> {
         pastTokensSize += decodeTokenSize;
         float[] logits = LlamaService.getLogits();
 
-        // execute logits processor
+        //execute logits processor
         if (generateParams.getLogitsProcessorList() != null) {
             logits = generateParams.getLogitsProcessorList().processor(inputIds, logits);
         }
@@ -144,12 +155,13 @@ public class Generator implements Iterator<Token> {
         long timestamp = System.currentTimeMillis();
         int tokenId = LlamaService.sampling(generateParams, logits, inputIds, inputLength, lastTokensSize);
         Token token = new Token(tokenId, timestamp, LlamaTokenType.valueOfType(LlamaService.getTokenType(tokenId)), tokenToPiece(tokenId));
-        //Save new token to the list
+        //Save token to the generate list
         generateTokens.add(token);
-
+        //truncation is required when the generation exceeds the current context size
         if (inputLength + 1 > contextSize) {
             truncate(generateParams.getKeepContextTokensSize());
         }
+        //update current input token
         inputIds[inputLength] = tokenId;
         ++inputLength;
 
@@ -160,12 +172,23 @@ public class Generator implements Iterator<Token> {
         return token;
     }
 
+    /**
+     * Return the generated complete text.
+     *
+     * @return String
+     */
     public String getFullGenerateText() {
         StringBuilder builder = new StringBuilder();
         generateTokens.forEach(token -> builder.append(token.getText()));
         return builder.toString();
     }
 
+    /**
+     * Return the finished reason for the last token.
+     *
+     * @return FinishReason, Last token finished reason.
+     * @see FinishReason
+     */
     public FinishReason getFinishReason() {
         return (generateTokens == null || generateTokens.isEmpty()) ? FinishReason.UNKNOWN : generateTokens.get(generateTokens.size() - 1).getFinishReason();
 

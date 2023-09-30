@@ -5,8 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Prompt builder
  *
- * @author william
- * @version 1.0
+ * @author <a href="https://github.com/eoctet">William</a>
  */
 public class PromptBuilder {
 

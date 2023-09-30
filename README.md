@@ -4,11 +4,12 @@
 
 Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggerganov/llama.cpp), The goal is to integrate the capabilities of LLMs into the Java ecosystem, this project has the same functionality as other language versions.
 
-#### Main content
+#### Main features
 - 🚀 Built based on Llama.cpp, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp).
 - 🚀 Developed using JNI, ~~NOT JNA~~.
 - 🚀 News:
-  - [X] Conversation Memory.
+  - [X] Conversation memory.
+  - [X] Llama grammar.
 
 
 ## Quick start
@@ -16,11 +17,11 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 #### Maven POM
 
 ```xml
-    <dependency>
-        <groupId>chat.octet</groupId>
-        <artifactId>llama-java-core</artifactId>
-        <version>1.1.3</version>
-    </dependency>
+<dependency>
+    <groupId>chat.octet</groupId>
+    <artifactId>llama-java-core</artifactId>
+    <version>1.1.3</version>
+</dependency>
 ```
 
 #### Examples
@@ -132,16 +133,16 @@ You can use `LogitsProcessor` and `StoppingCriteria` to customize and control th
 Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor.java](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
 ```java
-    Map<Integer, String> logitBias = Maps.newLinkedHashMap();
-    logitBias.put(5546, "false");
-    logitBias.put(12113, "5.89");
-    LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
+Map<Integer, String> logitBias = Maps.newLinkedHashMap();
+logitBias.put(5546, "false");
+logitBias.put(12113, "5.89");
+LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
 
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .logitsProcessorList(logitsProcessorList)
-            .build();
+GenerateParameter generateParams = GenerateParameter.builder()
+        .logitsProcessorList(logitsProcessorList)
+        .build();
     
-    ... ...
+...
 
 ```
 
@@ -150,14 +151,14 @@ Customize a processor to adjust the probability distribution of words and contro
 Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
 ```java
-    long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
-    StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
+long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
+StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
 
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .stoppingCriteriaList(stopCriteriaList)
-            .build();
-    
-    ... ...
+GenerateParameter generateParams = GenerateParameter.builder()
+        .stoppingCriteriaList(stopCriteriaList)
+        .build();
+
+...
 
 ```
 
@@ -171,7 +172,7 @@ Develop using JNI:
 > `LlamaService.sampling(...)` sampling has been optimized to reduce performance losses caused by data transfer between JVM Native.
 >
 >
-> More information: [`Java Docs`](docs/API.md)
+> More information: [API docs](docs%2Fapidocs%2Findex.html)
 
 #### Build
 

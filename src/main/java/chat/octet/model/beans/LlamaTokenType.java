@@ -2,45 +2,48 @@ package chat.octet.model.beans;
 
 
 import com.google.common.collect.Maps;
+import lombok.Getter;
 
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * Llama token type define
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ */
+@Getter
 public enum LlamaTokenType {
     /**
-     * LLAMA_TOKEN_TYPE_UNDEFINED
+     * Undefined type.
      */
     LLAMA_TOKEN_TYPE_UNDEFINED(0),
     /**
-     * LLAMA_TOKEN_TYPE_NORMAL
+     * Normal type.
      */
     LLAMA_TOKEN_TYPE_NORMAL(1),
     /**
-     * LLAMA_TOKEN_TYPE_UNKNOWN
+     * Unknown type.
      */
     LLAMA_TOKEN_TYPE_UNKNOWN(2),
     /**
-     * LLAMA_TOKEN_TYPE_CONTROL
+     * Control type.
      */
     LLAMA_TOKEN_TYPE_CONTROL(3),
     /**
-     * LLAMA_TOKEN_TYPE_USER_DEFINED
+     * User defined type.
      */
     LLAMA_TOKEN_TYPE_USER_DEFINED(4),
     /**
-     * LLAMA_TOKEN_TYPE_UNUSED
+     * Unused type.
      */
     LLAMA_TOKEN_TYPE_UNUSED(5),
     /**
-     * LLAMA_TOKEN_TYPE_BYTE
+     * Byte type.
      */
     LLAMA_TOKEN_TYPE_BYTE(6);
 
     private final int type;
-
-    public int getType() {
-        return type;
-    }
 
     private static final Map<Integer, LlamaTokenType> TYPES;
 

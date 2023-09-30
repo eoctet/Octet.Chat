@@ -8,6 +8,11 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Stopping criteria list
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ */
 public final class LogitsProcessorList extends ArrayList<LogitsProcessor> implements LogitsProcessor {
 
     public LogitsProcessorList() {

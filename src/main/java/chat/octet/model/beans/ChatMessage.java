@@ -3,6 +3,11 @@ package chat.octet.model.beans;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+/**
+ * Chat message entity
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatMessage {
@@ -18,19 +23,35 @@ public class ChatMessage {
         this.content = content;
     }
 
+    /**
+     * Chat role define
+     *
+     * @author <a href="https://github.com/eoctet">William</a>
+     */
     public enum ChatRole {
-        SYSTEM, USER, ASSISTANT
+        /**
+         * System prompt
+         */
+        SYSTEM,
+        /**
+         * User role
+         */
+        USER,
+        /**
+         * Assistant role
+         */
+        ASSISTANT
     }
 
-    public static ChatMessage system(String content) {
+    public static ChatMessage toSystem(String content) {
         return new ChatMessage(ChatRole.SYSTEM, content);
     }
 
-    public static ChatMessage user(String content) {
+    public static ChatMessage toUser(String content) {
         return new ChatMessage(ChatRole.USER, content);
     }
 
-    public static ChatMessage assistant(String content) {
+    public static ChatMessage toAssistant(String content) {
         return new ChatMessage(ChatRole.ASSISTANT, content);
     }
 }

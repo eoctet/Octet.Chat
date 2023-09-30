@@ -8,6 +8,11 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Stopping criteria list
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ */
 @Slf4j
 public class StoppingCriteriaList extends ArrayList<StoppingCriteria> implements StoppingCriteria {
 

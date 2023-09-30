@@ -10,13 +10,13 @@ import java.util.Objects;
 /**
  * Token
  *
- * @author william
- * @version 1.0
+ * @author <a href="https://github.com/eoctet">William</a>
  */
 @Getter
 @ToString
 public final class Token implements Serializable {
     private final int id;
+    //NOTE: Token sampling time in milliseconds
     private final long elapsed;
     private final String text;
     private final LlamaTokenType tokenType;

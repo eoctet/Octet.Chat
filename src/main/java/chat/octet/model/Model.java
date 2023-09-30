@@ -26,10 +26,8 @@ import java.util.Map;
 /**
  * LLama model, which provides functions for generating and chatting conversations.
  *
- * @author william
- * @since 1.0
+ * @author <a href="https://github.com/eoctet">William</a>
  */
-
 @Slf4j
 public class Model implements AutoCloseable {
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
@@ -43,7 +41,7 @@ public class Model implements AutoCloseable {
     private final int lastTokensSize;
     private final int keepSize;
     private final Map<Integer, List<ChatMessage>> conversation;
-    private int conversationTimes = 1;
+    private int conversationTimes;
     private Generator chatGenerator;
 
     public Model(String modelPath) {
@@ -61,6 +59,7 @@ public class Model implements AutoCloseable {
         this.modelParams = modelParams;
         this.modelName = modelParams.getModelName();
         this.conversation = Maps.newConcurrentMap();
+        this.conversationTimes = 1;
         //setting model parameters
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
         LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);
@@ -164,10 +163,25 @@ public class Model implements AutoCloseable {
         return PromptBuilder.toPrompt(finalSystemPrompts, question.getContent());
     }
 
+    /**
+     * Generate complete text.
+     *
+     * @param text Input text or prompt.
+     * @return CompletionResult, generated text and completion reason.
+     * @see CompletionResult
+     */
     public CompletionResult completions(String text) {
         return completions(GenerateParameter.builder().build(), text);
     }
 
+    /**
+     * Generate complete text.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param text           Input text or prompt.
+     * @return CompletionResult, generated text and completion reason.
+     * @see CompletionResult
+     */
     public CompletionResult completions(GenerateParameter generateParams, String text) {
         Iterable<Token> tokenIterable = generate(generateParams, text);
         tokenIterable.forEach(e -> {
@@ -176,10 +190,25 @@ public class Model implements AutoCloseable {
         return CompletionResult.builder().content(generator.getFullGenerateText()).finishReason(generator.getFinishReason()).build();
     }
 
+    /**
+     * Generate text in stream format.
+     *
+     * @param text Input text or prompt.
+     * @return Iterable, Generation iterator.
+     * @see Generator
+     */
     public Iterable<Token> generate(String text) {
         return generate(GenerateParameter.builder().build(), text);
     }
 
+    /**
+     * Generate text in stream format.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param text           Input text or prompt.
+     * @return Iterable, Generation iterator.
+     * @see Generator
+     */
     public Iterable<Token> generate(GenerateParameter generateParams, String text) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(text, "Text cannot be null");
@@ -199,14 +228,38 @@ public class Model implements AutoCloseable {
         };
     }
 
+    /**
+     * Start a conversation and chat.
+     *
+     * @param question User question.
+     * @return CompletionResult, generated text and completion reason.
+     * @see CompletionResult
+     */
     public CompletionResult chatCompletions(String question) {
         return chatCompletions(GenerateParameter.builder().build(), null, question);
     }
 
+    /**
+     * Start a conversation and chat.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param question       User question.
+     * @return CompletionResult, generated text and completion reason.
+     * @see CompletionResult
+     */
     public CompletionResult chatCompletions(GenerateParameter generateParams, String question) {
         return chatCompletions(generateParams, null, question);
     }
 
+    /**
+     * Start a conversation and chat.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param system         System prompt.
+     * @param question       User question.
+     * @return CompletionResult, generated text and completion reason.
+     * @see CompletionResult
+     */
     public CompletionResult chatCompletions(GenerateParameter generateParams, String system, String question) {
         Iterable<Token> tokenIterable = chat(generateParams, system, question);
         tokenIterable.forEach(e -> {
@@ -215,34 +268,66 @@ public class Model implements AutoCloseable {
         return CompletionResult.builder().content(generator.getFullGenerateText()).finishReason(generator.getFinishReason()).build();
     }
 
+    /**
+     * Start a conversation and chat in streaming format.
+     *
+     * @param question User question.
+     * @return Iterable, Generation iterator.
+     * @see Generator
+     */
     public Iterable<Token> chat(String question) {
         return chat(GenerateParameter.builder().build(), null, question);
     }
 
+    /**
+     * Start a conversation and chat in streaming format.
+     *
+     * @param system   System prompt.
+     * @param question User question.
+     * @return Iterable, Generation iterator.
+     * @see Generator
+     */
     public Iterable<Token> chat(String system, String question) {
         return chat(GenerateParameter.builder().build(), system, question);
     }
 
+    /**
+     * Start a conversation and chat in streaming format.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param question       User question.
+     * @return Iterable, Generation iterator.
+     * @see Generator
+     */
     public Iterable<Token> chat(GenerateParameter generateParams, String question) {
         return chat(generateParams, null, question);
     }
 
+    /**
+     * Start a conversation and chat in streaming format.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param system         System prompt.
+     * @param question       User question.
+     * @return Iterable, Generation iterator.
+     * @see Generator
+     */
     public Iterable<Token> chat(GenerateParameter generateParams, String system, String question) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(question, "question cannot be null");
 
         //append last response
         if (chatGenerator != null) {
-            conversation.get(conversationTimes).add(ChatMessage.assistant(chatGenerator.getFullGenerateText()));
+            conversation.get(conversationTimes).add(ChatMessage.toAssistant(chatGenerator.getFullGenerateText()));
             ++conversationTimes;
             chatGenerator = null;
         }
         //create new conversation messages
         List<ChatMessage> messages = Lists.newArrayList();
         if (StringUtils.isNotBlank(system)) {
-            messages.add(ChatMessage.system(system));
+            messages.add(ChatMessage.toSystem(system));
         }
-        messages.add(ChatMessage.user(question));
+        messages.add(ChatMessage.toUser(question));
         conversation.put(conversationTimes, messages);
         //
         String prompt = getPromptByConversation(generateParams);
@@ -252,18 +337,28 @@ public class Model implements AutoCloseable {
         return tokenIterable;
     }
 
+    /**
+     * Print generation metrics.
+     * <p>Require verbose parameter to be true.</p>
+     */
     public void metrics() {
         if (modelParams.isVerbose()) {
             log.info("Metrics: " + LlamaService.getSamplingMetrics(true).toString());
         }
     }
 
+    /**
+     * Remove conversation memory.
+     */
     public void removeConversationMemory() {
         if (conversation != null && !conversation.isEmpty()) {
             conversation.clear();
         }
     }
 
+    /**
+     * Close the model and release resources.
+     */
     @Override
     public void close() {
         LlamaService.release();

@@ -1,14 +1,42 @@
 package chat.octet.model.beans;
 
+import chat.octet.model.components.criteria.StoppingCriteria;
+
 /**
  * Token generate status
  *
- * @author william
- * @version 1.0
+ * @author <a href="https://github.com/eoctet">William</a>
  */
 public enum FinishReason {
-    FINISHED, LENGTH, STOP, NONE, UNKNOWN;
+    /**
+     * Completed generation.
+     */
+    FINISHED,
+    /**
+     * Generation has exceeded the maximum token limit and has been truncated.
+     */
+    LENGTH,
+    /**
+     * Generation stopped by StoppingCriteria.
+     *
+     * @see StoppingCriteria
+     */
+    STOP,
+    /**
+     * Default type.
+     */
+    NONE,
+    /**
+     * Unknown type, no available token state.
+     */
+    UNKNOWN;
 
+    /**
+     * Check if the token has been completed else return false.
+     * Finished reason: FINISHED / LENGTH / STOP
+     *
+     * @return boolean
+     */
     public boolean isFinished() {
         return this == FINISHED || this == LENGTH || this == STOP;
     }

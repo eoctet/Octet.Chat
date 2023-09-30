@@ -1,6 +1,7 @@
 package chat.octet.model.parameters;
 
 import chat.octet.model.beans.LlamaContextParams;
+import chat.octet.model.beans.LlamaModelParams;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -11,10 +12,9 @@ import javax.annotation.Nullable;
 /**
  * Llama model parameters
  *
- * @author william
- * @version 1.0
+ * @author <a href="https://github.com/eoctet">William</a>
+ * @see LlamaModelParams
  * @see LlamaContextParams
- * <a href="https://github.com/ggerganov/llama.cpp/blob/master/examples/main/README.md">Llama cpp docs</a>.
  */
 @Getter
 @Builder

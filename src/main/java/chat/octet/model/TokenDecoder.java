@@ -3,6 +3,11 @@ package chat.octet.model;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Token decoder
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ */
 public class TokenDecoder {
 
     private TokenDecoder() {

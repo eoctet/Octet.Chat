@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.text.MessageFormat;
 
+/**
+ * Generation metrics
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ */
 @Data
 public class Metrics {
 

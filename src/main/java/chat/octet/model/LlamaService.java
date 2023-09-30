@@ -13,6 +13,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 
+/**
+ * Llama.cpp API
+ * <p>C++ source: llamajava.h, llamajava.cpp</p>
+ *
+ * @author <a href="https://github.com/eoctet">William</a>
+ * @since b1292
+ */
 public class LlamaService {
 
     static {

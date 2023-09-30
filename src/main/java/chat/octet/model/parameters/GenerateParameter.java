@@ -9,14 +9,13 @@ import lombok.ToString;
 import javax.annotation.Nullable;
 
 /**
- * Sampling parameters
- * Llama cpp
- * <a href="https://github.com/ggerganov/llama.cpp/blob/master/examples/main/README.md">Llama cpp docs</a>.
- * transformers documentation
+ * <p>Generate parameter</p>
+ * For more information, please refer to
+ * <a href="https://github.com/ggerganov/llama.cpp/blob/master/examples/main/README.md">Llama.cpp docs</a>
+ * and
  * <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">Transformers docs</a>.
  *
- * @author william
- * @version 1.0
+ * @author <a href="https://github.com/eoctet">William</a>
  */
 @Getter
 @Builder
@@ -150,11 +149,17 @@ public final class GenerateParameter {
     @Nullable
     private StoppingCriteriaList stoppingCriteriaList;
 
-
+    /**
+     * <b>user</b><br/>
+     * Specify user nickname, default: User.
+     */
     @Builder.Default
     private String user = "User";
 
-
+    /**
+     * <b>assistant</b><br/>
+     * Specify bot nickname, default: Assistant.
+     */
     @Builder.Default
     private String assistant = "Assistant";
 

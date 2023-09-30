@@ -4,23 +4,23 @@
 
 这是一个基于 🦙[`llama.cpp`](https://github.com/ggerganov/llama.cpp)  API开发的Java库，目标是更快速将大语言模型的能力集成到Java生态，本项目和其他语言版本库具有一样的功能。
 
-#### 主要功能
+#### 主要特点
 - 🚀 基于 Llama.cpp 构建，更多细节请关注 **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp)。
 - 🚀 使用JNI开发本地库，~~而不是JNA~~，测试的性能上与其他库无异。
 - 🚀 新增:
   - [X] 对话历史记忆。
-
+  - [X] Llama 语法解析。
 
 ## 快速开始
 
 #### Maven POM
 
 ```xml
-    <dependency>
-        <groupId>chat.octet</groupId>
-        <artifactId>llama-java-core</artifactId>
-        <version>1.1.3</version>
-    </dependency>
+<dependency>
+    <groupId>chat.octet</groupId>
+    <artifactId>llama-java-core</artifactId>
+    <version>1.1.3</version>
+</dependency>
 ```
 
 #### Examples
@@ -132,16 +132,16 @@ public class ModelExample {
 自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor.java](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
 
 ```java
-    Map<Integer, String> logitBias = Maps.newLinkedHashMap();
-    logitBias.put(5546, "false");
-    logitBias.put(12113, "5.89");
-    LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
+Map<Integer, String> logitBias = Maps.newLinkedHashMap();
+logitBias.put(5546, "false");
+logitBias.put(12113, "5.89");
+LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
 
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .logitsProcessorList(logitsProcessorList)
-            .build();
+GenerateParameter generateParams = GenerateParameter.builder()
+        .logitsProcessorList(logitsProcessorList)
+        .build();
 
-    ... ...
+...
 
 ```
 
@@ -150,14 +150,14 @@ public class ModelExample {
 自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
 
 ```java
-    long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
-    StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
+long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
+StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
 
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .stoppingCriteriaList(stopCriteriaList)
-            .build();
+GenerateParameter generateParams = GenerateParameter.builder()
+        .stoppingCriteriaList(stopCriteriaList)
+        .build();
 
-    ... ...
+...
 
 ```
 
@@ -168,7 +168,7 @@ public class ModelExample {
 > `LlamaService.sampling(...)` 对采样进行了优化，以减少JVM Native之间数据传递带来的性能损失。
 >
 >
-> 完整的文档请参考[`Java Docs`](docs/API.md)。
+> 完整的文档请参考 [API docs](docs%2Fapidocs%2Findex.html)。
 
 #### 如何编译
 
