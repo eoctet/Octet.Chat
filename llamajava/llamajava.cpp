@@ -3,12 +3,18 @@
 //
 #include "llama.h"
 #include "llamajava.h"
+#include "common/grammar-parser.h"
 #include <vector>
 
-//Global ref
+//Global define
 llama_model *model = nullptr;
 llama_context *llama_ctx = nullptr;
+static int batchSize;
 
+//Grammar
+llama_grammar *grammar = nullptr;
+
+//JNI init native status
 static bool init_native = false;
 
 //Class ModelException:
@@ -237,7 +243,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
     struct llama_model_params params = GetLlamaModelParams(env, llamaModelParams);
     model = llama_load_model_from_file(ToCString(env, modelPath), params);
 
-    if (!model) {
+    if (model == nullptr) {
         env->ThrowNew(MODEL_EXCEPTION, "Load model failed");
     }
 }
@@ -250,8 +256,9 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_createNewContextWithMo
         (JNIEnv *env, jclass thisClass, jobject llamaContextParams) {
     struct llama_context_params params = GetLlamaContextParams(env, llamaContextParams);
     llama_ctx = llama_new_context_with_model(model, params);
+    batchSize = params.n_batch;
 
-    if (!llama_ctx) {
+    if (llama_ctx == nullptr) {
         env->ThrowNew(MODEL_EXCEPTION, "Create llama context failed");
     }
 }
@@ -262,13 +269,17 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_createNewContextWithMo
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
         (JNIEnv *env, jclass thisClass) {
-    if (model) {
+    if (model != nullptr) {
         llama_free_model(model);
         model = nullptr;
     }
-    if (llama_ctx) {
+    if (llama_ctx != nullptr) {
         llama_free(llama_ctx);
         llama_ctx = nullptr;
+    }
+    if (grammar != nullptr) {
+        llama_grammar_free(grammar);
+        grammar = nullptr;
     }
 }
 
@@ -337,12 +348,21 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
 
 /*
  * Class:     chat_octet_model_LlamaService
+ * Method:    getBatchSize
+ */
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getBatchSize
+        (JNIEnv *env, jclass thisClass) {
+    return batchSize;
+}
+
+/*
+ * Class:     chat_octet_model_LlamaService
  * Method:    loadLoraModelFromFile
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
         (JNIEnv *env, jclass thisClass, jstring loraPath, jfloat scale, jstring baseModelPath,
          jint threads) {
-    if (!model) {
+    if (model == nullptr) {
         env->ThrowNew(MODEL_EXCEPTION, "llama model cannot be null");
         return -1;
     }
@@ -552,6 +572,10 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         candidates_p.data[token_nl].logit = nl_logit;
     }
 
+    if (grammar != nullptr) {
+        llama_sample_grammar(llama_ctx, &candidates_p, grammar);
+    }
+
     llama_token token;
     if (temperature <= 0) {
         token = llama_sample_token_greedy(llama_ctx, &candidates_p);
@@ -576,8 +600,37 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
             token = llama_sample_token(llama_ctx, &candidates_p);
         }
     }
+
+    if (grammar != nullptr) {
+        llama_grammar_accept_token(llama_ctx, grammar, token);
+    }
     //clear all resources
     env->ReleaseIntArrayElements(lastTokensArray, lastTokens, 0);
     env->ReleaseFloatArrayElements(jLogits, logits, 0);
     return token;
+}
+
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    loadLlamaGrammar
+ */
+JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
+        (JNIEnv *env, jclass thisClass, jstring grammarRules) {
+    if (grammarRules == nullptr) {
+        return false;
+    }
+    if (grammar != nullptr) {
+        llama_grammar_free(grammar);
+    }
+    const char *grammarBytes = env->GetStringUTFChars(grammarRules, JNI_FALSE);
+    grammar_parser::parse_state parsed_grammar = grammar_parser::parse(grammarBytes);
+
+    jboolean status = false;
+    if (!parsed_grammar.rules.empty()) {
+        std::vector<const llama_grammar_element *> grammar_rules(parsed_grammar.c_rules());
+        grammar = llama_grammar_init(grammar_rules.data(), grammar_rules.size(), parsed_grammar.symbol_ids.at("root"));
+        status = true;
+    }
+    env->ReleaseStringUTFChars(grammarRules, grammarBytes);
+    return status;
 }

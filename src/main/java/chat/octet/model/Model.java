@@ -78,8 +78,6 @@ public class Model implements AutoCloseable {
         //setting context parameters
         LlamaContextParams llamaContextParams = getLlamaContextParameters(modelParams);
         LlamaService.createNewContextWithModel(llamaContextParams);
-        LlamaService.batchSize = modelParams.getBatchSize();
-        LlamaService.threads = modelParams.getThreads();
         this.keepSize = (modelParams.getKeep() > 0 && modelParams.getKeep() <= DEFAULT_KEEP_SIZE) ? modelParams.getKeep() : DEFAULT_KEEP_SIZE;
         this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastNTokensSize();
 

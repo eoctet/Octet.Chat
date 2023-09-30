@@ -109,14 +109,13 @@ public final class GenerateParameter {
     @Builder.Default
     private float mirostatTAU = 5.0f;
 
-//    /**
-//     * <b>grammars</b><br/>
-//     * Specify a grammar (defined inline or in a file) to constrain model output to a specific format.
-//     * For example, you could force the model to output JSON or to speak only in emojis
-//     * <b>TODO Not yet realized<b/>
-//     */
-//    @Nullable
-//    private Object grammar;
+    /**
+     * <b>grammars</b><br/>
+     * Specify a grammar (defined inline or in a file) to constrain model output to a specific format.
+     * For example, you could force the model to output JSON or to speak only in emojis
+     */
+    @Nullable
+    private String grammarRules;
 
     /**
      * <b>max-new-tokens</b><br/>

@@ -36,7 +36,7 @@ OS_VER=$(uname -s)
 
 if [ "$OS_VER" == "Darwin" ]; then
   #Build MacOS dylib
-  BUILD_LLAMA_JAVA_DYLIB_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.dylib: llama.o ggml.o llamajava.o \$(OBJS) \n\t\$(CXX) \$(CXXFLAGS) -shared -fPIC -o \$@ $^ \$(LDFLAGS)\n"
+  BUILD_LLAMA_JAVA_DYLIB_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.dylib: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS) \n\t\$(CXX) \$(CXXFLAGS) -shared -fPIC -o \$@ $^ \$(LDFLAGS)\n"
   BUILD_LLAMA_CMD="$BUILD_LLAMA_JAVA_DYLIB_CMD\nclean:"
   #echo $BUILD_LLAMA_CMD
   sed -i "" -e "s/clean:/$BUILD_LLAMA_CMD/g" "$LLAMA_CPP_DIR/Makefile"
@@ -51,7 +51,7 @@ if [ "$OS_VER" == "Darwin" ]; then
 elif [ "$OS_VER" == "Linux" ]; then
   #Build linux so
   LIB_LLAMA_CMD="libllama.so: llama.o ggml.o \$(OBJS)"
-  BUILD_LLAMA_JAVA_SO_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.so: llama.o ggml.o llamajava.o \$(OBJS)"
+  BUILD_LLAMA_JAVA_SO_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.so: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS)"
   #echo $BUILD_LLAMA_JAVA_SO_CMD
   sed -i "s/$LIB_LLAMA_CMD/$BUILD_LLAMA_JAVA_SO_CMD/g" "$LLAMA_CPP_DIR/Makefile"
 

@@ -1,6 +1,7 @@
 package chat.octet.model;
 
 import chat.octet.model.beans.FinishReason;
+import chat.octet.model.beans.LlamaTokenType;
 import chat.octet.model.beans.Token;
 import chat.octet.model.parameters.GenerateParameter;
 import com.google.common.collect.Lists;
@@ -51,7 +52,12 @@ public class Generator implements Iterator<Token> {
         if (maxNewTokensSize + tokens.length > contextSize) {
             maxNewTokensSize = contextSize - tokens.length;
         }
-
+        if (StringUtils.isNotBlank(generateParams.getGrammarRules())) {
+            boolean status = LlamaService.loadLlamaGrammar(generateParams.getGrammarRules());
+            if (!status) {
+                log.error("Grammar rule parsing failed, Please check the grammar rule format.");
+            }
+        }
         generateTokens = Lists.newArrayList();
         log.debug(MessageFormat.format("Generate starting, input tokens size: {0}.", tokens.length));
     }
@@ -137,7 +143,7 @@ public class Generator implements Iterator<Token> {
         //do sampling
         long timestamp = System.currentTimeMillis();
         int tokenId = LlamaService.sampling(generateParams, logits, inputIds, inputLength, lastTokensSize);
-        Token token = new Token(tokenId, timestamp, tokenToPiece(tokenId));
+        Token token = new Token(tokenId, timestamp, LlamaTokenType.valueOfType(LlamaService.getTokenType(tokenId)), tokenToPiece(tokenId));
         //Save new token to the list
         generateTokens.add(token);
 

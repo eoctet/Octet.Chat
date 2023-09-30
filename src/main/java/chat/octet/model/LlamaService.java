@@ -15,9 +15,6 @@ import java.text.MessageFormat;
 
 public class LlamaService {
 
-    public static int batchSize;
-    public static int threads;
-
     static {
         System.load(Platform.LIB_RESOURCE_PATH);
         initNative();
@@ -56,6 +53,8 @@ public class LlamaService {
 
     public static native int getVocabType();
 
+    public static native int getBatchSize();
+
     public static native int loadLoraModelFromFile(String loraPath, float loraScale, String baseModelPath, int threads);
 
     public static native int decode(int[] tokens, int nTokens, int nPast);
@@ -86,6 +85,7 @@ public class LlamaService {
 
     public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical);
 
+    public static native boolean loadLlamaGrammar(String grammarRules);
 
     public static float[] embedding(String text) {
         Preconditions.checkNotNull(text, "Text cannot be null");
@@ -112,8 +112,8 @@ public class LlamaService {
         int decodeSize;
         for (decodeTokenSize = 0; pastTokens < inputLength; decodeTokenSize += decodeSize) {
             decodeSize = inputLength - pastTokens;
-            if (decodeSize > batchSize) {
-                decodeSize = batchSize;
+            if (decodeSize > getBatchSize()) {
+                decodeSize = getBatchSize();
             }
 
             int endIndex = decodeSize + pastTokens;
