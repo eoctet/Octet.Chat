@@ -155,6 +155,8 @@ public class Model implements AutoCloseable {
                 if (!msg.getContent().equalsIgnoreCase(firstSystemPrompt)) {
                     systemPrompts.append(msg.getContent()).append(LINE_CHAR);
                 }
+            } else {
+                throw new IllegalArgumentException("Unsupported role type " + msg.getRole());
             }
         }
         String now = "Current time: " + DATETIME_FORMATTER.format(ZonedDateTime.now());
