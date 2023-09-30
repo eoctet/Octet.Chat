@@ -164,14 +164,14 @@ public class ModelParameter {
      * Base frequency for RoPE sampling.
      */
     @Builder.Default
-    private float ropeFreqBase = 10000.0f;
+    private float ropeFreqBase = 0;
 
     /**
      * <b>rope-freq-scale</b><br/>
      * Scale factor for RoPE sampling.
      */
     @Builder.Default
-    private float ropeFreqScale = 1.0f;
+    private float ropeFreqScale = 0;
 
     /**
      * <b>n-gqa</b><br/>
