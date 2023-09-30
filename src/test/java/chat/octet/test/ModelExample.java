@@ -37,11 +37,9 @@ public class ModelExample {
 
             //Example 3: Chat with memory prompt
             //Model: llama2-chat
-            String sys = "Answer the questions.";
-            String user = "Who are you?";
 
             //streaming output
-            model.chat(generateParams, sys, user).forEach(e -> System.out.print(e.getText()));
+            model.chat(generateParams, system, question).forEach(e -> System.out.print(e.getText()));
 
             //completion output
             CompletionResult response = model.chatCompletions(generateParams, prompt);
