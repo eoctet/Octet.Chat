@@ -57,8 +57,6 @@ public class LlamaService {
 
     public static native int getVocabType();
 
-    public static native int getBatchSize();
-
     public static native int loadLoraModelFromFile(String loraPath, float loraScale, String baseModelPath, int threads) throws ModelException;
 
     public static native float[] getLogits(int index);

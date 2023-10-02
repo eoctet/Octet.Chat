@@ -115,13 +115,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getBatchSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getBatchSize
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    loadLoraModelFromFile
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
