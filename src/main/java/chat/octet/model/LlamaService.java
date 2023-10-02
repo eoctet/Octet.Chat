@@ -5,7 +5,6 @@ import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.beans.Metrics;
 import chat.octet.model.exceptions.ModelException;
-import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.Platform;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.ArrayUtils;
@@ -36,13 +35,11 @@ public class LlamaService {
 
     public static native void llamaBackendInit(boolean numa);
 
-    // Note: Call once at the end of the program - currently only used for MPI
-    @Deprecated
     public static native void llamaBackendFree();
 
-    public static native void loadLlamaModelFromFile(String modelPath, LlamaModelParams params);
+    public static native void loadLlamaModelFromFile(String modelPath, LlamaModelParams params) throws ModelException;
 
-    public static native void createNewContextWithModel(LlamaContextParams params);
+    public static native void createNewContextWithModel(LlamaContextParams params) throws ModelException;
 
     public static native void release();
 
@@ -62,11 +59,9 @@ public class LlamaService {
 
     public static native int getBatchSize();
 
-    public static native int loadLoraModelFromFile(String loraPath, float loraScale, String baseModelPath, int threads);
+    public static native int loadLoraModelFromFile(String loraPath, float loraScale, String baseModelPath, int threads) throws ModelException;
 
-    public static native int decode(int[] tokens, int nTokens, int nPast);
-
-    public static native float[] getLogits();
+    public static native float[] getLogits(int index);
 
     public static native float[] getEmbeddings();
 
@@ -90,15 +85,16 @@ public class LlamaService {
 
     public static native String getSystemInfo();
 
-    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical);
+    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, int sequenceId, int pastTokens) throws ModelException;
 
     public static native boolean loadLlamaGrammar(String grammarRules);
 
-    public static float[] embedding(String text) {
-        Preconditions.checkNotNull(text, "Text cannot be null");
-        int[] tokens = tokenize(new String(text.getBytes(StandardCharsets.UTF_8)), true);
-        decodeTokens(tokens, 0, tokens.length);
-        return getEmbeddings();
+    public static native int batchDecode(int[] tokens) throws ModelException;
+
+    public static native void clearCache(int sequenceId, int posStart, int posEnd);
+
+    public static void clearCache(int sequenceId) {
+        clearCache(sequenceId, 0, getContextSize());
     }
 
     public static int[] tokenize(String text, boolean addBos) {
@@ -112,47 +108,4 @@ public class LlamaService {
         return ArrayUtils.subarray(tokens, 0, nextTokens);
     }
 
-    public static int decodeTokens(int[] inputIds, int pastTokensSize, int inputLength) {
-        int pastTokens = pastTokensSize;
-
-        int decodeTokenSize;
-        int decodeSize;
-        for (decodeTokenSize = 0; pastTokens < inputLength; decodeTokenSize += decodeSize) {
-            decodeSize = inputLength - pastTokens;
-            if (decodeSize > getBatchSize()) {
-                decodeSize = getBatchSize();
-            }
-
-            int endIndex = decodeSize + pastTokens;
-            int[] batchTokens = ArrayUtils.subarray(inputIds, pastTokens, endIndex);
-            int returnCode = decode(batchTokens, decodeSize, pastTokens);
-            if (returnCode != 0) {
-                throw new ModelException("failed to decode, return code: " + returnCode);
-            }
-            pastTokens += decodeSize;
-        }
-        return decodeTokenSize;
-    }
-
-    public static int sampling(GenerateParameter generateParams, float[] logits, int[] inputIds, int inputLength, int lastTokensSize) {
-        int startIndex = Math.max(0, inputLength - lastTokensSize);
-        int[] lastTokens = ArrayUtils.subarray(inputIds, startIndex, inputLength);
-        return sampling(
-                logits,
-                lastTokens,
-                lastTokensSize,
-                generateParams.getRepeatPenalty(),
-                generateParams.getFrequencyPenalty(),
-                generateParams.getPresencePenalty(),
-                generateParams.isPenalizeNl(),
-                generateParams.getMirostatMode().ordinal(),
-                generateParams.getMirostatTAU(),
-                generateParams.getMirostatETA(),
-                generateParams.getTemperature(),
-                generateParams.getTopK(),
-                generateParams.getTopP(),
-                generateParams.getTsf(),
-                generateParams.getTypical()
-        );
-    }
 }

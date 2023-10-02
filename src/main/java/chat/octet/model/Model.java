@@ -22,6 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * LLama model, which provides functions for generating and chatting conversations.
@@ -81,9 +83,9 @@ public class Model implements AutoCloseable {
         this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastNTokensSize();
 
         if (modelParams.isVerbose()) {
-            log.info(MessageFormat.format("system info: {0}", LlamaService.getSystemInfo()));
+            log.info("system info: {}", LlamaService.getSystemInfo());
         }
-        log.info(MessageFormat.format("model parameters: {0}", modelParams));
+        log.info("model parameters: {}", modelParams);
     }
 
     private LlamaModelParams getLlamaModelParameters(ModelParameter modelParams) {
@@ -227,6 +229,20 @@ public class Model implements AutoCloseable {
                 }
                 return generator;
             }
+
+            @Override
+            public void forEach(Consumer<? super Token> action) {
+                Objects.requireNonNull(action);
+                try {
+                    for (Token token : this) {
+                        action.accept(token);
+                    }
+                } catch (Exception e) {
+                    throw new ModelException("Generate next token error ", e);
+                } finally {
+                    generator.clearCache();
+                }
+            }
         };
     }
 
@@ -345,7 +361,7 @@ public class Model implements AutoCloseable {
      */
     public void metrics() {
         if (modelParams.isVerbose()) {
-            log.info("Metrics: " + LlamaService.getSamplingMetrics(true).toString());
+            log.info("Metrics: {}", LlamaService.getSamplingMetrics(true).toString());
         }
     }
 
@@ -364,6 +380,7 @@ public class Model implements AutoCloseable {
     @Override
     public void close() {
         LlamaService.release();
+        LlamaService.llamaBackendFree();
     }
 
     @Override

@@ -16,15 +16,12 @@ import java.util.Objects;
 @ToString
 public final class Token implements Serializable {
     private final int id;
-    //NOTE: Token sampling time in milliseconds
-    private final long elapsed;
     private final String text;
     private final LlamaTokenType tokenType;
     private FinishReason finishReason;
 
-    public Token(int id, long elapsed, LlamaTokenType tokenType, String text) {
+    public Token(int id, LlamaTokenType tokenType, String text) {
         this.id = id;
-        this.elapsed = System.currentTimeMillis() - elapsed;
         this.text = text;
         this.tokenType = tokenType;
         this.finishReason = FinishReason.NONE;

@@ -129,17 +129,10 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    decode
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_decode
-        (JNIEnv *, jclass, jintArray, jint, jint);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    getLogits
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
-        (JNIEnv *, jclass);
+        (JNIEnv *, jclass, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
@@ -224,7 +217,7 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getSystemInfo
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         (JNIEnv *, jclass, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jint, jfloat,
-         jfloat, jfloat, jint, jfloat, jfloat, jfloat);
+         jfloat, jfloat, jint, jfloat, jfloat, jfloat, jint, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
@@ -232,6 +225,21 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
         (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    batchDecode
+ */
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
+        (JNIEnv *, jclass, jintArray);
+
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    clearCache
+ */
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
+        (JNIEnv *, jclass, jint, jint, jint);
+
 
 #ifdef __cplusplus
 }
