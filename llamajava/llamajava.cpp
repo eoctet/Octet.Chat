@@ -610,16 +610,20 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     }
 
     //decode the next new token
-    llama_batch batch = llama_batch_init(1, 0);
-    batch.token[0] = token;
-    batch.pos[0] = past_tokens;
-    batch.seq_id[0] = sequence_id;
-    batch.logits[0] = true;
-    batch.n_tokens = 1;
-    int decode_status = llama_decode(llama_ctx, batch);
+    int decode_status = 0;
+    if (token != llama_token_eos(llama_ctx)) {
+        //decode the next new token
+        llama_batch batch = llama_batch_init(1, 0);
+        batch.token[0] = token;
+        batch.pos[0] = past_tokens;
+        batch.seq_id[0] = sequence_id;
+        batch.logits[0] = true;
+        batch.n_tokens = 1;
+        decode_status = llama_decode(llama_ctx, batch);
+        llama_batch_free(batch);
+    }
 
     //clear all resources
-    llama_batch_free(batch);
     env->ReleaseIntArrayElements(last_tokens_array, last_tokens, 0);
     env->ReleaseFloatArrayElements(jlogits, logits, 0);
 

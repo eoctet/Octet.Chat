@@ -91,7 +91,7 @@ public class Generator implements Iterator<Token> {
         return false;
     }
 
-    private String tokenToPiece(int token) {
+    private String tokenToText(int token) {
         byte[] buffer = new byte[64];
         int length = LlamaService.tokenToPiece(token, buffer, buffer.length);
         byte code = buffer[0];
@@ -184,7 +184,7 @@ public class Generator implements Iterator<Token> {
         }
         //do sampling
         int tokenId = doSampling(generateParams, logits);
-        Token token = new Token(tokenId, LlamaTokenType.valueOfType(LlamaService.getTokenType(tokenId)), tokenToPiece(tokenId));
+        Token token = new Token(tokenId, LlamaTokenType.valueOfType(LlamaService.getTokenType(tokenId)), tokenToText(tokenId));
         //save token to the generate list
         generateTokens.add(token);
         ++pastTokensSize;
