@@ -10,7 +10,8 @@
 //Global define
 llama_model *model = nullptr;
 llama_context *llama_ctx = nullptr;
-static int batch_size = 0;
+
+llama_context_params llama_ctx_params;
 
 //Grammar
 llama_grammar *grammar = nullptr;
@@ -272,7 +273,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_createNewContextWithMo
         (JNIEnv *env, jclass thisClass, jobject jllama_context_params) {
     struct llama_context_params params = GetLlamaContextParams(env, jllama_context_params);
     llama_ctx = llama_new_context_with_model(model, params);
-    batch_size = params.n_batch;
+    llama_ctx_params = params;
 
     if (llama_ctx == nullptr) {
         ThrowByName(env, model_exception, "Create llama context failed");
@@ -383,6 +384,15 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
         (JNIEnv *env, jclass thisClass, jint index) {
+    if (index < 0 || index > llama_ctx_params.n_ctx) {
+        std::string msg = "Invalid index, range 0 to " + std::to_string(llama_ctx_params.n_ctx);
+        ThrowByName(env, model_exception, msg.c_str());
+        return nullptr;
+    }
+    if (!llama_ctx_params.logits_all && index > 0) {
+        //This is not logits_all, so the index must be 0
+        index = 0;
+    }
     float *logits = llama_get_logits_ith(llama_ctx, index);
     const int vocab_size = llama_n_vocab(model);
 
@@ -668,7 +678,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     //batch decode
     int past_tokens = 0;
     int decode_status = 0;
-    int n_batch = batch_size;
+    int n_batch = llama_ctx_params.n_batch;
     while (past_tokens < token_length) {
         int decode_size = token_length - past_tokens;
         if (decode_size > n_batch) {
