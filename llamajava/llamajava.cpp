@@ -682,11 +682,10 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     //batch decode
     int past_tokens = 0;
     int decode_status = 0;
-    int n_batch = llama_ctx_params.n_batch;
     while (past_tokens < token_length) {
         int decode_size = token_length - past_tokens;
-        if (decode_size > n_batch) {
-            decode_size = n_batch;
+        if (decode_size > llama_ctx_params.n_batch) {
+            decode_size = llama_ctx_params.n_batch;
         }
         int end_index = decode_size + past_tokens;
         std::vector<llama_token> batch_tokens(src_tokens.begin() + past_tokens, src_tokens.begin() + end_index);
@@ -701,23 +700,16 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         }
 
         //set logits for the last token of the prompt
-        bool finished = (token_length - (past_tokens + decode_size)) == 0;
-        if (finished) {
+        if (token_length == end_index) {
             batch.logits[batch.n_tokens - 1] = true;
         }
 
         decode_status = llama_decode(llama_ctx, batch);
+        llama_batch_free(batch);
         if (decode_status != 0) {
-            llama_batch_free(batch);
-            if (decode_status < 0) {
-                break;
-            }
-            n_batch /= 2;
-            printf("\nWARN => decode status: %d, n_batch: %d", decode_status, n_batch);
-            continue;
+            break;
         }
         past_tokens += decode_size;
-        llama_batch_free(batch);
     }
     //clear all resources
     env->ReleaseIntArrayElements(tokens_arrays, tokens, 0);
