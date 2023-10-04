@@ -198,7 +198,6 @@ public class Generator implements Iterator<Token> {
 
         if (breakOrContinue(token, logits)) {
             finished = true;
-            ++pastTokensSize;
         }
         return token;
     }
