@@ -389,13 +389,13 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
         ThrowByName(env, model_exception, msg.c_str());
         return nullptr;
     }
-    if (!llama_ctx_params.logits_all && index > 0) {
-        //This is not logits_all, so the index must be 0
-        index = 0;
+    float *logits;
+    if (llama_ctx_params.logits_all) {
+        logits = llama_get_logits_ith(llama_ctx, index);
+    } else {
+        logits = llama_get_logits(llama_ctx);
     }
-    float *logits = llama_get_logits_ith(llama_ctx, index);
     const int vocab_size = llama_n_vocab(model);
-
     jfloatArray arrays = env->NewFloatArray(vocab_size);
     env->SetFloatArrayRegion(arrays, 0, vocab_size, logits);
     return arrays;
@@ -699,9 +699,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
             batch.logits[i] = false;
         }
 
-        //set logits for the last token of the prompt
-        if (token_length == end_index) {
-            batch.logits[batch.n_tokens - 1] = true;
+        if (llama_ctx_params.logits_all) {
+            //set logits for the last token of the prompt
+            if (token_length == end_index) {
+                batch.logits[batch.n_tokens - 1] = true;
+            }
+        } else {
+            batch.logits = nullptr;
         }
 
         decode_status = llama_decode(llama_ctx, batch);

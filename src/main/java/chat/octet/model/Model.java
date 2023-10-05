@@ -65,6 +65,9 @@ public class Model implements AutoCloseable {
         //setting model parameters
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
         LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);
+        //setting context parameters
+        LlamaContextParams llamaContextParams = getLlamaContextParameters(modelParams);
+        LlamaService.createNewContextWithModel(llamaContextParams);
 
         //apple lora from file
         if (StringUtils.isNotBlank(modelParams.getLoraPath())) {
@@ -76,9 +79,7 @@ public class Model implements AutoCloseable {
                 throw new ModelException(String.format("Failed to apply LoRA from lora path: %s to base path: %s", modelParams.getLoraPath(), modelParams.getLoraBase()));
             }
         }
-        //setting context parameters
-        LlamaContextParams llamaContextParams = getLlamaContextParameters(modelParams);
-        LlamaService.createNewContextWithModel(llamaContextParams);
+
         this.keepSize = (modelParams.getKeep() > 0 && modelParams.getKeep() <= DEFAULT_KEEP_SIZE) ? modelParams.getKeep() : DEFAULT_KEEP_SIZE;
         this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastNTokensSize();
 
