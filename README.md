@@ -20,7 +20,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 </dependency>
 ```
 
@@ -37,7 +37,7 @@ public class ConsoleExample {
     public static void main(String[] args) {
         ModelParameter modelParams = ModelParameter.builder()
                 .modelPath(MODEL_PATH)
-                .threads(8)
+                .threads(6)
                 .contextSize(4096)
                 .verbose(true)
                 .build();
