@@ -2,18 +2,16 @@ package chat.octet.model;
 
 import chat.octet.model.beans.FinishReason;
 import chat.octet.model.beans.LlamaTokenType;
+import chat.octet.model.beans.Status;
 import chat.octet.model.beans.Token;
 import chat.octet.model.parameters.GenerateParameter;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Generation iterator,
@@ -24,39 +22,44 @@ import java.util.List;
 @Slf4j
 public class Generator implements Iterator<Token> {
     private final GenerateParameter generateParams;
-    private final List<Token> generateTokens;
-    private final int[] inputIds;
+    private final Status status;
+    private final int sequenceId;
     private final byte[] multiByteTokenBuffer;
     private int multiByteTokenLength;
     private int multiByteTokenIndex;
     private boolean finished = false;
     private int maxNewTokensSize;
-    private int inputLength;
-    private int pastTokensSize;
-    private final int contextSize;
-    private final int lastTokensSize;
-    private final int sequenceId;
 
-    protected Generator(GenerateParameter generateParams, String text, int lastTokensSize) {
+    protected Status getStatus() {
+        return status;
+    }
+
+    /**
+     * Create continuous conversation generator
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param prompt         Prompt
+     * @param srcSequenceId  Source sequence id.
+     * @param srcStatus      Source status.
+     */
+    protected Generator(GenerateParameter generateParams, String prompt, int srcSequenceId, Status srcStatus) {
         this.generateParams = generateParams;
-        this.contextSize = LlamaService.getContextSize();
-        this.inputIds = new int[contextSize];
         this.multiByteTokenBuffer = new byte[8];
-        this.lastTokensSize = lastTokensSize;
+        this.status = srcStatus == null ? new Status() : new Status(srcStatus);
 
-        int[] tokens = StringUtils.isNotBlank(text) ? LlamaService.tokenize(text, true) : new int[]{LlamaService.getTokenBOS()};
+        int contextSize = LlamaService.getContextSize();
+        int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, true) : new int[]{LlamaService.getTokenBOS()};
         if (tokens.length >= contextSize) {
             throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
         }
         if (generateParams.isVerbosePrompt()) {
-            log.info("Print prompt text:\n{}", text);
+            log.info("Print prompt text:\n{}", prompt);
         }
-        System.arraycopy(tokens, 0, inputIds, 0, tokens.length);
-        inputLength += tokens.length;
+        this.status.appendInputIds(tokens);
 
-        maxNewTokensSize = (generateParams.getMaxNewTokensSize() <= 0) ? contextSize - tokens.length : generateParams.getMaxNewTokensSize();
-        if (maxNewTokensSize + tokens.length > contextSize) {
-            maxNewTokensSize = contextSize - tokens.length;
+        this.maxNewTokensSize = (generateParams.getMaxNewTokensSize() <= 0) ? contextSize - tokens.length : generateParams.getMaxNewTokensSize();
+        if (this.maxNewTokensSize + tokens.length > contextSize) {
+            this.maxNewTokensSize = contextSize - tokens.length;
         }
         if (StringUtils.isNotBlank(generateParams.getGrammarRules())) {
             boolean status = LlamaService.loadLlamaGrammar(generateParams.getGrammarRules());
@@ -64,12 +67,21 @@ public class Generator implements Iterator<Token> {
                 log.error("Grammar rule parsing failed, Please check the grammar rule format.");
             }
         }
-        generateTokens = Lists.newArrayList();
-        log.debug("Generate starting, input tokens size: {}.", tokens.length);
+        log.debug("Generate starting, input tokens size: {}, past tokens size: {}.", tokens.length, this.status.getPastTokensSize());
         //batch decode input tokens
-        sequenceId = LlamaService.batchDecode(tokens);
-        pastTokensSize += tokens.length;
-        log.debug("Batch decode completed, sequence id: {}.", sequenceId);
+        this.sequenceId = LlamaService.batchDecode(srcSequenceId, this.status.getInputIds(), this.status.getInputLength(), this.status.getPastTokensSize());
+        this.status.incrementPastTokensSize(tokens.length);
+        log.debug("Batch decode completed, sequence id: {}.", this.sequenceId);
+    }
+
+    /**
+     * Create regular generator
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param text           Input text or prompt.
+     */
+    protected Generator(GenerateParameter generateParams, String text) {
+        this(generateParams, text, -1, null);
     }
 
     private boolean breakOrContinue(Token token, float[] logits) {
@@ -78,13 +90,13 @@ public class Generator implements Iterator<Token> {
             return true;
         }
         if (generateParams.getStoppingCriteriaList() != null) {
-            boolean matched = generateParams.getStoppingCriteriaList().criteria(inputIds, logits);
+            boolean matched = generateParams.getStoppingCriteriaList().criteria(status.getInputIds(), logits);
             if (matched) {
                 token.updateFinishReason(FinishReason.STOP);
                 return true;
             }
         }
-        if (generateTokens.size() > maxNewTokensSize) {
+        if (status.getInputLength() > maxNewTokensSize) {
             token.updateFinishReason(FinishReason.LENGTH);
             return true;
         }
@@ -114,37 +126,13 @@ public class Generator implements Iterator<Token> {
         return new String(buffer, 0, length, StandardCharsets.UTF_8);
     }
 
-    private void truncate(int keepSize) {
-        if (keepSize <= 0 || keepSize >= contextSize) {
-            keepSize = contextSize / 2;
-        }
-        //check multibyte token
-        for (int truncateIndex = keepSize; truncateIndex > 0; truncateIndex--) {
-            int size = TokenDecoder.isMultiByte(inputIds[truncateIndex]);
-            if (size >= 0) {
-                keepSize -= size;
-                break;
-            }
-        }
-        //clear truncated cache tokens
-        LlamaService.clearCache(sequenceId, 0, keepSize);
-        //
-        int[] newTokensBuffer = ArrayUtils.subarray(inputIds, keepSize, inputIds.length);
-        Arrays.fill(inputIds, 0);
-        System.arraycopy(newTokensBuffer, 0, inputIds, 0, newTokensBuffer.length);
-        //reset size position
-        pastTokensSize = keepSize;
-        inputLength = keepSize;
-        log.debug("Generation exceeds the current context size {}, truncated to {}.", contextSize, keepSize);
-    }
-
     private int doSampling(GenerateParameter generateParams, float[] logits) {
-        int startIndex = Math.max(0, inputLength - lastTokensSize);
-        int[] lastTokens = ArrayUtils.subarray(inputIds, startIndex, inputLength);
+        int startIndex = Math.max(0, status.getInputLength() - generateParams.getLastTokensSize());
+        int[] lastTokens = status.subInputIds(startIndex);
         return LlamaService.sampling(
                 logits,
                 lastTokens,
-                lastTokensSize,
+                generateParams.getLastTokensSize(),
                 generateParams.getRepeatPenalty(),
                 generateParams.getFrequencyPenalty(),
                 generateParams.getPresencePenalty(),
@@ -158,7 +146,7 @@ public class Generator implements Iterator<Token> {
                 generateParams.getTsf(),
                 generateParams.getTypical(),
                 sequenceId,
-                pastTokensSize
+                status.getPastTokensSize()
         );
     }
 
@@ -175,26 +163,25 @@ public class Generator implements Iterator<Token> {
      */
     @Override
     public Token next() {
-        int index = generateTokens.isEmpty() ? pastTokensSize - 1 : 0;
-        float[] logits = LlamaService.getLogits(index);
+        float[] logits = LlamaService.getLogits(status.getLogitsIndex());
 
         //execute logits processor
         if (generateParams.getLogitsProcessorList() != null) {
-            logits = generateParams.getLogitsProcessorList().processor(inputIds, logits);
+            logits = generateParams.getLogitsProcessorList().processor(status.getInputIds(), logits);
         }
         //do sampling
         int tokenId = doSampling(generateParams, logits);
         Token token = new Token(tokenId, LlamaTokenType.valueOfType(LlamaService.getTokenType(tokenId)), tokenToText(tokenId));
-        //save token to the generate list
-        generateTokens.add(token);
-        ++pastTokensSize;
-        //truncation is required when the generation exceeds the current context size
-        if (inputLength + 1 > contextSize) {
-            truncate(generateParams.getKeepContextTokensSize());
+        status.incrementPastTokensSize();
+        //context size has been exceeded, truncate and clear the context cache
+        if (status.isOutOfContext()) {
+            clearCache();
+            token.updateFinishReason(FinishReason.TRUNCATED);
+            finished = true;
+            return token;
         }
         //update current input token
-        inputIds[inputLength] = tokenId;
-        ++inputLength;
+        status.appendInputIds(token);
 
         if (breakOrContinue(token, logits)) {
             finished = true;
@@ -207,10 +194,8 @@ public class Generator implements Iterator<Token> {
      *
      * @return String
      */
-    public String getFullGenerateText() {
-        StringBuilder builder = new StringBuilder();
-        generateTokens.forEach(token -> builder.append(token.getText()));
-        return builder.toString();
+    public String getGeneratedCompleteText() {
+        return status.getGeneratedCompleteText();
     }
 
     /**
@@ -220,14 +205,15 @@ public class Generator implements Iterator<Token> {
      * @see FinishReason
      */
     public FinishReason getFinishReason() {
-        return (generateTokens == null || generateTokens.isEmpty()) ? FinishReason.UNKNOWN : generateTokens.get(generateTokens.size() - 1).getFinishReason();
+        return (status.getGenerateTokens() == null || status.getGenerateTokens().isEmpty()) ? FinishReason.UNKNOWN : status.getGenerateTokens().get(status.getGenerateTokens().size() - 1).getFinishReason();
     }
 
     /**
-     * Clear KV cache at the end of generation
+     * Clear context cache at the end of generation
      */
     public void clearCache() {
         LlamaService.clearCache(sequenceId);
+        this.status.reset();
         log.debug("Cache clear completed, sequence id: {}.", sequenceId);
     }
 

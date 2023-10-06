@@ -1,5 +1,6 @@
 package chat.octet.test;
 
+import chat.octet.model.ChatSessionManager;
 import chat.octet.model.Model;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
@@ -16,7 +17,7 @@ public class ConversationExample {
     public static void main(String[] args) {
         ModelParameter modelParams = ModelParameter.builder()
                 .modelPath(MODEL_PATH)
-                .threads(8)
+                .threads(6)
                 .contextSize(4096)
                 .verbose(true)
                 .build();
@@ -28,6 +29,7 @@ public class ConversationExample {
 
             GenerateParameter generateParams = GenerateParameter.builder().build();
             String system = "Answer the questions.";
+            String userId = "user";
 
             while (true) {
                 System.out.print("\nQuestion: ");
@@ -41,7 +43,7 @@ public class ConversationExample {
                     continue;
                 }
                 if (StringUtils.trimToEmpty(input).equalsIgnoreCase("FORGET_ME")) {
-                    model.removeConversationMemory();
+                    ChatSessionManager.getInstance().removeChatSession(userId);
                     System.err.println("\n=> DONE!");
                     continue;
                 }

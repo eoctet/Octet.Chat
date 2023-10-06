@@ -665,25 +665,26 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
  * Method:    batchDecode
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
-        (JNIEnv *env, jclass thisClass, jintArray tokens_arrays) {
-    llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokens_arrays, JNI_FALSE);
-    int token_length = env->GetArrayLength(tokens_arrays);
+        (JNIEnv *env, jclass thisClass, jint sequence_id, jintArray tokens_arrays, jint input_length,
+         jint past_tokens_size) {
 
     //create a new sequence id
-    int sequence_id = GetNewSequenceId(env);
+    int new_sequence_id = sequence_id == -1 ? GetNewSequenceId(env) : sequence_id;
 
+    llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokens_arrays, JNI_FALSE);
+    //int token_length = env->GetArrayLength(tokens_arrays);
     //copy tokens to vector
     std::vector<llama_token> src_tokens;
-    src_tokens.reserve(token_length);
-    for (int i = 0; i < token_length; i++) {
+    src_tokens.reserve(input_length);
+    for (int i = 0; i < input_length; i++) {
         src_tokens.emplace_back(tokens[i]);
     }
 
     //batch decode
-    int past_tokens = 0;
+    int past_tokens = past_tokens_size;
     int decode_status = 0;
-    while (past_tokens < token_length) {
-        int decode_size = token_length - past_tokens;
+    while (past_tokens < input_length) {
+        int decode_size = input_length - past_tokens;
         if (decode_size > llama_ctx_params.n_batch) {
             decode_size = llama_ctx_params.n_batch;
         }
@@ -695,13 +696,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         for (int32_t i = 0; i < batch.n_tokens; i++) {
             batch.token[i] = batch_tokens[i];
             batch.pos[i] = i + past_tokens;
-            batch.seq_id[i] = sequence_id;
+            batch.seq_id[i] = new_sequence_id;
             batch.logits[i] = false;
         }
 
         if (llama_ctx_params.logits_all) {
             //set logits for the last token of the prompt
-            if (token_length == end_index) {
+            if (input_length == end_index) {
                 batch.logits[batch.n_tokens - 1] = true;
             }
         } else {
@@ -722,7 +723,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         std::string msg = "Failed to decode, return code: " + std::to_string(decode_status);
         ThrowByName(env, model_exception, msg.c_str());
     }
-    return sequence_id;
+    return new_sequence_id;
 }
 
 /*

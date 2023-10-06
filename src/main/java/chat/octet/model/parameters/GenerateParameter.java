@@ -4,6 +4,7 @@ import chat.octet.model.components.criteria.StoppingCriteriaList;
 import chat.octet.model.components.processor.LogitsProcessorList;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
@@ -162,6 +163,13 @@ public final class GenerateParameter {
      */
     @Builder.Default
     private String assistant = "Assistant";
+
+    /**
+     * NOTE: Reserved parameter, do not use it.
+     */
+    @Setter
+    @Builder.Default
+    private int lastTokensSize = 64;
 
     /**
      * Mirostat sampling mode define

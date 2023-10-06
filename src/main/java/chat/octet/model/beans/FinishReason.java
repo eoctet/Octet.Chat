@@ -29,15 +29,19 @@ public enum FinishReason {
     /**
      * Unknown type, no available token state.
      */
-    UNKNOWN;
+    UNKNOWN,
+    /**
+     * Generation has exceeded the maximum context limit and has been truncated.
+     */
+    TRUNCATED;
 
     /**
      * Check if the token has been completed else return false.
-     * Finished reason: FINISHED / LENGTH / STOP
+     * Finished reason: FINISHED / LENGTH / STOP / TRUNCATED
      *
      * @return boolean
      */
     public boolean isFinished() {
-        return this == FINISHED || this == LENGTH || this == STOP;
+        return this == FINISHED || this == LENGTH || this == STOP || this == TRUNCATED;
     }
 }

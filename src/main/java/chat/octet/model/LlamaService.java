@@ -87,7 +87,7 @@ public class LlamaService {
 
     public static native boolean loadLlamaGrammar(String grammarRules);
 
-    public static native int batchDecode(int[] tokens) throws ModelException;
+    public static native int batchDecode(int sequenceId, int[] tokens, int inputLength, int pastTokensSize) throws ModelException;
 
     public static native void clearCache(int sequenceId, int posStart, int posEnd);
 

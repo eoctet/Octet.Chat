@@ -191,13 +191,8 @@ public class ModelParameter {
      * <b>mul-mat-q</b><br/>
      * If true, use experimental mul_mat_q kernels.
      */
+    @Builder.Default
     private boolean mulMatQ = true;
-
-    /**
-     * <b>keep</b><br/>
-     * Set the length for keep conversation histories.
-     */
-    private int keep;
 
     /**
      * <b>verbose</b><br/>

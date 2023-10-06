@@ -224,7 +224,7 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
  * Method:    batchDecode
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
-        (JNIEnv *, jclass, jintArray);
+        (JNIEnv *, jclass, jint, jintArray, jint, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService
