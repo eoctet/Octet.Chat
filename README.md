@@ -184,6 +184,11 @@ By default, each system version library is included.
 -Doctet.llama.lib=<YOUR_LIB_PATH>
 ```
 
+## Why Java
+
+No special reason, I hope this is not a crude API encapsulation. Based on this, I will make some optimizations and extensions to better port it to the Java ecosystem.
+
+
 ## Feedback
 
 - If you have any questions, please submit them in GitHub Issue.

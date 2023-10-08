@@ -181,6 +181,10 @@ GenerateParameter generateParams = GenerateParameter.builder()
 -Doctet.llama.lib=<YOUR_LIB_PATH>
 ```
 
+## Why Java
+
+没有特殊理由，我希望这不是粗燥的API封装，在此基础之上做一些优化和扩展，使其能够更好地移植到Java生态。
+
 
 ## 问题反馈
 
