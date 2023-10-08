@@ -66,52 +66,48 @@ public class ConsoleExample {
 }
 ```
 
-- **More examples**
+- **Continuous Chat Example**
 
 ```java
-public class ModelExample {
+public class ContinuousChatExample {
+
     private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
 
     public static void main(String[] args) {
-        GenerateParameter generateParams = GenerateParameter.builder().verbosePrompt(true).build();
+        String system = "You are a helpful assistant. ";
+        String[] questions = new String[]{
+                "List five emojis about food and explain their meanings",
+                "Write a fun story based on the third emoji",
+                "Continue this story and refine it",
+                "Summarize a title for this story, extract five keywords, and the keywords should not exceed five words",
+                "Mark the characters, time, and location of this story",
+                "Great, translate this story into Chinese",
+                "Who are you and why are you here?",
+                "Summarize today's conversation"
+        };
+
+        GenerateParameter generateParams = GenerateParameter.builder()
+                .verbosePrompt(true)
+                .user("William")
+                .build();
 
         try (Model model = new Model(MODEL_PATH)) {
+            for (String question : questions) {
+                //Example 1: Continuous generation example.
+                //String text = PromptBuilder.toPrompt(system, question);
+                //model.generate(generateParams, text).forEach(e -> System.out.print(e.getText()));
 
-            //Example 1: continue writing the story
-            //Model: llama2
-            String text = "long time a ago";
-            //streaming output
-            model.generate(generateParams, text).forEach(e -> System.out.print(e.getText()));
-
-            //completion output
-            CompletionResult result = model.completions(generateParams, text);
-            System.out.println(result);
-
-            //Example 2: Normal chat without memory prompt
-            //Model: llama2-chat
-            String system = "Answer the questions.";
-            String question = "Who are you?";
-            String prompt = PromptBuilder.toPrompt(system, question);
-            //streaming output
-            model.generate(prompt).forEach(e -> System.out.print(e.getText()));
-
-            //completion output
-            CompletionResult answer = model.completions(generateParams, prompt);
-            System.out.println(answer);
-
-            //Example 3: Chat with memory prompt
-            //Model: llama2-chat
-
-            //streaming output
-            model.chat(generateParams, system, question).forEach(e -> System.out.print(e.getText()));
-
-            //completion output
-            CompletionResult response = model.chatCompletions(generateParams, prompt);
-            System.out.println(response);
+                //Example 2: Continuous chat example
+                model.chat(generateParams, system, question).forEach(e -> System.out.print(e.getText()));
+                System.out.println("\n");
+                model.metrics();
+            }
         }
     }
 }
 ```
+
+> More examples: [chat.octet.test](src%2Ftest%2Fjava%2Fchat%2Foctet%2Ftest)
 
 
 ## 开发手册
