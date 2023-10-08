@@ -8,9 +8,9 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 - 🚀 Built based on Llama.cpp, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp).
 - 🚀 Developed using JNI, ~~NOT JNA~~.
 - 🚀 News:
-  - [X] Conversation memory.
+  - [X] Continuous generation and chat.
   - [X] Llama grammar.
-
+  - [X] Parallel batch decode.
 
 ## Quick start
 
@@ -20,7 +20,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
 </dependency>
 ```
 
@@ -167,7 +167,7 @@ Develop using JNI:
 - Same interface as the original project.
 - Optimize JVM Native performance.
 
-> `LlamaService.sampling(...)` sampling has been optimized to reduce performance losses caused by data transfer between JVM Native.
+> `LlamaService` has been optimized to reduce performance losses caused by data transfer between JVM Native.
 >
 >
 > More information: [API docs](docs%2Fapidocs%2Findex.html)

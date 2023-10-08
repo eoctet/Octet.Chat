@@ -8,8 +8,9 @@
 - 🚀 基于 Llama.cpp 构建，更多细节请关注 **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp)。
 - 🚀 使用JNI开发本地库，~~而不是JNA~~，测试的性能上与其他库无异。
 - 🚀 新增:
-  - [X] 对话历史记忆。
+  - [X] 连续生成和对话。
   - [X] Llama 语法解析。
+  - [X] 并行批处理解码。
 
 ## 快速开始
 
@@ -19,7 +20,7 @@
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
 </dependency>
 ```
 
@@ -163,7 +164,7 @@ GenerateParameter generateParams = GenerateParameter.builder()
 
 使用JNI开发，开放与原项目相同的接口并优化JVM Native性能。
 
-> `LlamaService.sampling(...)` 对采样进行了优化，以减少JVM Native之间数据传递带来的性能损失。
+> `LlamaService` 对API进行了优化，以减少JVM Native之间数据传递带来的性能损失。
 >
 >
 > 完整的文档请参考 [API docs](docs%2Fapidocs%2Findex.html)。
