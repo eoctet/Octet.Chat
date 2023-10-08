@@ -16,9 +16,6 @@ llama_context_params llama_ctx_params;
 //Grammar
 llama_grammar *grammar = nullptr;
 
-//Sequence seed
-static int sequence_seed;
-
 //JNI init native status
 static bool init_native = false;
 
@@ -81,10 +78,6 @@ void ThrowByName(JNIEnv *env, const char *name, const char *msg) {
         env->ThrowNew(cls, msg);
     }
     env->DeleteLocalRef(cls);
-}
-
-int GetNewSequenceId(JNIEnv *env) {
-    return ++sequence_seed;
 }
 
 struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama_model_params) {
@@ -548,7 +541,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
          jfloat tsf,
          jfloat typical,
          jint sequence_id,
-         jint past_tokens) {
+         jint past_token_size) {
 
     float *logits = env->GetFloatArrayElements(jlogits, JNI_FALSE);
     const int n_vocab = llama_n_vocab(model);
@@ -615,7 +608,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         //decode the next new token
         llama_batch batch = llama_batch_init(1, 0);
         batch.token[0] = token;
-        batch.pos[0] = past_tokens;
+        batch.pos[0] = past_token_size;
         batch.seq_id[0] = sequence_id;
         batch.logits[0] = true;
         batch.n_tokens = 1;
@@ -666,13 +659,8 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         (JNIEnv *env, jclass thisClass, jint sequence_id, jintArray tokens_arrays, jint input_length,
-         jint past_tokens_size) {
-
-    //create a new sequence id
-    int new_sequence_id = sequence_id == -1 ? GetNewSequenceId(env) : sequence_id;
-
+         jint past_token_size) {
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokens_arrays, JNI_FALSE);
-    //int token_length = env->GetArrayLength(tokens_arrays);
     //copy tokens to vector
     std::vector<llama_token> src_tokens;
     src_tokens.reserve(input_length);
@@ -681,7 +669,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     }
 
     //batch decode
-    int past_tokens = past_tokens_size;
+    int past_tokens = past_token_size;
     int decode_status = 0;
     while (past_tokens < input_length) {
         int decode_size = input_length - past_tokens;
@@ -696,7 +684,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         for (int32_t i = 0; i < batch.n_tokens; i++) {
             batch.token[i] = batch_tokens[i];
             batch.pos[i] = i + past_tokens;
-            batch.seq_id[i] = new_sequence_id;
+            batch.seq_id[i] = sequence_id;
             batch.logits[i] = false;
         }
 
@@ -718,12 +706,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     }
     //clear all resources
     env->ReleaseIntArrayElements(tokens_arrays, tokens, 0);
-    //check decode status
-    if (decode_status != 0) {
-        std::string msg = "Failed to decode, return code: " + std::to_string(decode_status);
-        ThrowByName(env, model_exception, msg.c_str());
-    }
-    return new_sequence_id;
+    return decode_status;
 }
 
 /*

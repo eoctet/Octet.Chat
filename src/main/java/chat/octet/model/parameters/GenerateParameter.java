@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import javax.annotation.Nullable;
 
+
 /**
  * <p>Generate parameter</p>
  * For more information, please refer to
@@ -122,7 +123,7 @@ public final class GenerateParameter {
      * Maximum new token generation size.
      */
     @Builder.Default
-    private int maxNewTokensSize = 0;
+    private int maxNewTokenSize = 0;
 
     /**
      * <b>verbose prompt</b><br/>
@@ -130,13 +131,6 @@ public final class GenerateParameter {
      */
     @Builder.Default
     private boolean verbosePrompt = false;
-
-    /**
-     * <b>keep tokens size</b><br/>
-     * Number of tokens to keep from the context.
-     */
-    @Builder.Default
-    private int keepContextTokensSize = 1024;
 
     /**
      * <b>logits processor list</b><br/>

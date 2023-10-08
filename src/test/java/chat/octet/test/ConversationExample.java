@@ -1,6 +1,5 @@
 package chat.octet.test;
 
-import chat.octet.model.ChatSessionManager;
 import chat.octet.model.Model;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
@@ -43,7 +42,7 @@ public class ConversationExample {
                     continue;
                 }
                 if (StringUtils.trimToEmpty(input).equalsIgnoreCase("FORGET_ME")) {
-                    ChatSessionManager.getInstance().removeChatSession(userId);
+                    model.removeChatStatus(userId);
                     System.err.println("\n=> DONE!");
                     continue;
                 }

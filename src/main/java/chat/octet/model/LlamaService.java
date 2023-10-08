@@ -83,11 +83,11 @@ public class LlamaService {
 
     public static native String getSystemInfo();
 
-    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, int sequenceId, int pastTokens) throws ModelException;
+    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, int sequenceId, int pastTokenSize) throws ModelException;
 
     public static native boolean loadLlamaGrammar(String grammarRules);
 
-    public static native int batchDecode(int sequenceId, int[] tokens, int inputLength, int pastTokensSize) throws ModelException;
+    public static native int batchDecode(int sequenceId, int[] tokens, int inputLength, int pastTokenSize) throws ModelException;
 
     public static native void clearCache(int sequenceId, int posStart, int posEnd);
 
@@ -101,7 +101,7 @@ public class LlamaService {
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
         int nextTokens = tokenize(textBytes, textBytes.length, tokens, getContextSize(), addBos);
         if (nextTokens < 0) {
-            throw new ModelException(MessageFormat.format("failed to tokenize: {0}, next_tokens: {1}", text, nextTokens));
+            throw new ModelException(MessageFormat.format("Failed to tokenize: {0}, next_tokens: {1}", text, nextTokens));
         }
         return ArrayUtils.subarray(tokens, 0, nextTokens);
     }

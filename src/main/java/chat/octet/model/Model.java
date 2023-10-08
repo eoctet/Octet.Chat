@@ -1,14 +1,13 @@
 package chat.octet.model;
 
 
-import chat.octet.model.beans.CompletionResult;
-import chat.octet.model.beans.LlamaContextParams;
-import chat.octet.model.beans.LlamaModelParams;
-import chat.octet.model.beans.Token;
+import chat.octet.model.beans.*;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
+import chat.octet.model.utils.PromptBuilder;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +16,7 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -33,6 +33,7 @@ public class Model implements AutoCloseable {
     @Getter
     private final String modelName;
     private final int lastTokensSize;
+    private final Map<String, Status> chatStatus = Maps.newConcurrentMap();
 
     public Model(String modelPath) {
         this(ModelParameter.builder().modelPath(modelPath).build());
@@ -48,7 +49,6 @@ public class Model implements AutoCloseable {
         this.modelParams = modelParams;
         this.modelName = modelParams.getModelName();
         this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastNTokensSize();
-
         //setting model parameters
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
         LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);
@@ -109,6 +109,25 @@ public class Model implements AutoCloseable {
         return llamaContextParams;
     }
 
+    public void removeChatStatus(String user) {
+        boolean exists = chatStatus.containsKey(user);
+        if (exists) {
+            Status status = chatStatus.remove(user);
+            if (status != null) {
+                status.reset();
+            }
+            log.info("Removed chat session, User: {}.", user);
+        }
+    }
+
+    public void removeAllChatStatus() {
+        int size = chatStatus.size();
+        if (size > 0) {
+            chatStatus.keySet().forEach(this::removeChatStatus);
+            log.info("Removed all chat sessions, size: {}.", size);
+        }
+    }
+
     /**
      * Generate complete text.
      *
@@ -162,7 +181,7 @@ public class Model implements AutoCloseable {
 
         return new Iterable<Token>() {
 
-            private Generator generator = null;
+            private Generator generator;
 
             @Nonnull
             @Override
@@ -279,8 +298,51 @@ public class Model implements AutoCloseable {
         Preconditions.checkNotNull(generateParams.getUser(), "User id cannot be null");
         generateParams.setLastTokensSize(lastTokensSize);
 
-        ChatSession session = ChatSessionManager.getInstance().createChatSession(generateParams.getUser());
-        return session.getChatGenerator(generateParams, system, question);
+        boolean exists = chatStatus.containsKey(generateParams.getUser());
+        if (!exists) {
+            Status userStatus = new Status();
+            chatStatus.put(generateParams.getUser(), userStatus);
+            log.debug("Create new chat session, User: {} id: {}, chat session cache size: {}.", generateParams.getUser(), userStatus.getId(), chatStatus.size());
+        }
+        Status userStatus = chatStatus.get(generateParams.getUser());
+        if (StringUtils.isNotBlank(system) && system.equals(userStatus.getInitialSystemPrompt())) {
+            system = null;
+        }
+        if (StringUtils.isNotBlank(system) && StringUtils.isBlank(userStatus.getInitialSystemPrompt())) {
+            userStatus.setInitialSystemPrompt(system);
+        }
+        String prompt = PromptBuilder.toPrompt(system, question);
+        return new Iterable<Token>() {
+            private Generator generator;
+            private Status userChatStatus;
+
+            @Nonnull
+            @Override
+            public Iterator<Token> iterator() {
+                if (generator == null) {
+                    generator = new Generator(generateParams, prompt, userStatus);
+                }
+                if (userChatStatus == null) {
+                    userChatStatus = userStatus;
+                }
+                return generator;
+            }
+
+            @Override
+            public void forEach(Consumer<? super Token> action) {
+                Objects.requireNonNull(action);
+                try {
+                    for (Token token : this) {
+                        action.accept(token);
+                    }
+                } catch (Exception e) {
+                    throw new ModelException("Generate next token error ", e);
+                } finally {
+                    //copy last generated status
+                    userChatStatus.copyToStatus(generator.getStatus());
+                }
+            }
+        };
     }
 
     /**
@@ -298,7 +360,7 @@ public class Model implements AutoCloseable {
      */
     @Override
     public void close() {
-        ChatSessionManager.getInstance().removeAllSessions();
+        removeAllChatStatus();
         LlamaService.release();
         LlamaService.llamaBackendFree();
     }
@@ -309,5 +371,6 @@ public class Model implements AutoCloseable {
                 "modelParams=" + modelParams +
                 ')';
     }
+
 
 }

@@ -4,6 +4,7 @@ import chat.octet.model.beans.FinishReason;
 import chat.octet.model.beans.LlamaTokenType;
 import chat.octet.model.beans.Status;
 import chat.octet.model.beans.Token;
+import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +24,12 @@ import java.util.Iterator;
 public class Generator implements Iterator<Token> {
     private final GenerateParameter generateParams;
     private final Status status;
-    private final int sequenceId;
     private final byte[] multiByteTokenBuffer;
     private int multiByteTokenLength;
     private int multiByteTokenIndex;
     private boolean finished = false;
-    private int maxNewTokensSize;
+    private final int maxNewTokenSize;
+    private final int contextSize;
 
     protected Status getStatus() {
         return status;
@@ -39,15 +40,14 @@ public class Generator implements Iterator<Token> {
      *
      * @param generateParams Specify a generation parameter.
      * @param prompt         Prompt
-     * @param srcSequenceId  Source sequence id.
      * @param srcStatus      Source status.
      */
-    protected Generator(GenerateParameter generateParams, String prompt, int srcSequenceId, Status srcStatus) {
+    protected Generator(GenerateParameter generateParams, String prompt, Status srcStatus) {
         this.generateParams = generateParams;
         this.multiByteTokenBuffer = new byte[8];
+        this.contextSize = LlamaService.getContextSize();
         this.status = srcStatus == null ? new Status() : new Status(srcStatus);
 
-        int contextSize = LlamaService.getContextSize();
         int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, true) : new int[]{LlamaService.getTokenBOS()};
         if (tokens.length >= contextSize) {
             throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
@@ -55,23 +55,17 @@ public class Generator implements Iterator<Token> {
         if (generateParams.isVerbosePrompt()) {
             log.info("Print prompt text:\n{}", prompt);
         }
-        this.status.appendInputIds(tokens);
+        this.status.appendTokens(tokens);
 
-        this.maxNewTokensSize = (generateParams.getMaxNewTokensSize() <= 0) ? contextSize - tokens.length : generateParams.getMaxNewTokensSize();
-        if (this.maxNewTokensSize + tokens.length > contextSize) {
-            this.maxNewTokensSize = contextSize - tokens.length;
-        }
+        this.maxNewTokenSize = (generateParams.getMaxNewTokenSize() <= 0) ? contextSize - this.status.getInputLength() : generateParams.getMaxNewTokenSize();
         if (StringUtils.isNotBlank(generateParams.getGrammarRules())) {
             boolean status = LlamaService.loadLlamaGrammar(generateParams.getGrammarRules());
             if (!status) {
                 log.error("Grammar rule parsing failed, Please check the grammar rule format.");
             }
         }
-        log.debug("Generate starting, input tokens size: {}, past tokens size: {}.", tokens.length, this.status.getPastTokensSize());
-        //batch decode input tokens
-        this.sequenceId = LlamaService.batchDecode(srcSequenceId, this.status.getInputIds(), this.status.getInputLength(), this.status.getPastTokensSize());
-        this.status.incrementPastTokensSize(tokens.length);
-        log.debug("Batch decode completed, sequence id: {}.", this.sequenceId);
+        log.debug("Generate starting, input token size: {}, past token size: {}.", tokens.length, this.status.getPastTokenSize());
+        decodePrompt();
     }
 
     /**
@@ -81,7 +75,18 @@ public class Generator implements Iterator<Token> {
      * @param text           Input text or prompt.
      */
     protected Generator(GenerateParameter generateParams, String text) {
-        this(generateParams, text, -1, null);
+        this(generateParams, text, null);
+    }
+
+    private void decodePrompt() {
+        //batch decode input tokens
+        int decodeStatus = LlamaService.batchDecode(status.getId(), status.getInputIds(), status.getInputLength(), status.getPastTokenSize());
+        if (decodeStatus != 0) {
+            throw new ModelException(MessageFormat.format("Failed to decode, return code: {0}.", decodeStatus));
+        }
+        int size = status.getInputLength() - status.getPastTokenSize();
+        status.addPastTokensSize(size);
+        log.debug("Batch decode prompt completed, decode token size: {}, sequence id: {}.", size, status.getId());
     }
 
     private boolean breakOrContinue(Token token, float[] logits) {
@@ -96,7 +101,12 @@ public class Generator implements Iterator<Token> {
                 return true;
             }
         }
-        if (status.getInputLength() > maxNewTokensSize) {
+        if (status.getInputLength() >= contextSize) {
+            token.updateFinishReason(FinishReason.TRUNCATED);
+            log.warn("Context size has been exceeded. Truncate and reset the context cache, sequence id: {}.", status.getId());
+            return true;
+        }
+        if (status.getGenerateTokens().size() >= maxNewTokenSize) {
             token.updateFinishReason(FinishReason.LENGTH);
             return true;
         }
@@ -126,7 +136,7 @@ public class Generator implements Iterator<Token> {
         return new String(buffer, 0, length, StandardCharsets.UTF_8);
     }
 
-    private int doSampling(GenerateParameter generateParams, float[] logits) {
+    private int doSampling(float[] logits) {
         int startIndex = Math.max(0, status.getInputLength() - generateParams.getLastTokensSize());
         int[] lastTokens = status.subInputIds(startIndex);
         return LlamaService.sampling(
@@ -145,8 +155,8 @@ public class Generator implements Iterator<Token> {
                 generateParams.getTopP(),
                 generateParams.getTsf(),
                 generateParams.getTypical(),
-                sequenceId,
-                status.getPastTokensSize()
+                status.getId(),
+                status.getPastTokenSize()
         );
     }
 
@@ -164,28 +174,16 @@ public class Generator implements Iterator<Token> {
     @Override
     public Token next() {
         float[] logits = LlamaService.getLogits(status.getLogitsIndex());
-
         //execute logits processor
         if (generateParams.getLogitsProcessorList() != null) {
             logits = generateParams.getLogitsProcessorList().processor(status.getInputIds(), logits);
         }
         //do sampling
-        int tokenId = doSampling(generateParams, logits);
+        int tokenId = doSampling(logits);
         Token token = new Token(tokenId, LlamaTokenType.valueOfType(LlamaService.getTokenType(tokenId)), tokenToText(tokenId));
-        status.incrementPastTokensSize();
-        //context size has been exceeded, truncate and clear the context cache
-        if (status.isOutOfContext()) {
-            clearCache();
-            token.updateFinishReason(FinishReason.TRUNCATED);
-            finished = true;
-            return token;
-        }
-        //update current input token
-        status.appendInputIds(token);
-
-        if (breakOrContinue(token, logits)) {
-            finished = true;
-        }
+        //update generate status
+        status.appendNextToken(token);
+        finished = breakOrContinue(token, logits);
         return token;
     }
 
@@ -205,16 +203,15 @@ public class Generator implements Iterator<Token> {
      * @see FinishReason
      */
     public FinishReason getFinishReason() {
-        return (status.getGenerateTokens() == null || status.getGenerateTokens().isEmpty()) ? FinishReason.UNKNOWN : status.getGenerateTokens().get(status.getGenerateTokens().size() - 1).getFinishReason();
+        return status.getFinishReason();
     }
 
     /**
      * Clear context cache at the end of generation
      */
     public void clearCache() {
-        LlamaService.clearCache(sequenceId);
-        this.status.reset();
-        log.debug("Cache clear completed, sequence id: {}.", sequenceId);
+        status.reset();
+        log.debug("Cache clear completed, sequence id: {}.", status.getId());
     }
 
 }

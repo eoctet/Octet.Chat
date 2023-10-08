@@ -9,7 +9,7 @@ public class GrammarExample {
 
     public static void main(String[] args) {
 
-        String grammarRules  = "root   ::= object\n" +
+        String grammarRules = "root   ::= object\n" +
                 "value  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\n" +
                 "\n" +
                 "object ::=\n" +
