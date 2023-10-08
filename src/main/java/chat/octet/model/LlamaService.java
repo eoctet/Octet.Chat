@@ -4,6 +4,7 @@ package chat.octet.model;
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.beans.Metrics;
+import chat.octet.model.exceptions.DecodeException;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.utils.Platform;
 import com.google.common.base.Preconditions;
@@ -17,7 +18,7 @@ import java.text.MessageFormat;
  * <p>C++ source: llamajava.h, llamajava.cpp</p>
  *
  * @author <a href="https://github.com/eoctet">William</a>
- * @since b1317
+ * @since b1345
  */
 public class LlamaService {
 
@@ -83,11 +84,11 @@ public class LlamaService {
 
     public static native String getSystemInfo();
 
-    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, int sequenceId, int pastTokenSize) throws ModelException;
+    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, int sequenceId, int pastTokenSize) throws DecodeException;
 
     public static native boolean loadLlamaGrammar(String grammarRules);
 
-    public static native int batchDecode(int sequenceId, int[] tokens, int inputLength, int pastTokenSize) throws ModelException;
+    public static native int batchDecode(int sequenceId, int[] tokens, int inputLength, int pastTokenSize);
 
     public static native void clearCache(int sequenceId, int posStart, int posEnd);
 

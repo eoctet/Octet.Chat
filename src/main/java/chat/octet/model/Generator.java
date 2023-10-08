@@ -4,7 +4,7 @@ import chat.octet.model.beans.FinishReason;
 import chat.octet.model.beans.LlamaTokenType;
 import chat.octet.model.beans.Status;
 import chat.octet.model.beans.Token;
-import chat.octet.model.exceptions.ModelException;
+import chat.octet.model.exceptions.DecodeException;
 import chat.octet.model.parameters.GenerateParameter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -82,7 +82,7 @@ public class Generator implements Iterator<Token> {
         //batch decode input tokens
         int decodeStatus = LlamaService.batchDecode(status.getId(), status.getInputIds(), status.getInputLength(), status.getPastTokenSize());
         if (decodeStatus != 0) {
-            throw new ModelException(MessageFormat.format("Failed to decode, return code: {0}.", decodeStatus));
+            throw new DecodeException(MessageFormat.format("Failed to decode, return code: {0}.", decodeStatus));
         }
         int size = status.getInputLength() - status.getPastTokenSize();
         status.addPastTokensSize(size);
@@ -137,8 +137,11 @@ public class Generator implements Iterator<Token> {
     }
 
     private int doSampling(float[] logits) {
-        int startIndex = Math.max(0, status.getInputLength() - generateParams.getLastTokensSize());
-        int[] lastTokens = status.subInputIds(startIndex);
+        int[] lastTokens = null;
+        if (generateParams.getLastTokensSize() != 0) {
+            int startIndex = Math.max(0, status.getInputLength() - generateParams.getLastTokensSize());
+            lastTokens = status.subInputIds(startIndex);
+        }
         return LlamaService.sampling(
                 logits,
                 lastTokens,

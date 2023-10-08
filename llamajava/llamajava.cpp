@@ -21,6 +21,7 @@ static bool init_native = false;
 
 //Class name
 static const char *model_exception = "chat/octet/model/exceptions/ModelException";
+static const char *decode_exception = "chat/octet/model/exceptions/DecodeException";
 
 //Class LlamaContextParams:
 jclass LLAMA_CONTEXT_PARAMS_CLASS;
@@ -557,13 +558,16 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     }
     llama_token_data_array candidates_p = {candidates.data(), candidates.size(), false};
 
-    llama_token *last_tokens = (llama_token *) env->GetIntArrayElements(last_tokens_array, JNI_FALSE);
+    if (last_tokens_array != nullptr) {
+        llama_token *last_tokens = (llama_token *) env->GetIntArrayElements(last_tokens_array, JNI_FALSE);
 
-    //repetition penalty
-    llama_sample_repetition_penalty(llama_ctx, &candidates_p, last_tokens, last_tokens_size, penalty);
-    llama_sample_frequency_and_presence_penalties(llama_ctx, &candidates_p, last_tokens, last_tokens_size,
-                                                  alpha_frequency,
-                                                  alpha_presence);
+        //repetition penalty
+        llama_sample_repetition_penalty(llama_ctx, &candidates_p, last_tokens, last_tokens_size, penalty);
+        llama_sample_frequency_and_presence_penalties(llama_ctx, &candidates_p, last_tokens, last_tokens_size,
+                                                      alpha_frequency,
+                                                      alpha_presence);
+        env->ReleaseIntArrayElements(last_tokens_array, last_tokens, 0);
+    }
 
     if (!penalize_nl) {
         candidates_p.data[token_nl].logit = nl_logit;
@@ -602,7 +606,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         llama_grammar_accept_token(llama_ctx, grammar, token);
     }
 
-    //decode the next new token
     int decode_status = 0;
     if (token != llama_token_eos(llama_ctx)) {
         //decode the next new token
@@ -617,13 +620,12 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     }
 
     //clear all resources
-    env->ReleaseIntArrayElements(last_tokens_array, last_tokens, 0);
     env->ReleaseFloatArrayElements(jlogits, logits, 0);
 
     //check decode status
     if (decode_status != 0) {
         std::string msg = "Failed to decode, return code: " + std::to_string(decode_status);
-        ThrowByName(env, model_exception, msg.c_str());
+        ThrowByName(env, decode_exception, msg.c_str());
     }
     return token;
 }
