@@ -1,6 +1,13 @@
 # ☕️ Java bindings for [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 
-[**🇨🇳中文**](./README.Zh_CN.md) | [**🌐English**](./README.md) | 🤖 [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git) 
+
+[![README Zh_CN](https://img.shields.io/badge/Lang-中文-red)](./README.Zh_CN.md)
+[![README English](https://img.shields.io/badge/Lang-English-blue)](./README.md)
+[![Llama java chat](https://img.shields.io/badge/Github-llama_java_chat-green)](https://github.com/eoctet/llama-java-chat.git)
+![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java-core/total)
+![GitHub language count](https://img.shields.io/github/languages/count/eoctet/llama-java-core)
+[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core)](https://opensource.org/licenses/MIT)
+
 
 这是一个基于 🦙[`llama.cpp`](https://github.com/ggerganov/llama.cpp)  API开发的Java库，目标是更快速将大语言模型的能力集成到Java生态，本项目和其他语言版本库具有一样的功能。
 
@@ -186,6 +193,4 @@ GenerateParameter generateParams = GenerateParameter.builder()
 
 - 如果你有任何疑问，欢迎在GitHub Issue中提交。
 
-----
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)

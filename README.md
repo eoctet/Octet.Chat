@@ -1,6 +1,13 @@
 # ☕️ Java bindings for [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 
-[**🇨🇳中文**](./README.Zh_CN.md) | [**🌐English**](./README.md) | 🤖 [**Llama-Java-Chat**](https://github.com/eoctet/llama-java-chat.git)
+
+[![README Zh_CN](https://img.shields.io/badge/Lang-中文-red)](./README.Zh_CN.md)
+[![README English](https://img.shields.io/badge/Lang-English-blue)](./README.md)
+[![Llama java chat](https://img.shields.io/badge/Github-llama_java_chat-green)](https://github.com/eoctet/llama-java-chat.git)
+![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java-core/total)
+![GitHub language count](https://img.shields.io/github/languages/count/eoctet/llama-java-core)
+[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core)](https://opensource.org/licenses/MIT)
+
 
 Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggerganov/llama.cpp), The goal is to integrate the capabilities of LLMs into the Java ecosystem, this project has the same functionality as other language versions.
 
@@ -189,6 +196,3 @@ No special reason, I hope this is not a crude API encapsulation. Based on this, 
 
 - If you have any questions, please submit them in GitHub Issue.
 
-----
-
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
