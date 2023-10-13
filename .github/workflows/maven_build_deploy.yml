@@ -64,7 +64,6 @@ jobs:
 
       - name: Upload lib file
         uses: actions/upload-artifact@v3
-        run: cd llama.cpp
         with:
           path: |
             libllama.so
@@ -114,7 +113,8 @@ jobs:
 
       - name: Upload lib file
         uses: actions/upload-artifact@v3
-        run: cd llama.cpp
         with:
           path: |
             libllama.dylib
+
+  
