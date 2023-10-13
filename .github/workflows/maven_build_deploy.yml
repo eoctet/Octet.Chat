@@ -14,7 +14,6 @@ jobs:
   #build linux lib
   ubuntu-latest-make:
     runs-on: ubuntu-latest
-
     steps:
       - name: Dependencies
         id: depends
@@ -59,19 +58,19 @@ jobs:
           make clean
           make LLAMA_OPENBLAS=1 libllama.so
           if [ -f "libllama.so" ]; then
+            ls -l
             echo "Build libllama.so success"
           fi
 
       - name: Upload lib file
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            libllama.so
+          name: libllama_so
+          path: llama.cpp/libllama.so
 
   #build macos lib
   macos-latest-make:
     runs-on: macos-latest
-
     steps:
       - name: Clone project
         id: clone_project
@@ -98,7 +97,7 @@ jobs:
           BUILD_LLAMA_JAVA_DYLIB_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.dylib: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS) \n\t\$(CXX) \$(CXXFLAGS) -shared -fPIC -o \$@ $^ \$(LDFLAGS)\n"
           BUILD_LLAMA_CMD="$BUILD_LLAMA_JAVA_DYLIB_CMD\nclean:"
           echo $BUILD_LLAMA_CMD
-          sed -i "" -e "s/clean:/$BUILD_LLAMA_CMD/g" "$LLAMA_CPP_DIR/Makefile"
+          sed -i "" -e "s/clean:/$BUILD_LLAMA_CMD/g" "Makefile"
 
       - name: Build
         id: make_build
@@ -108,13 +107,13 @@ jobs:
           make clean
           make libllama.dylib
           if [ -f "libllama.dylib" ]; then
+            ls -l
             echo "Build libllama.dylib success"
           fi
 
       - name: Upload lib file
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            libllama.dylib
+          name: libllama_dylib
+          path: llama.cpp/libllama.dylib
 
-  
