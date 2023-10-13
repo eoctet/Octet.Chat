@@ -11,7 +11,7 @@ on:
       - main
 
 jobs:
-  #build x86 linux lib
+  #build linux lib
   ubuntu-latest-make:
     runs-on: ubuntu-latest
 
@@ -64,6 +64,57 @@ jobs:
 
       - name: Upload lib file
         uses: actions/upload-artifact@v3
+        run: cd llama.cpp
         with:
           path: |
             libllama.so
+
+  #build macos lib
+  macos-latest-make:
+    runs-on: macos-latest
+
+    steps:
+      - name: Clone project
+        id: clone_project
+        run: |
+          git clone https://github.com/ggerganov/llama.cpp.git
+          git clone https://github.com/eoctet/llama-java-core.git
+          cp llama-java-core/llamajava/* llama.cpp
+
+      - name: Update MakeFile
+        id: makefile
+        shell: bash
+        run: |
+          cd llama.cpp
+          if [ ! -f "llamajava.cpp" ]; then
+            echo "llamajava.cpp not found"
+            exit 1
+          fi
+
+          if [ ! -f "Makefile_backup" ]; then
+            cp "Makefile" "Makefile_backup"
+          fi
+          
+          BUILD_LLAMA_JAVA_CMD="llamajava.o: llamajava.cpp llamajava.h jni.h jni_md.h \n\t\$(CXX) \$(CXXFLAGS) -c $< -o \$@\n"
+          BUILD_LLAMA_JAVA_DYLIB_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.dylib: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS) \n\t\$(CXX) \$(CXXFLAGS) -shared -fPIC -o \$@ $^ \$(LDFLAGS)\n"
+          BUILD_LLAMA_CMD="$BUILD_LLAMA_JAVA_DYLIB_CMD\nclean:"
+          echo $BUILD_LLAMA_CMD
+          sed -i "" -e "s/clean:/$BUILD_LLAMA_CMD/g" "$LLAMA_CPP_DIR/Makefile"
+
+      - name: Build
+        id: make_build
+        shell: bash
+        run: |
+          cd llama.cpp
+          make clean
+          make libllama.dylib
+          if [ -f "libllama.dylib" ]; then
+            echo "Build libllama.dylib success"
+          fi
+
+      - name: Upload lib file
+        uses: actions/upload-artifact@v3
+        run: cd llama.cpp
+        with:
+          path: |
+            libllama.dylib
