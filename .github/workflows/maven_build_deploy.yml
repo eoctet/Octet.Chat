@@ -133,10 +133,10 @@ jobs:
           java-version: '18'
           distribution: 'oracle'
           architecture: 'x64'
-          cache: 'maven'
+#          cache: 'maven'
           server-id: 'ossrh'
-          server-username: ${{ secrets.MAVEN_REPO_NAME }}
-          server-password: ${{ secrets.MAVEN_REPO_CODE }}
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           gpg-private-key: ${{ secrets.MAVEN_PRIVATE_KEY }}
 
@@ -162,4 +162,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean package deploy
         env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_CODE }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
