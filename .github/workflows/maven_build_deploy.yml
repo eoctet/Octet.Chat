@@ -9,9 +9,6 @@ on:
         description: 'llama.cpp branch'
         required: true
         default: 'master'
-  push:
-    branches:
-      - main
 
 jobs:
   #build linux lib
@@ -135,7 +132,9 @@ jobs:
         with:
           java-version: '18'
           distribution: 'oracle'
-          server-id: ossrh
+          architecture: 'x64'
+          cache: 'maven'
+          server-id: 'ossrh'
           server-username: ${{ secrets.MAVEN_REPO_NAME }}
           server-password: ${{ secrets.MAVEN_REPO_CODE }}
           gpg-passphrase: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
