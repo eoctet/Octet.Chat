@@ -1,4 +1,4 @@
-name: CI
+name: Llama-java-CI
 on:
   workflow_dispatch:
     inputs:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   #build linux lib
-  ubuntu-latest-make:
+  build-linux-lib:
     runs-on: ubuntu-latest
     steps:
       - name: Dependencies
@@ -65,11 +65,11 @@ jobs:
       - name: Upload lib file
         uses: actions/upload-artifact@v3
         with:
-          name: libllama_so
+          name: linux-libllama
           path: llama.cpp/libllama.so
 
   #build macos lib
-  macos-latest-make:
+  build-macos-lib:
     runs-on: macos-latest
     steps:
       - name: Clone project
@@ -114,6 +114,45 @@ jobs:
       - name: Upload lib file
         uses: actions/upload-artifact@v3
         with:
-          name: libllama_dylib
+          name: macos-libllama
           path: llama.cpp/libllama.dylib
 
+  # maven build & deploy
+  maven-build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
+        with:
+          java-version: '18'
+          distribution: 'x86'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Download linux lib
+        id: download-artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-libllama
+          path: src/main/resources/linux-x86-64
+
+      - name: Download macos lib
+        id: download-artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-libllama
+          path: src/main/resources/darwin-x86-64
+
+      - name: Test
+        id: show_libs
+        run: |
+          ls -l src/main/resources/*
+
+      - name: Publish package
+        run: mvn clean package deploy
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_CODE }}
