@@ -34,7 +34,7 @@ jobs:
         id: makefile
         shell: bash
         run: |
-          ll
+          ls -l
           if [ ! -d "llamajava.h" ]; then
             echo "llamajava is empty..."
             exit 1
