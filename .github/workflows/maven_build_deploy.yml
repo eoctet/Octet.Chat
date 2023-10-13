@@ -22,17 +22,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install build-essential
 
-      - name: Clone project
-        id: clone_project
+      - name: Build lib
+        id: build_lib
+        shell: bash
         run: |
           git clone https://github.com/ggerganov/llama.cpp.git
           git clone https://github.com/eoctet/llama-java-core.git
           cp llama-java-core/llamajava/* llama.cpp
-
-      - name: Update MakeFile
-        id: makefile
-        shell: bash
-        run: |
           cd llama.cpp
           if [ ! -d "llamajava.h" ]; then
             echo "llamajava is empty..."
@@ -49,11 +45,6 @@ jobs:
           echo $BUILD_LLAMA_JAVA_SO_CMD
           sed -i "s/$LIB_LLAMA_CMD/$BUILD_LLAMA_JAVA_SO_CMD/g" "Makefile"
 
-      - name: Build
-        id: make_build
-        shell: bash
-        run: |
-          cd llama.cpp
           make clean
           make LLAMA_OPENBLAS=1 libllama.so
           if [ -f "libllama.so" ]; then
