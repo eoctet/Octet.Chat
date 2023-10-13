@@ -158,6 +158,7 @@ jobs:
           ls -l src/main/resources/*
 
       - name: Publish package
+        uses: samuelmeuli/action-maven-publish@v1
         run: mvn clean package deploy
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
