@@ -22,29 +22,40 @@ jobs:
           sudo apt-get update
           sudo apt-get install build-essential
 
-      - name: Build lib
-        id: build_lib
+      - name: Clone project
+        id: clone_project
         shell: bash
         run: |
           git clone https://github.com/ggerganov/llama.cpp.git
           git clone https://github.com/eoctet/llama-java-core.git
           cp llama-java-core/llamajava/* llama.cpp
-          cd llama.cpp
-          if [ ! -d "llamajava.h" ]; then
-            echo "llamajava is empty..."
-            exit 1
-          fi
-          
-          if [ ! -f "Makefile_backup" ]; then
-            cp "Makefile" "Makefile_backup"
-          fi
-          
-          BUILD_LLAMA_JAVA_CMD="llamajava.o: llamajava.cpp llamajava.h jni.h jni_md.h \n\t\$(CXX) \$(CXXFLAGS) -c $< -o \$@\n"
-          LIB_LLAMA_CMD="libllama.so: llama.o ggml.o \$(OBJS)"
-          BUILD_LLAMA_JAVA_SO_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.so: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS)"
-          echo $BUILD_LLAMA_JAVA_SO_CMD
-          sed -i "s/$LIB_LLAMA_CMD/$BUILD_LLAMA_JAVA_SO_CMD/g" "Makefile"
 
+      - name: Update MakeFile
+        id: makefile
+        shell: bash
+        run: |
+          cd llama.cpp
+          ls -l
+#          if [ ! -d "llamajava.h" ]; then
+#            echo "llamajava is empty..."
+#            exit 1
+#          fi
+#
+#          if [ ! -f "Makefile_backup" ]; then
+#            cp "Makefile" "Makefile_backup"
+#          fi
+#
+#          BUILD_LLAMA_JAVA_CMD="llamajava.o: llamajava.cpp llamajava.h jni.h jni_md.h \n\t\$(CXX) \$(CXXFLAGS) -c $< -o \$@\n"
+#          LIB_LLAMA_CMD="libllama.so: llama.o ggml.o \$(OBJS)"
+#          BUILD_LLAMA_JAVA_SO_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.so: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS)"
+#          echo $BUILD_LLAMA_JAVA_SO_CMD
+#          sed -i "s/$LIB_LLAMA_CMD/$BUILD_LLAMA_JAVA_SO_CMD/g" "Makefile"
+
+      - name: Build
+        id: make_build
+        shell: bash
+        run: |
+          cd llama.cpp
           make clean
           make LLAMA_OPENBLAS=1 libllama.so
           if [ -f "libllama.so" ]; then
