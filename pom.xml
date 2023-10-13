@@ -30,6 +30,12 @@
         </developer>
     </developers>
 
+    <scm>
+        <url>https://github.com/eoctet/llama-java-core</url>
+        <connection>https://github.com/eoctet/llama-java-core.git</connection>
+        <developerConnection>https://github.com/eoctet/llama-java-core.git</developerConnection>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>ossrh</id>
