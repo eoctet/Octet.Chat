@@ -133,14 +133,14 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Download linux lib
-        id: download-artifact
+        id: download_linux_lib
         uses: actions/download-artifact@v3
         with:
           name: linux-libllama
           path: src/main/resources/linux-x86-64
 
       - name: Download macos lib
-        id: download-artifact
+        id: download_macos_lib
         uses: actions/download-artifact@v3
         with:
           name: macos-libllama
