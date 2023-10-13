@@ -136,7 +136,6 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
           gpg-passphrase: MAVEN_PRIVATE_KEY_PASS
-          gpg_private_key: MAVEN_PRIVATE_KEY
 
       - name: Download linux lib
         id: download_linux_lib
