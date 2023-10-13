@@ -1,4 +1,4 @@
-name: Llama-java-CI
+name: Llama-Java-CI
 on:
   workflow_dispatch:
     inputs:
@@ -137,7 +137,7 @@ jobs:
           server-id: 'ossrh'
           server-username: ${{ secrets.MAVEN_REPO_NAME }}
           server-password: ${{ secrets.MAVEN_REPO_CODE }}
-          gpg-passphrase: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
           gpg-private-key: ${{ secrets.MAVEN_PRIVATE_KEY }}
 
       - name: Download linux lib
@@ -161,3 +161,5 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package deploy
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
