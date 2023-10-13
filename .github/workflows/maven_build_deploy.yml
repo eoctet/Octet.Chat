@@ -24,7 +24,6 @@ jobs:
 
       - name: Clone project
         id: clone_project
-        shell: bash
         run: |
           git clone https://github.com/ggerganov/llama.cpp.git
           git clone https://github.com/eoctet/llama-java-core.git
