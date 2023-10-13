@@ -5,7 +5,10 @@ on:
       create_release:
         description: 'Create new release'
         required: true
-        type: boolean
+      llama_branch:
+        description: 'llama.cpp branch'
+        required: true
+        default: 'master'
   push:
     branches:
       - main
@@ -26,7 +29,7 @@ jobs:
       - name: Clone project
         id: clone_project
         run: |
-          git clone https://github.com/ggerganov/llama.cpp.git
+          git clone -b ${{ github.event.inputs.llama_branch }} --single-branch https://github.com/ggerganov/llama.cpp.git
           git clone https://github.com/eoctet/llama-java-core.git
           cp llama-java-core/llamajava/* llama.cpp
 
@@ -133,9 +136,9 @@ jobs:
           java-version: '18'
           distribution: 'oracle'
           server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-passphrase: MAVEN_PRIVATE_KEY_PASS
+          server-username: ${{ secrets.MAVEN_REPO_NAME }}
+          server-password: ${{ secrets.MAVEN_REPO_CODE }}
+          gpg-passphrase: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
 
       - name: Download linux lib
         id: download_linux_lib
@@ -158,9 +161,8 @@ jobs:
 
       - name: Publish package
         uses: samuelmeuli/action-maven-publish@v1
-        run: mvn clean package deploy
-        env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_CODE }}
-          MAVEN_PRIVATE_KEY_PASS: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
-          MAVEN_PRIVATE_KEY: ${{ secrets.MAVEN_PRIVATE_KEY }}
+        with:
+          gpg_private_key: ${{ secrets.MAVEN_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
+          nexus_username: ${{ secrets.MAVEN_REPO_NAME }}
+          nexus_password: ${{ secrets.MAVEN_REPO_CODE }}
