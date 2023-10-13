@@ -12,7 +12,7 @@ on:
 
 jobs:
   #build x86 linux lib
-  ubuntu-latest-cmake:
+  ubuntu-latest-make:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,18 +22,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install build-essential
 
-      - name: Clone llama.cpp
-        id: clone_llamacpp
+      - name: Clone project
+        id: clone_project
         run: |
           git clone https://github.com/ggerganov/llama.cpp.git
+          git clone https://github.com/eoctet/llama-java-core.git
+          cp llama-java-core/llamajava/* llama.cpp
           cd llama.cpp
-
-      - name: Upload llama java cpp
-        id: upload_javacpp
-        uses: actions/upload-artifact@v3
-        with:
-          path: |
-            llamajava/*
 
       - name: Update MakeFile
         id: makefile
