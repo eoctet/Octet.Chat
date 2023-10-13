@@ -34,21 +34,20 @@ jobs:
         shell: bash
         run: |
           cd llama.cpp
-          ls -l
-#          if [ ! -d "llamajava.h" ]; then
-#            echo "llamajava is empty..."
-#            exit 1
-#          fi
-#
-#          if [ ! -f "Makefile_backup" ]; then
-#            cp "Makefile" "Makefile_backup"
-#          fi
-#
-#          BUILD_LLAMA_JAVA_CMD="llamajava.o: llamajava.cpp llamajava.h jni.h jni_md.h \n\t\$(CXX) \$(CXXFLAGS) -c $< -o \$@\n"
-#          LIB_LLAMA_CMD="libllama.so: llama.o ggml.o \$(OBJS)"
-#          BUILD_LLAMA_JAVA_SO_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.so: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS)"
-#          echo $BUILD_LLAMA_JAVA_SO_CMD
-#          sed -i "s/$LIB_LLAMA_CMD/$BUILD_LLAMA_JAVA_SO_CMD/g" "Makefile"
+          if [ ! -f "llamajava.cpp" ]; then
+            echo "llamajava.cpp not found"
+            exit 1
+          fi
+
+          if [ ! -f "Makefile_backup" ]; then
+            cp "Makefile" "Makefile_backup"
+          fi
+
+          BUILD_LLAMA_JAVA_CMD="llamajava.o: llamajava.cpp llamajava.h jni.h jni_md.h \n\t\$(CXX) \$(CXXFLAGS) -c $< -o \$@\n"
+          LIB_LLAMA_CMD="libllama.so: llama.o ggml.o \$(OBJS)"
+          BUILD_LLAMA_JAVA_SO_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.so: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS)"
+          echo $BUILD_LLAMA_JAVA_SO_CMD
+          sed -i "s/$LIB_LLAMA_CMD/$BUILD_LLAMA_JAVA_SO_CMD/g" "Makefile"
 
       - name: Build
         id: make_build
@@ -58,5 +57,13 @@ jobs:
           make clean
           make LLAMA_OPENBLAS=1 libllama.so
           if [ -f "libllama.so" ]; then
+            mkdir -p /llama-java-core/linux-x86-64
+            mv libllama.so /llama-java-core/linux-x86-64/
             echo "Build libllama.so success"
           fi
+
+      - name: Upload lib file
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            /llama-java-core/linux-x86-64/libllama.so
