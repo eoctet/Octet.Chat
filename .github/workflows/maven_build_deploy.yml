@@ -72,7 +72,7 @@ jobs:
       - name: Clone project
         id: clone_project
         run: |
-          git clone https://github.com/ggerganov/llama.cpp.git
+          git clone -b ${{ github.event.inputs.llama_branch }} --single-branch https://github.com/ggerganov/llama.cpp.git
           git clone https://github.com/eoctet/llama-java-core.git
           cp llama-java-core/llamajava/* llama.cpp
 
