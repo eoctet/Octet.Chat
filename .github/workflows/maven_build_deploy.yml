@@ -28,13 +28,12 @@ jobs:
           git clone https://github.com/ggerganov/llama.cpp.git
           git clone https://github.com/eoctet/llama-java-core.git
           cp llama-java-core/llamajava/* llama.cpp
-          cd llama.cpp
 
       - name: Update MakeFile
         id: makefile
         shell: bash
         run: |
-          ls -l
+          cd llama.cpp
           if [ ! -d "llamajava.h" ]; then
             echo "llamajava is empty..."
             exit 1
@@ -52,7 +51,9 @@ jobs:
 
       - name: Build
         id: make_build
+        shell: bash
         run: |
+          cd llama.cpp
           make clean
           make LLAMA_OPENBLAS=1 libllama.so
           if [ -f "libllama.so" ]; then
