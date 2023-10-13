@@ -135,7 +135,8 @@ jobs:
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-          gpg-passphrase: MAVEN_GPG_PASS
+          gpg-passphrase: MAVEN_PRIVATE_KEY_PASS
+          gpg_private_key: MAVEN_PRIVATE_KEY
 
       - name: Download linux lib
         id: download_linux_lib
@@ -151,7 +152,7 @@ jobs:
           name: macos-libllama
           path: src/main/resources/darwin-x86-64
 
-      - name: Test
+      - name: Show libs
         id: show_libs
         run: |
           ls -l src/main/resources/*
@@ -161,4 +162,5 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_CODE }}
-          MAVEN_GPG_PASS: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
+          MAVEN_PRIVATE_KEY_PASS: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
+          MAVEN_PRIVATE_KEY: ${{ secrets.MAVEN_PRIVATE_KEY }}
