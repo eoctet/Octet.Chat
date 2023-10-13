@@ -1,7 +1,7 @@
 # ☕️ Java bindings for [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 
 
-![GitHub release (with filter)](https://img.shields.io/github/v/release/eoctet/llama-java-core?logo=GitHub&color=purple)
+[![CI](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml)
 [![README English](https://img.shields.io/badge/Lang-English-blue)](./README.md)
 [![Llama java chat](https://img.shields.io/badge/Github-llama_java_chat-green)](https://github.com/eoctet/llama-java-chat.git)
 ![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java-core/total)
@@ -27,7 +27,7 @@
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.1.7</version>
+    <version>1.1.8</version>
 </dependency>
 ```
 
