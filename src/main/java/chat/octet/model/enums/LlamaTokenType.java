@@ -1,4 +1,4 @@
-package chat.octet.model.beans;
+package chat.octet.model.enums;
 
 
 import com.google.common.collect.Maps;

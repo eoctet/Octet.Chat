@@ -2,6 +2,7 @@ package chat.octet.model.beans;
 
 
 import chat.octet.model.LlamaService;
+import chat.octet.model.enums.FinishReason;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;

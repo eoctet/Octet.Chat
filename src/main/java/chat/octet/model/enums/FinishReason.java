@@ -1,4 +1,4 @@
-package chat.octet.model.beans;
+package chat.octet.model.enums;
 
 import chat.octet.model.components.criteria.StoppingCriteria;
 

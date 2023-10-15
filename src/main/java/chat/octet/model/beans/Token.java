@@ -1,5 +1,7 @@
 package chat.octet.model.beans;
 
+import chat.octet.model.enums.FinishReason;
+import chat.octet.model.enums.LlamaTokenType;
 import lombok.Getter;
 import lombok.ToString;
 

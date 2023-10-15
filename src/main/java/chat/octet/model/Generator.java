@@ -1,7 +1,7 @@
 package chat.octet.model;
 
-import chat.octet.model.beans.FinishReason;
-import chat.octet.model.beans.LlamaTokenType;
+import chat.octet.model.enums.FinishReason;
+import chat.octet.model.enums.LlamaTokenType;
 import chat.octet.model.beans.Status;
 import chat.octet.model.beans.Token;
 import chat.octet.model.exceptions.DecodeException;

@@ -1,5 +1,6 @@
 package chat.octet.model.beans;
 
+import chat.octet.model.enums.FinishReason;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
