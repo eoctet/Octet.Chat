@@ -1,11 +1,8 @@
 name: Llama-Java-CI
 on:
-  workflow_dispatch:
-    inputs:
-      llama_branch:
-        description: 'llama.cpp branch'
-        required: true
-        default: 'master'
+  push:
+    tags:
+      - "v*"
 
 jobs:
   #build linux lib
@@ -20,12 +17,26 @@ jobs:
           sudo apt-get install libopenblas-dev
           sudo apt-get install libopenblas64-dev
 
-      - name: Clone project
-        id: clone_project
+      - name: Checkout project
+        id: checkout_project
+        uses: actions/checkout@v4
+
+      - name: Checkout llama.cpp
+        id: checkout_llamacpp
+        shell: bash
         run: |
-          git clone -b ${{ github.event.inputs.llama_branch }} --single-branch https://github.com/ggerganov/llama.cpp.git
-          git clone https://github.com/eoctet/llama-java-core.git
-          cp llama-java-core/llamajava/* llama.cpp
+          git clone https://github.com/ggerganov/llama.cpp.git
+          if [ ! -d "llama.cpp" ]; then
+            echo "Git clone llama.cpp failed."
+            exit 1
+          fi
+          
+          cp llamajava/* llama.cpp
+          cd llama.cpp
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "=> Llama.cpp latest tag: $LATEST_TAG"
+          git checkout $LATEST_TAG
+          echo "=> Checkout llama.cpp $LATEST_TAG finished."
 
       - name: Update MakeFile
         id: makefile
@@ -69,12 +80,26 @@ jobs:
   build-macos-lib:
     runs-on: macos-latest
     steps:
-      - name: Clone project
-        id: clone_project
+      - name: Checkout project
+        id: checkout_project
+        uses: actions/checkout@v4
+
+      - name: Checkout llama.cpp
+        id: checkout_llamacpp
+        shell: bash
         run: |
-          git clone -b ${{ github.event.inputs.llama_branch }} --single-branch https://github.com/ggerganov/llama.cpp.git
-          git clone https://github.com/eoctet/llama-java-core.git
-          cp llama-java-core/llamajava/* llama.cpp
+          git clone https://github.com/ggerganov/llama.cpp.git
+          if [ ! -d "llama.cpp" ]; then
+            echo "Git clone llama.cpp failed."
+            exit 1
+          fi
+          
+          cp llamajava/* llama.cpp
+          cd llama.cpp
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "=> Llama.cpp latest tag: $LATEST_TAG"
+          git checkout $LATEST_TAG
+          echo "=> Checkout llama.cpp $LATEST_TAG finished."
 
       - name: Update MakeFile
         id: makefile
@@ -162,3 +187,10 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_CODE }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body_path: CHANGELOG
+          token: ${{ secrets.DEV_TOKEN }}
