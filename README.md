@@ -4,20 +4,19 @@
 [![CI](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml)
 [![README Zh_CN](https://img.shields.io/badge/Lang-中文-red)](./README.Zh_CN.md)
 [![Llama java chat](https://img.shields.io/badge/Github-llama_java_chat-green)](https://github.com/eoctet/llama-java-chat.git)
-![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java-core/total)
 ![GitHub language count](https://img.shields.io/github/languages/count/eoctet/llama-java-core)
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core)](https://opensource.org/licenses/MIT)
 
 
 Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggerganov/llama.cpp), The goal is to integrate the capabilities of LLMs into the Java ecosystem, this project has the same functionality as other language versions.
 
-#### Main features
-- 🚀 Built based on Llama.cpp, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp).
-- 🚀 Developed using JNI, ~~NOT JNA~~.
+#### Features
+- 🚀 Built based on `Llama.cpp`, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp).
+- 🚀 Developed using `JNI`, ~~NOT JNA~~.
 - 🚀 News:
-  - [X] Continuous generation and chat.
-  - [X] Llama grammar.
-  - [X] Parallel batch decode.
+  - [X] Continuous generation and chat
+  - [X] Llama grammar
+  - [X] Parallel batch decode
 
 ## Quick start
 
@@ -27,7 +26,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
 </dependency>
 ```
 
@@ -122,8 +121,8 @@ public class ContinuousChatExample {
 #### Customize inference
 
 - **Components**
-  - LogitsProcessor
-  - StoppingCriteria
+  - `LogitsProcessor`
+  - `StoppingCriteria`
 
 You can use `LogitsProcessor` and `StoppingCriteria` to customize and control the model inference process.
 
@@ -165,7 +164,7 @@ GenerateParameter generateParams = GenerateParameter.builder()
 
 #### [LlamaService](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FLlamaService.java)
 
-Develop using JNI:
+Develop using `JNI`:
 
 - Same interface as the original project.
 - Optimize JVM Native performance.
