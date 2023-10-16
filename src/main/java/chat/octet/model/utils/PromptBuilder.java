@@ -45,9 +45,6 @@ public class PromptBuilder {
             case VICUNA:
                 formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join(system, "\n\n");
                 return StringUtils.join(formateSystem, "USER:\n", question, "\n\nASSISTANT:\n");
-            case OPEN_BUDDY:
-                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
-                return StringUtils.join(formateSystem, "User:\n", question, "\nAssistant:\n");
             case OASST_LLAMA:
                 formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join("[INST] <<SYS>>\n", system, "\n<</SYS>>\n\n");
                 return StringUtils.join(formateSystem, "<|prompter|>\n", question, "\n\n<|assistant|>\n");
@@ -55,11 +52,15 @@ public class PromptBuilder {
                 formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
                 return StringUtils.join(formateSystem, "<human>\n", question, "\n<bot>\n");
             case LLAMA2:
-            default:
                 if (StringUtils.isNotBlank(system)) {
                     formateSystem = StringUtils.join("<<SYS>>\n", system, "\n<</SYS>>\n\n");
                 }
                 return StringUtils.join("[INST] ", formateSystem, question, " [/INST] ");
+            case OPEN_BUDDY:
+            case COMMON:
+            default:
+                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formateSystem, "User:\n", question, "\nAssistant:\n");
         }
     }
 

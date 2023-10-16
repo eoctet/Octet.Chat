@@ -11,5 +11,6 @@ public enum ModelType {
     OASST_LLAMA,
     OPEN_BUDDY,
     REDPAJAMA_INCITE,
-    SNOOZY
+    SNOOZY,
+    COMMON
 }
