@@ -57,6 +57,7 @@ public class PromptBuilder {
                 }
                 return StringUtils.join("[INST] ", formateSystem, question, " [/INST] ");
             case OPEN_BUDDY:
+            case FALCON:
             case COMMON:
             default:
                 formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");

@@ -12,5 +12,6 @@ public enum ModelType {
     OPEN_BUDDY,
     REDPAJAMA_INCITE,
     SNOOZY,
+    FALCON,
     COMMON
 }
