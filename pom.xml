@@ -122,6 +122,7 @@
                     <charset>${project.build.sourceEncoding}</charset>
                     <docencoding>${project.build.sourceEncoding}</docencoding>
                     <locale>en_US</locale>
+                    <doclint>none</doclint>
                 </configuration>
                 <executions>
                     <execution>
@@ -140,7 +141,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
