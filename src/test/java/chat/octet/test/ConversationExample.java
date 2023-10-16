@@ -1,6 +1,7 @@
 package chat.octet.test;
 
 import chat.octet.model.Model;
+import chat.octet.model.enums.ModelType;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
 import chat.octet.model.utils.PromptBuilder;
@@ -49,7 +50,7 @@ public class ConversationExample {
                 if (chatMode) {
                     model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
                 } else {
-                    String text = PromptBuilder.toPrompt(system, input);
+                    String text = PromptBuilder.toPrompt(ModelType.LLAMA2, system, input);
                     model.generate(generateParams, text).forEach(e -> System.out.print(e.getText()));
                 }
                 System.out.print("\n");

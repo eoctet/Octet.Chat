@@ -33,6 +33,11 @@ public class ModelParameter {
     private String modelName;
 
     /**
+     * Llama model type
+     */
+    private String modelType;
+
+    /**
      * <b>context-size</b><br/>
      * option allows you to set the size of the prompt context used by the LLaMA models during text generation.
      * (default: 512)

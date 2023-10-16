@@ -2,6 +2,7 @@ package chat.octet.test;
 
 import chat.octet.model.Model;
 import chat.octet.model.beans.CompletionResult;
+import chat.octet.model.enums.ModelType;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.PromptBuilder;
 
@@ -27,7 +28,7 @@ public class ModelExample {
             //Model: llama2-chat
             String system = "Answer the questions.";
             String question = "Who are you?";
-            String prompt = PromptBuilder.toPrompt(system, question);
+            String prompt = PromptBuilder.toPrompt(ModelType.LLAMA2, system, question);
             //streaming output
             model.generate(prompt).forEach(e -> System.out.print(e.getText()));
 

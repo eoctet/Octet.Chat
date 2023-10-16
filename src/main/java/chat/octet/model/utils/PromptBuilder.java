@@ -1,5 +1,6 @@
 package chat.octet.model.utils;
 
+import chat.octet.model.enums.ModelType;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -9,23 +10,57 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PromptBuilder {
 
-    private static final String INST_BEGIN_SUFFIX = "[INST] ";
-    private static final String INST_END_SUFFIX = " [/INST] ";
-    private static final String SYS_BEGIN_SUFFIX = "<<SYS>>\n";
-    private static final String SYS_END_SUFFIX = "\n<</SYS>>\n\n";
+    public static final String DEFAULT_SYSTEM = "Below is an instruction that describes a task. Write a response that appropriately completes the request.";
 
-    public static String toPrompt(String system, String question) {
-        if (StringUtils.isBlank(system)) {
-            return toPrompt(question);
-        }
-        return StringUtils.join(INST_BEGIN_SUFFIX, SYS_BEGIN_SUFFIX, system, SYS_END_SUFFIX, question, INST_END_SUFFIX);
+    /**
+     * Create prompt text
+     *
+     * @param modelType Model type.
+     * @param question  User question.
+     * @return Prompt text.
+     * @see ModelType
+     */
+    public static String toPrompt(ModelType modelType, String question) {
+        return toPrompt(modelType, null, question);
     }
 
-    public static String toPrompt(String question) {
-        if (StringUtils.isAnyBlank(question)) {
-            throw new IllegalArgumentException("prompt parameter cannot be empty");
+    /**
+     * Create prompt text
+     *
+     * @param modelType Model type.
+     * @param system    System prompt (optional).
+     * @param question  User question.
+     * @return Prompt text.
+     * @see ModelType
+     */
+    public static String toPrompt(ModelType modelType, String system, String question) {
+        String formateSystem = StringUtils.EMPTY;
+        switch (modelType) {
+            case ALPACA:
+                formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formateSystem, "### Instruction:\n", question, "\n\n### Response:\n");
+            case SNOOZY:
+                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join("### Instruction:\n", system, "\n\n");
+                return StringUtils.join(formateSystem, "### Prompt\n", question, "\n### Response\n");
+            case VICUNA:
+                formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formateSystem, "USER:\n", question, "\n\nASSISTANT:\n");
+            case OPEN_BUDDY:
+                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formateSystem, "User:\n", question, "\nAssistant:\n");
+            case OASST_LLAMA:
+                formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join("[INST] <<SYS>>\n", system, "\n<</SYS>>\n\n");
+                return StringUtils.join(formateSystem, "<|prompter|>\n", question, "\n\n<|assistant|>\n");
+            case REDPAJAMA_INCITE:
+                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formateSystem, "<human>\n", question, "\n<bot>\n");
+            case LLAMA2:
+            default:
+                if (StringUtils.isNotBlank(system)) {
+                    formateSystem = StringUtils.join("<<SYS>>\n", system, "\n<</SYS>>\n\n");
+                }
+                return StringUtils.join("[INST] ", formateSystem, question, " [/INST] ");
         }
-        return StringUtils.join(INST_BEGIN_SUFFIX, question, INST_END_SUFFIX);
     }
 
 }

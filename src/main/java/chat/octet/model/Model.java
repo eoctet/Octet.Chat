@@ -2,6 +2,7 @@ package chat.octet.model;
 
 
 import chat.octet.model.beans.*;
+import chat.octet.model.enums.ModelType;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
@@ -32,6 +33,8 @@ public class Model implements AutoCloseable {
     private final ModelParameter modelParams;
     @Getter
     private final String modelName;
+    @Getter
+    private final String modelType;
     private final int lastTokensSize;
     private final Map<String, Status> chatStatus = Maps.newConcurrentMap();
 
@@ -48,6 +51,8 @@ public class Model implements AutoCloseable {
         }
         this.modelParams = modelParams;
         this.modelName = modelParams.getModelName();
+        this.modelType = modelParams.getModelType();
+        Preconditions.checkNotNull(modelType, "Model type cannot be null");
         this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastNTokensSize();
         //setting model parameters
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
@@ -311,7 +316,7 @@ public class Model implements AutoCloseable {
         if (StringUtils.isNotBlank(system) && StringUtils.isBlank(userStatus.getInitialSystemPrompt())) {
             userStatus.setInitialSystemPrompt(system);
         }
-        String prompt = PromptBuilder.toPrompt(system, question);
+        String prompt = PromptBuilder.toPrompt(ModelType.valueOf(modelType.toUpperCase()), system, question);
         return new Iterable<Token>() {
             private Generator generator;
             private Status userChatStatus;
