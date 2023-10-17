@@ -296,15 +296,6 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getMaxDevices
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getMaxDevices
-        (JNIEnv *env, jclass thisClass) {
-    return llama_max_devices();
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    isMmapSupported
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMmapSupported
@@ -323,38 +314,11 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getVocabSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
-        (JNIEnv *env, jclass thisClass) {
-    return llama_n_vocab(model);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    getContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
         (JNIEnv *env, jclass thisClass) {
     return llama_n_ctx(llama_ctx);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getEmbeddingSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getEmbeddingSize
-        (JNIEnv *env, jclass thisClass) {
-    return llama_n_embd(model);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getVocabType
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
-        (JNIEnv *env, jclass thisClass) {
-    return llama_vocab_type(model);
 }
 
 /*
@@ -411,24 +375,6 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getTokenText
- */
-JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getTokenText
-        (JNIEnv *env, jclass thisClass, jint token) {
-    return ToJString(env, llama_token_get_text(llama_ctx, token));
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenScore
- */
-JNIEXPORT jfloat JNICALL Java_chat_octet_model_LlamaService_getTokenScore
-        (JNIEnv *env, jclass thisClass, jint token) {
-    return llama_token_get_score(llama_ctx, token);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    getTokenType
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
@@ -452,15 +398,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
         (JNIEnv *env, jclass thisClass) {
     return llama_token_eos(llama_ctx);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenNL
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenNL
-        (JNIEnv *env, jclass thisClass) {
-    return llama_token_nl(llama_ctx);
 }
 
 /*

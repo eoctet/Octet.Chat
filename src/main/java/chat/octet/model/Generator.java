@@ -1,9 +1,8 @@
 package chat.octet.model;
 
-import chat.octet.model.enums.FinishReason;
-import chat.octet.model.enums.LlamaTokenType;
 import chat.octet.model.beans.Status;
 import chat.octet.model.beans.Token;
+import chat.octet.model.enums.FinishReason;
 import chat.octet.model.exceptions.DecodeException;
 import chat.octet.model.parameters.GenerateParameter;
 import lombok.extern.slf4j.Slf4j;
@@ -183,7 +182,7 @@ public class Generator implements Iterator<Token> {
         }
         //do sampling
         int tokenId = doSampling(logits);
-        Token token = new Token(tokenId, LlamaTokenType.valueOfType(LlamaService.getTokenType(tokenId)), tokenToText(tokenId));
+        Token token = new Token(tokenId, LlamaService.getLlamaTokenType(tokenId), tokenToText(tokenId));
         //update generate status
         status.appendNextToken(token);
         finished = breakOrContinue(token, logits);

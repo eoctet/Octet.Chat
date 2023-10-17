@@ -66,13 +66,6 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getMaxDevices
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getMaxDevices
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    isMmapSupported
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMmapSupported
@@ -87,30 +80,9 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getVocabSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    getContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getEmbeddingSize
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getEmbeddingSize
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getVocabType
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabType
         (JNIEnv *, jclass);
 
 /*
@@ -136,20 +108,6 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getTokenText
- */
-JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getTokenText
-        (JNIEnv *, jclass, jint);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenScore
- */
-JNIEXPORT jfloat JNICALL Java_chat_octet_model_LlamaService_getTokenScore
-        (JNIEnv *, jclass, jint);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    getTokenType
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
@@ -167,13 +125,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
  * Method:    getTokenEOS
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenNL
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenNL
         (JNIEnv *, jclass);
 
 /*
