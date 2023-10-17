@@ -47,7 +47,7 @@ public class Generator implements Iterator<Token> {
         this.contextSize = LlamaService.getContextSize();
         this.status = srcStatus == null ? new Status() : new Status(srcStatus);
 
-        int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, true) : new int[]{LlamaService.getTokenBOS()};
+        int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, true, true) : new int[]{LlamaService.getTokenBOS()};
         if (tokens.length >= contextSize) {
             throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
         }

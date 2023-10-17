@@ -163,14 +163,15 @@ public class LlamaService {
      * The tokens pointer must be large enough to hold the resulting tokens.
      * Returns the number of tokens on success, no more than n_max_tokens.
      *
-     * @param buf          Text byte buffer.
-     * @param bufferLength Text byte buffer length.
-     * @param tokens       Empty token arrays, Used to receive the returned tokens.
-     * @param maxTokens    Max token size, by default is context size.
-     * @param addBos       Add special BOS token.
+     * @param buf           Text byte buffer.
+     * @param bufferLength  Text byte buffer length.
+     * @param tokens        Empty token arrays, Used to receive the returned tokens.
+     * @param maxTokens     Max token size, by default is context size.
+     * @param addBos        Add special BOS token.
+     * @param specialTokens Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext. Does not insert a leading space.
      * @return int, Returns a negative number on failure, else the number of tokens that would have been returned.
      */
-    public static native int tokenize(byte[] buf, int bufferLength, int[] tokens, int maxTokens, boolean addBos);
+    public static native int tokenize(byte[] buf, int bufferLength, int[] tokens, int maxTokens, boolean addBos, boolean specialTokens);
 
     /**
      * Convert the token id to text piece.
@@ -263,15 +264,16 @@ public class LlamaService {
     /**
      * Convert the provided text into tokens.
      *
-     * @param text   Input text.
-     * @param addBos Add special BOS token.
+     * @param text          Input text.
+     * @param addBos        Add special BOS token.
+     * @param specialTokens Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext. Does not insert a leading space.
      * @return Returns a negative number on failure, else the number of tokens that would have been returned.
      */
-    public static int[] tokenize(String text, boolean addBos) {
+    public static int[] tokenize(String text, boolean addBos, boolean specialTokens) {
         Preconditions.checkNotNull(text, "Text cannot be null");
         int[] tokens = new int[getContextSize()];
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-        int nextTokens = tokenize(textBytes, textBytes.length, tokens, getContextSize(), addBos);
+        int nextTokens = tokenize(textBytes, textBytes.length, tokens, getContextSize(), addBos, specialTokens);
         if (nextTokens < 0) {
             throw new ModelException(MessageFormat.format("Failed to tokenize: {0}, next_tokens: {1}", text, nextTokens));
         }
