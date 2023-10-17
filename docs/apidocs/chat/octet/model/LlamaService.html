@@ -335,18 +335,20 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 </tr>
 <tr id="i25" class="rowColor">
 <td class="colFirst"><code>static int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../chat/octet/model/LlamaService.html#tokenize-byte:A-int-int:A-int-boolean-">tokenize</a></span>(byte[]&nbsp;buf,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../chat/octet/model/LlamaService.html#tokenize-byte:A-int-int:A-int-boolean-boolean-">tokenize</a></span>(byte[]&nbsp;buf,
         int&nbsp;bufferLength,
         int[]&nbsp;tokens,
         int&nbsp;maxTokens,
-        boolean&nbsp;addBos)</code>
+        boolean&nbsp;addBos,
+        boolean&nbsp;specialTokens)</code>
 <div class="block">Convert the provided text into tokens.</div>
 </td>
 </tr>
 <tr id="i26" class="altColor">
 <td class="colFirst"><code>static int[]</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../chat/octet/model/LlamaService.html#tokenize-java.lang.String-boolean-">tokenize</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;text,
-        boolean&nbsp;addBos)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../chat/octet/model/LlamaService.html#tokenize-java.lang.String-boolean-boolean-">tokenize</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;text,
+        boolean&nbsp;addBos,
+        boolean&nbsp;specialTokens)</code>
 <div class="block">Convert the provided text into tokens.</div>
 </td>
 </tr>
@@ -656,7 +658,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 </dl>
 </li>
 </ul>
-<a name="tokenize-byte:A-int-int:A-int-boolean-">
+<a name="tokenize-byte:A-int-int:A-int-boolean-boolean-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -666,7 +668,8 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
                            int&nbsp;bufferLength,
                            int[]&nbsp;tokens,
                            int&nbsp;maxTokens,
-                           boolean&nbsp;addBos)</pre>
+                           boolean&nbsp;addBos,
+                           boolean&nbsp;specialTokens)</pre>
 <div class="block">Convert the provided text into tokens.
  The tokens pointer must be large enough to hold the resulting tokens.
  Returns the number of tokens on success, no more than n_max_tokens.</div>
@@ -677,6 +680,7 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <dd><code>tokens</code> - Empty token arrays, Used to receive the returned tokens.</dd>
 <dd><code>maxTokens</code> - Max token size, by default is context size.</dd>
 <dd><code>addBos</code> - Add special BOS token.</dd>
+<dd><code>specialTokens</code> - Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext. Does not insert a leading space.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>int, Returns a negative number on failure, else the number of tokens that would have been returned.</dd>
 </dl>
@@ -857,19 +861,21 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 </dl>
 </li>
 </ul>
-<a name="tokenize-java.lang.String-boolean-">
+<a name="tokenize-java.lang.String-boolean-boolean-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>tokenize</h4>
 <pre>public static&nbsp;int[]&nbsp;tokenize(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;text,
-                             boolean&nbsp;addBos)</pre>
+                             boolean&nbsp;addBos,
+                             boolean&nbsp;specialTokens)</pre>
 <div class="block">Convert the provided text into tokens.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>text</code> - Input text.</dd>
 <dd><code>addBos</code> - Add special BOS token.</dd>
+<dd><code>specialTokens</code> - Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext. Does not insert a leading space.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Returns a negative number on failure, else the number of tokens that would have been returned.</dd>
 </dl>
