@@ -130,11 +130,11 @@ public class LlamaService {
     public static native float[] getLogits(int index);
 
     /**
-     * Get Embeddings
+     * Get embedding
      *
-     * @return float[], Returns embedding float array of the text.
+     * @return float[], Returns embedding float array.
      */
-    public static native float[] getEmbeddings();
+    public static native float[] getEmbedding();
 
     /**
      * Get token type code.
