@@ -2,6 +2,7 @@ package chat.octet.model.parameters;
 
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
+import chat.octet.model.enums.ModelType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -33,9 +34,10 @@ public class ModelParameter {
     private String modelName;
 
     /**
-     * Llama model type
+     * Llama model type (default model type: Llama2).
      */
-    private String modelType;
+    @Builder.Default
+    private String modelType = ModelType.LLAMA2.name();
 
     /**
      * <b>context-size</b><br/>
