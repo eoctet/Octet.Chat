@@ -1,4 +1,4 @@
-package chat.octet.test;
+package chat.octet.examples;
 
 import chat.octet.model.Model;
 import chat.octet.model.beans.CompletionResult;
