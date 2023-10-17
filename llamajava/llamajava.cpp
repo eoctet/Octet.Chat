@@ -41,6 +41,7 @@ jfieldID FIELD_EMBEDDING;
 jclass LLAMA_MODEL_PARAMS_CLASS;
 jfieldID FIELD_GPU_LAYERS;
 jfieldID FIELD_MAIN_GPU;
+jfieldID FIELD_TENSOR_SPLIT;
 jfieldID FIELD_VOCAB_ONLY;
 jfieldID FIELD_USE_MMAP;
 jfieldID FIELD_USE_MLOCK;
@@ -82,16 +83,25 @@ void ThrowByName(JNIEnv *env, const char *name, const char *msg) {
 }
 
 struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama_model_params) {
+    float *tensor_split = nullptr;
+    jfloatArray arrays_data = (jfloatArray) env->GetObjectField(jllama_model_params, FIELD_TENSOR_SPLIT);
+    if (arrays_data != nullptr) {
+        tensor_split = env->GetFloatArrayElements(arrays_data, JNI_FALSE);
+    }
+
     struct llama_model_params params = {
             /*.n_gpu_layers                =*/ env->GetIntField(jllama_model_params, FIELD_GPU_LAYERS),
             /*.main_gpu                    =*/ env->GetIntField(jllama_model_params, FIELD_MAIN_GPU),
-            /*.tensor_split                =*/ nullptr,
+            /*.tensor_split                =*/ tensor_split,
             /*.progress_callback           =*/ nullptr,
             /*.progress_callback_user_data =*/ nullptr,
             /*.vocab_only                  =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_VOCAB_ONLY)),
             /*.use_mmap                    =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_USE_MMAP)),
             /*.use_mlock                   =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_USE_MLOCK)),
     };
+    if (arrays_data != nullptr) {
+        env->ReleaseFloatArrayElements(arrays_data, tensor_split, 0);
+    }
     return params;
 }
 
@@ -158,6 +168,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     LLAMA_MODEL_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelParams");
     FIELD_GPU_LAYERS = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "gpuLayers", "I");
     FIELD_MAIN_GPU = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mainGpu", "I");
+    FIELD_TENSOR_SPLIT = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "tensorSplit", "[F");
     FIELD_VOCAB_ONLY = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "vocabOnly", "Z");
     FIELD_USE_MMAP = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mmap", "Z");
     FIELD_USE_MLOCK = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mlock", "Z");
