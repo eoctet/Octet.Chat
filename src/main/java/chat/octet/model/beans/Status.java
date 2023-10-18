@@ -83,12 +83,6 @@ public class Status {
         return (generateTokens.isEmpty() && pastTokenSize > 0) ? pastTokenSize - 1 : 0;
     }
 
-    public String getGeneratedCompleteText() {
-        StringBuilder builder = new StringBuilder();
-        generateTokens.forEach(token -> builder.append(token.getText()));
-        return builder.toString();
-    }
-
     public FinishReason getFinishReason() {
         return (generateTokens == null || generateTokens.isEmpty()) ? FinishReason.UNKNOWN : generateTokens.get(generateTokens.size() - 1).getFinishReason();
     }

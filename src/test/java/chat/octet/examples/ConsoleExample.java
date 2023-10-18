@@ -32,7 +32,7 @@ public class ConsoleExample {
                 if (StringUtils.trimToEmpty(input).equalsIgnoreCase("exit")) {
                     break;
                 }
-                model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
+                model.chat(generateParams, system, input).output();
                 System.out.print("\n");
                 model.metrics();
             }

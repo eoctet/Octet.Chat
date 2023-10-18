@@ -51,7 +51,7 @@ public class ConversationExample {
                     model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
                 } else {
                     String text = PromptBuilder.toPrompt(ModelType.LLAMA2, system, input);
-                    model.generate(generateParams, text).forEach(e -> System.out.print(e.getText()));
+                    model.generate(generateParams, text).output();
                 }
                 System.out.print("\n");
                 model.metrics();

@@ -18,7 +18,7 @@ public class ModelExample {
             //Model: llama2
             String text = "long time a ago";
             //streaming output
-            model.generate(generateParams, text).forEach(e -> System.out.print(e.getText()));
+            model.generate(generateParams, text).output();
 
             //completion output
             CompletionResult result = model.completions(generateParams, text);
@@ -30,7 +30,7 @@ public class ModelExample {
             String question = "Who are you?";
             String prompt = PromptBuilder.toPrompt(ModelType.LLAMA2, system, question);
             //streaming output
-            model.generate(prompt).forEach(e -> System.out.print(e.getText()));
+            model.generate(prompt).output();
 
             //completion output
             CompletionResult answer = model.completions(generateParams, prompt);
@@ -40,7 +40,7 @@ public class ModelExample {
             //Model: llama2-chat
 
             //streaming output
-            model.chat(generateParams, system, question).forEach(e -> System.out.print(e.getText()));
+            model.chat(generateParams, system, question).output();
 
             //completion output
             CompletionResult response = model.chatCompletions(generateParams, prompt);

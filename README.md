@@ -16,7 +16,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 - 🚀 News:
   - [X] Continuous generation and chat
   - [X] Llama grammar
-  - [X] Parallel batch decode
+  - [X] Parallel batch decoding
 
 ## Quick start
 
@@ -60,7 +60,7 @@ public class ConsoleExample {
                 if (StringUtils.trimToEmpty(input).equalsIgnoreCase("exit")) {
                     break;
                 }
-                model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
+                model.chat(generateParams, system, input).output();
                 System.out.print("\n");
                 model.metrics();
             }
@@ -101,10 +101,10 @@ public class ContinuousChatExample {
             for (String question : questions) {
                 //Example 1: Continuous generation example.
                 //String text = PromptBuilder.toPrompt(system, question);
-                //model.generate(generateParams, text).forEach(e -> System.out.print(e.getText()));
+                //model.generate(generateParams, text).output();
 
                 //Example 2: Continuous chat example
-                model.chat(generateParams, system, question).forEach(e -> System.out.print(e.getText()));
+                model.chat(generateParams, system, question).output();
                 System.out.println("\n");
                 model.metrics();
             }

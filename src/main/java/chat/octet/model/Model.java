@@ -1,7 +1,10 @@
 package chat.octet.model;
 
 
-import chat.octet.model.beans.*;
+import chat.octet.model.beans.CompletionResult;
+import chat.octet.model.beans.LlamaContextParams;
+import chat.octet.model.beans.LlamaModelParams;
+import chat.octet.model.beans.Status;
 import chat.octet.model.enums.ModelType;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
@@ -13,13 +16,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * LLama model, which provides functions for generating and chatting conversations.
@@ -114,6 +113,11 @@ public class Model implements AutoCloseable {
         return llamaContextParams;
     }
 
+    /**
+     * Delete the session state of the specified user.
+     *
+     * @param user User name.
+     */
     public void removeChatStatus(String user) {
         boolean exists = chatStatus.containsKey(user);
         if (exists) {
@@ -125,6 +129,9 @@ public class Model implements AutoCloseable {
         }
     }
 
+    /**
+     * Delete all user session states.
+     */
     public void removeAllChatStatus() {
         int size = chatStatus.size();
         if (size > 0) {
@@ -153,21 +160,17 @@ public class Model implements AutoCloseable {
      * @see CompletionResult
      */
     public CompletionResult completions(GenerateParameter generateParams, String text) {
-        Iterable<Token> tokenIterable = generate(generateParams, text);
-        tokenIterable.forEach(e -> {
-        });
-        Generator generator = (Generator) tokenIterable.iterator();
-        return CompletionResult.builder().content(generator.getGeneratedCompleteText()).finishReason(generator.getFinishReason()).build();
+        return generate(generateParams, text).result();
     }
 
     /**
      * Generate text in stream format.
      *
      * @param text Input text or prompt.
-     * @return Iterable, Generation iterator.
+     * @return Inference generator.
      * @see Generator
      */
-    public Iterable<Token> generate(String text) {
+    public Generator generate(String text) {
         return generate(GenerateParameter.builder().build(), text);
     }
 
@@ -176,41 +179,14 @@ public class Model implements AutoCloseable {
      *
      * @param generateParams Specify a generation parameter.
      * @param text           Input text or prompt.
-     * @return Iterable, Generation iterator.
+     * @return Inference generator.
      * @see Generator
      */
-    public Iterable<Token> generate(GenerateParameter generateParams, String text) {
+    public Generator generate(GenerateParameter generateParams, String text) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(text, "Text cannot be null");
         generateParams.setLastTokensSize(lastTokensSize);
-
-        return new Iterable<Token>() {
-
-            private Generator generator;
-
-            @Nonnull
-            @Override
-            public Iterator<Token> iterator() {
-                if (generator == null) {
-                    generator = new Generator(generateParams, text);
-                }
-                return generator;
-            }
-
-            @Override
-            public void forEach(Consumer<? super Token> action) {
-                Objects.requireNonNull(action);
-                try {
-                    for (Token token : this) {
-                        action.accept(token);
-                    }
-                } catch (Exception e) {
-                    throw new ModelException("Generate next token error ", e);
-                } finally {
-                    generator.clearCache();
-                }
-            }
-        };
+        return new Generator(generateParams, text);
     }
 
     /**
@@ -246,21 +222,17 @@ public class Model implements AutoCloseable {
      * @see CompletionResult
      */
     public CompletionResult chatCompletions(GenerateParameter generateParams, String system, String question) {
-        Iterable<Token> tokenIterable = chat(generateParams, system, question);
-        tokenIterable.forEach(e -> {
-        });
-        Generator generator = (Generator) tokenIterable.iterator();
-        return CompletionResult.builder().content(generator.getGeneratedCompleteText()).finishReason(generator.getFinishReason()).build();
+        return chat(generateParams, system, question).result();
     }
 
     /**
      * Start a conversation and chat in streaming format.
      *
      * @param question User question.
-     * @return Iterable, Generation iterator.
+     * @return Inference generator.
      * @see Generator
      */
-    public Iterable<Token> chat(String question) {
+    public Generator chat(String question) {
         return chat(GenerateParameter.builder().build(), null, question);
     }
 
@@ -269,10 +241,10 @@ public class Model implements AutoCloseable {
      *
      * @param system   System prompt.
      * @param question User question.
-     * @return Iterable, Generation iterator.
+     * @return Inference generator.
      * @see Generator
      */
-    public Iterable<Token> chat(String system, String question) {
+    public Generator chat(String system, String question) {
         return chat(GenerateParameter.builder().build(), system, question);
     }
 
@@ -281,10 +253,10 @@ public class Model implements AutoCloseable {
      *
      * @param generateParams Specify a generation parameter.
      * @param question       User question.
-     * @return Iterable, Generation iterator.
+     * @return Inference generator.
      * @see Generator
      */
-    public Iterable<Token> chat(GenerateParameter generateParams, String question) {
+    public Generator chat(GenerateParameter generateParams, String question) {
         return chat(generateParams, null, question);
     }
 
@@ -294,10 +266,10 @@ public class Model implements AutoCloseable {
      * @param generateParams Specify a generation parameter.
      * @param system         System prompt.
      * @param question       User question.
-     * @return Iterable, Generation iterator.
+     * @return Inference generator.
      * @see Generator
      */
-    public Iterable<Token> chat(GenerateParameter generateParams, String system, String question) {
+    public Generator chat(GenerateParameter generateParams, String system, String question) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(question, "Question cannot be null");
         Preconditions.checkNotNull(generateParams.getUser(), "User id cannot be null");
@@ -317,37 +289,7 @@ public class Model implements AutoCloseable {
             userStatus.setInitialSystemPrompt(system);
         }
         String prompt = PromptBuilder.toPrompt(ModelType.valueOf(modelType.toUpperCase()), system, question);
-        return new Iterable<Token>() {
-            private Generator generator;
-            private Status userChatStatus;
-
-            @Nonnull
-            @Override
-            public Iterator<Token> iterator() {
-                if (generator == null) {
-                    generator = new Generator(generateParams, prompt, userStatus);
-                }
-                if (userChatStatus == null) {
-                    userChatStatus = userStatus;
-                }
-                return generator;
-            }
-
-            @Override
-            public void forEach(Consumer<? super Token> action) {
-                Objects.requireNonNull(action);
-                try {
-                    for (Token token : this) {
-                        action.accept(token);
-                    }
-                } catch (Exception e) {
-                    throw new ModelException("Generate next token error ", e);
-                } finally {
-                    //copy last generated status
-                    userChatStatus.copyToStatus(generator.getStatus());
-                }
-            }
-        };
+        return new Generator(generateParams, prompt, userStatus);
     }
 
     /**
