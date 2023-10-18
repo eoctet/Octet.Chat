@@ -1,3 +1,2 @@
-1. Update tensor_split param.
-2. Update Java docs.
-3. Update llama.cpp libs version to b1387.
+1. Update inference generator.
+2. Update llama.cpp libs version to b1395.
