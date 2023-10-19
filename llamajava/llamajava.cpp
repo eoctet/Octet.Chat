@@ -566,7 +566,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     int decode_status = 0;
     if (token != llama_token_eos(llama_ctx)) {
         //decode the next new token
-        llama_batch batch = llama_batch_init(1, 0);
+        llama_batch batch = llama_batch_init(1, 0, 1);
         batch.token[0] = token;
         batch.pos[0] = past_token_size;
         batch.seq_id[0] = sequence_id;
@@ -638,7 +638,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         int end_index = decode_size + past_tokens;
         std::vector<llama_token> batch_tokens(src_tokens.begin() + past_tokens, src_tokens.begin() + end_index);
 
-        llama_batch batch = llama_batch_init(decode_size, 0);
+        llama_batch batch = llama_batch_init(decode_size, 0, 1);
         batch.n_tokens = decode_size;
         for (int32_t i = 0; i < batch.n_tokens; i++) {
             batch.token[i] = batch_tokens[i];
