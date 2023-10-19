@@ -80,6 +80,13 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
 
 /*
  * Class:     chat_octet_model_LlamaService
+ * Method:    getVocabSize
+ */
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
+        (JNIEnv *, jclass);
+
+/*
+ * Class:     chat_octet_model_LlamaService
  * Method:    getContextSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize

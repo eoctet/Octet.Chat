@@ -100,6 +100,13 @@ public class LlamaService {
     public static native boolean isMlockSupported();
 
     /**
+     * Get model vocab size.
+     *
+     * @return int
+     */
+    public static native int getVocabSize();
+
+    /**
      * Get model context size.
      *
      * @return int
