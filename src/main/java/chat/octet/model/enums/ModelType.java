@@ -13,5 +13,7 @@ public enum ModelType {
     REDPAJAMA_INCITE,
     SNOOZY,
     FALCON,
+    BAICHUAN,
+    AQUILA,
     COMMON
 }

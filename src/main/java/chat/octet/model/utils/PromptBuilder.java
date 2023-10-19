@@ -10,7 +10,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PromptBuilder {
 
-    public static final String DEFAULT_SYSTEM = "Below is an instruction that describes a task. Write a response that appropriately completes the request.";
+    public static final String DEFAULT_ALPACA_SYSTEM = "Below is an instruction that describes a task. Write a response that appropriately completes the request.";
+
+    public static final String DEFAULT_COMMON_SYSTEM = "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n" +
+            "If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.";
 
     /**
      * Create prompt text
@@ -34,34 +37,34 @@ public class PromptBuilder {
      * @see ModelType
      */
     public static String toPrompt(ModelType modelType, String system, String question) {
-        String formateSystem = StringUtils.EMPTY;
+        String formatSystem;
         switch (modelType) {
             case ALPACA:
-                formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join(system, "\n\n");
-                return StringUtils.join(formateSystem, "### Instruction:\n", question, "\n\n### Response:\n");
+                formatSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formatSystem, "### Instruction:\n", question, "\n\n### Response:\n");
             case SNOOZY:
-                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join("### Instruction:\n", system, "\n\n");
-                return StringUtils.join(formateSystem, "### Prompt\n", question, "\n### Response\n");
+                formatSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join("### Instruction:\n", system, "\n\n");
+                return StringUtils.join(formatSystem, "### Prompt\n", question, "\n### Response\n");
             case VICUNA:
-                formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join(system, "\n\n");
-                return StringUtils.join(formateSystem, "USER:\n", question, "\n\nASSISTANT:\n");
+                formatSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formatSystem, "USER:\n", question, "\n\nASSISTANT:\n");
             case OASST_LLAMA:
-                formateSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join("[INST] <<SYS>>\n", system, "\n<</SYS>>\n\n");
-                return StringUtils.join(formateSystem, "<|prompter|>\n", question, "\n\n<|assistant|>\n");
+                formatSystem = StringUtils.isBlank(system) ? "\n\n" : StringUtils.join("[INST] <<SYS>>\n", system, "\n<</SYS>>\n\n");
+                return StringUtils.join(formatSystem, "<|prompter|>\n", question, "\n\n<|assistant|>\n");
             case REDPAJAMA_INCITE:
-                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
-                return StringUtils.join(formateSystem, "<human>\n", question, "\n<bot>\n");
+                formatSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formatSystem, "<human>\n", question, "\n<bot>\n");
             case LLAMA2:
-                if (StringUtils.isNotBlank(system)) {
-                    formateSystem = StringUtils.join("<<SYS>>\n", system, "\n<</SYS>>\n\n");
-                }
-                return StringUtils.join("[INST] ", formateSystem, question, " [/INST] ");
+                formatSystem = StringUtils.isBlank(system) ? StringUtils.EMPTY : StringUtils.join("<<SYS>>\n", system, "\n<</SYS>>\n\n");
+                return StringUtils.join("[INST] ", formatSystem, question, " [/INST] ");
             case OPEN_BUDDY:
             case FALCON:
+            case BAICHUAN:
+            case AQUILA:
             case COMMON:
             default:
-                formateSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
-                return StringUtils.join(formateSystem, "User:\n", question, "\nAssistant:\n");
+                formatSystem = StringUtils.isBlank(system) ? "\n" : StringUtils.join(system, "\n\n");
+                return StringUtils.join(formatSystem, "User: ", question, "\nAssistant: ");
         }
     }
 
