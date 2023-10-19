@@ -2,21 +2,25 @@
 
 
 [![CI](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml)
-[![README English](https://img.shields.io/badge/Lang-English-blue)](./README.md)
-[![Llama java chat](https://img.shields.io/badge/Github-llama_java_chat-green)](https://github.com/eoctet/llama-java-chat.git)
-![GitHub language count](https://img.shields.io/github/languages/count/eoctet/llama-java-core)
-[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core)](https://opensource.org/licenses/MIT)
+[![Maven Central](https://img.shields.io/maven-central/v/chat.octet/llama-java-core?color=orange)](https://mvnrepository.com/artifact/chat.octet/llama-java-core)
+[![README English](https://img.shields.io/badge/Lang-English-red)](./README.md)
+[![Llama java chat](https://img.shields.io/badge/Github-Llama_Java_Chat-blue?logo=github)](https://github.com/eoctet/llama-java-chat.git)
+[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core?color=green)](https://opensource.org/licenses/MIT)
 
 
 这是一个基于 🦙[`llama.cpp`](https://github.com/ggerganov/llama.cpp)  API开发的Java库，目标是更快速将大语言模型的能力集成到Java生态，本项目和其他语言版本库具有一样的功能。
 
 #### 主要特点
-- 🚀 基于 `Llama.cpp` 构建，更多细节请关注 **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp)。
-- 🚀 使用 `JNI` 开发本地库，~~而不是JNA~~，测试的性能上与其他库无异。
-- 🚀 新增:
-  - [X] 连续生成和对话
-  - [X] Llama 语法解析
-  - [X] 并行批处理解码
+- 🦙 基于 `Llama.cpp` 构建。
+- 🤖 支持 `并行推理`、`连续对话` 和 `文本生成`。
+- 📦 支持 `Llama2` 系列模型和其他开源模型，例如：`Baichuan 7B`。
+- ☕️ 使用 `JNI` 开发本地库，提供与 `Llama.cpp` 一致的接口。
+
+#### 最近更新
+  - [X] 🚀 自定义模型的提示词模版（例如：Vicuna、Alpaca等等）
+  - [X] 🚀 并行批处理解码
+  - [X] 🚀 Llama 语法解析
+
 
 ## 快速开始
 
@@ -113,14 +117,12 @@ public class ContinuousChatExample {
 }
 ```
 
-> More examples: [chat.octet.test](src%2Ftest%2Fjava%2Fchat%2Foctet%2Ftest)
+> More examples: `chat.octet.examples.*`
 
 
 ## 开发手册
 
-#### 自定义推理
-
-- **Components**
+#### Components
   - `LogitsProcessor`
   - `StoppingCriteria`
 
@@ -162,14 +164,7 @@ GenerateParameter generateParams = GenerateParameter.builder()
 
 ```
 
-#### [LlamaService](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FLlamaService.java)
-
-使用 `JNI` 开发，开放与原项目相同的接口并优化JVM Native性能。
-
-> `LlamaService` 对API进行了优化，以减少JVM Native之间数据传递带来的性能损失。
->
->
-> 完整的文档请参考 [API docs](docs%2Fapidocs%2Findex.html)。
+> 完整的文档请参考 [Java docs](docs%2Fapidocs%2Findex.html)
 
 #### 如何编译
 

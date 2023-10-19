@@ -2,21 +2,25 @@
 
 
 [![CI](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/chat.octet/llama-java-core?color=orange)](https://mvnrepository.com/artifact/chat.octet/llama-java-core)
 [![README Zh_CN](https://img.shields.io/badge/Lang-中文-red)](./README.Zh_CN.md)
-[![Llama java chat](https://img.shields.io/badge/Github-llama_java_chat-green)](https://github.com/eoctet/llama-java-chat.git)
-![GitHub language count](https://img.shields.io/github/languages/count/eoctet/llama-java-core)
-[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core)](https://opensource.org/licenses/MIT)
+[![Llama java chat](https://img.shields.io/badge/Github-Llama_Java_Chat-blue?logo=github)](https://github.com/eoctet/llama-java-chat.git)
+[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core?color=green)](https://opensource.org/licenses/MIT)
 
 
 Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggerganov/llama.cpp), The goal is to integrate the capabilities of LLMs into the Java ecosystem, this project has the same functionality as other language versions.
 
 #### Features
-- 🚀 Built based on `Llama.cpp`, For more details, please follow **@ggerganov's** [`llama.cpp`](https://github.com/ggerganov/llama.cpp).
-- 🚀 Developed using `JNI`, ~~NOT JNA~~.
-- 🚀 News:
-  - [X] Continuous generation and chat
-  - [X] Llama grammar
-  - [X] Parallel batch decoding
+- 🦙 Built on `Llama.cpp`.
+- 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`.
+- 📦 Support for `Llama2` series models and other open source models, such as `Baichuan 7B`.
+- ☕️ Develop using `JNI`, Provides a consistent API with `Llama.cpp`.
+
+#### Last updated
+  - [X] 🚀 Custom model prompt templates (such as Vicuna, Alpaca, etc.)
+  - [X] 🚀 Parallel batch decoding
+  - [X] 🚀 Llama grammar
+
 
 ## Quick start
 
@@ -113,14 +117,12 @@ public class ContinuousChatExample {
 }
 ```
 
-> More examples: [chat.octet.test](src%2Ftest%2Fjava%2Fchat%2Foctet%2Ftest)
+> More examples: `chat.octet.examples.*`
 
 
 ## Development
 
-#### Customize inference
-
-- **Components**
+#### Components
   - `LogitsProcessor`
   - `StoppingCriteria`
 
@@ -162,17 +164,7 @@ GenerateParameter generateParams = GenerateParameter.builder()
 
 ```
 
-#### [LlamaService](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2FLlamaService.java)
-
-Develop using `JNI`:
-
-- Same interface as the original project.
-- Optimize JVM Native performance.
-
-> `LlamaService` has been optimized to reduce performance losses caused by data transfer between JVM Native.
->
->
-> More information: [API docs](docs%2Fapidocs%2Findex.html)
+> More information: [Java docs](docs%2Fapidocs%2Findex.html)
 
 #### Build
 
