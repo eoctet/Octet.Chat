@@ -1,2 +1,2 @@
-1. Update inference generator.
-2. Update llama.cpp libs version to b1395.
+1. Add model type and prompt templates.
+2. Restore llama API.
