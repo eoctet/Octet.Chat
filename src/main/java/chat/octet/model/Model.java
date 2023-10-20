@@ -288,7 +288,7 @@ public class Model implements AutoCloseable {
         if (StringUtils.isNotBlank(system) && StringUtils.isBlank(userStatus.getInitialSystemPrompt())) {
             userStatus.setInitialSystemPrompt(system);
         }
-        String prompt = PromptBuilder.toPrompt(ModelType.valueOf(modelType.toUpperCase()), system, question);
+        String prompt = PromptBuilder.format(ModelType.valueOf(modelType.toUpperCase()), system, question);
         return new Generator(generateParams, prompt, userStatus);
     }
 

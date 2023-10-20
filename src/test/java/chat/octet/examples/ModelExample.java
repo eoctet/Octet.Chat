@@ -28,7 +28,7 @@ public class ModelExample {
             //Model: llama2-chat
             String system = "Answer the questions.";
             String question = "Who are you?";
-            String prompt = PromptBuilder.toPrompt(ModelType.LLAMA2, system, question);
+            String prompt = PromptBuilder.format(ModelType.LLAMA2, system, question);
             //streaming output
             model.generate(prompt).output();
 

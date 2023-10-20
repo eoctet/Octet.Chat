@@ -50,7 +50,7 @@ public class ConversationExample {
                 if (chatMode) {
                     model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
                 } else {
-                    String text = PromptBuilder.toPrompt(ModelType.LLAMA2, system, input);
+                    String text = PromptBuilder.format(ModelType.LLAMA2, system, input);
                     model.generate(generateParams, text).output();
                 }
                 System.out.print("\n");
