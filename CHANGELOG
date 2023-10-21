@@ -1,2 +1,3 @@
-1. Add model type and prompt templates.
-2. Restore llama API.
+1. Rebuild prompt util.
+2. Update llama API.
+3. Update llama.cpp libs version to b1407.

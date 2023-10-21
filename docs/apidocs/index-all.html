@@ -231,8 +231,14 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="chat/octet/model/TokenDecoder.html#decodeToken-int...-">decodeToken(int...)</a></span> - Static method in class chat.octet.model.<a href="chat/octet/model/TokenDecoder.html" title="class in chat.octet.model">TokenDecoder</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#DEFAULT_SYSTEM">DEFAULT_SYSTEM</a></span> - Static variable in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
-<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#DEFAULT_ALPACA_SYSTEM">DEFAULT_ALPACA_SYSTEM</a></span> - Static variable in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
+<dd>
+<div class="block">Default prompt of Alpaca model.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#DEFAULT_COMMON_SYSTEM">DEFAULT_COMMON_SYSTEM</a></span> - Static variable in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
+<dd>
+<div class="block">Default common prompt.</div>
+</dd>
 </dl>
 <a name="I:E">
 <!--   -->
@@ -258,6 +264,18 @@
 <dt><a href="chat/octet/model/enums/FinishReason.html" title="enum in chat.octet.model.enums"><span class="typeNameLink">FinishReason</span></a> - Enum in <a href="chat/octet/model/enums/package-summary.html">chat.octet.model.enums</a></dt>
 <dd>
 <div class="block">Token generate status</div>
+</dd>
+<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#format-chat.octet.model.enums.ModelType-java.lang.String-">format(ModelType, String)</a></span> - Static method in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
+<dd>
+<div class="block">Format user question as prompt text.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#format-chat.octet.model.enums.ModelType-java.lang.String-java.lang.String-">format(ModelType, String, String)</a></span> - Static method in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
+<dd>
+<div class="block">Format user question as prompt text.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#format-chat.octet.model.enums.ModelType-chat.octet.model.beans.ChatMessage...-">format(ModelType, ChatMessage...)</a></span> - Static method in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
+<dd>
+<div class="block">Format chat messages as prompt text.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="chat/octet/model/utils/Platform.html#FREEBSD">FREEBSD</a></span> - Static variable in class chat.octet.model.utils.<a href="chat/octet/model/utils/Platform.html" title="class in chat.octet.model.utils">Platform</a></dt>
 <dd>&nbsp;</dd>
@@ -350,6 +368,10 @@
 </dd>
 <dt><span class="memberNameLink"><a href="chat/octet/model/TokenDecoder.html#getUtf8ByteLength-byte-">getUtf8ByteLength(byte)</a></span> - Static method in class chat.octet.model.<a href="chat/octet/model/TokenDecoder.html" title="class in chat.octet.model">TokenDecoder</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="chat/octet/model/LlamaService.html#getVocabSize--">getVocabSize()</a></span> - Static method in class chat.octet.model.<a href="chat/octet/model/LlamaService.html" title="class in chat.octet.model">LlamaService</a></dt>
+<dd>
+<div class="block">Get model vocab size.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="chat/octet/model/utils/Platform.html#GNU">GNU</a></span> - Static variable in class chat.octet.model.utils.<a href="chat/octet/model/utils/Platform.html" title="class in chat.octet.model.utils">Platform</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="chat/octet/model/beans/LlamaModelParams.html#gpuLayers">gpuLayers</a></span> - Variable in class chat.octet.model.beans.<a href="chat/octet/model/beans/LlamaModelParams.html" title="class in chat.octet.model.beans">LlamaModelParams</a></dt>
@@ -593,8 +615,6 @@
 <dd>
 <div class="block">Prompt builder</div>
 </dd>
-<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#PromptBuilder--">PromptBuilder()</a></span> - Constructor for class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
-<dd>&nbsp;</dd>
 </dl>
 <a name="I:R">
 <!--   -->
@@ -708,14 +728,6 @@
 <dt><span class="memberNameLink"><a href="chat/octet/model/LlamaService.html#tokenToPiece-int-byte:A-int-">tokenToPiece(int, byte[], int)</a></span> - Static method in class chat.octet.model.<a href="chat/octet/model/LlamaService.html" title="class in chat.octet.model">LlamaService</a></dt>
 <dd>
 <div class="block">Convert the token id to text piece.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#toPrompt-chat.octet.model.enums.ModelType-java.lang.String-">toPrompt(ModelType, String)</a></span> - Static method in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
-<dd>
-<div class="block">Create prompt text</div>
-</dd>
-<dt><span class="memberNameLink"><a href="chat/octet/model/utils/PromptBuilder.html#toPrompt-chat.octet.model.enums.ModelType-java.lang.String-java.lang.String-">toPrompt(ModelType, String, String)</a></span> - Static method in class chat.octet.model.utils.<a href="chat/octet/model/utils/PromptBuilder.html" title="class in chat.octet.model.utils">PromptBuilder</a></dt>
-<dd>
-<div class="block">Create prompt text</div>
 </dd>
 <dt><span class="memberNameLink"><a href="chat/octet/model/beans/Metrics.html#toString--">toString()</a></span> - Method in class chat.octet.model.beans.<a href="chat/octet/model/beans/Metrics.html" title="class in chat.octet.model.beans">Metrics</a></dt>
 <dd>&nbsp;</dd>

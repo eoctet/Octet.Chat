@@ -30,7 +30,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
 </dependency>
 ```
 

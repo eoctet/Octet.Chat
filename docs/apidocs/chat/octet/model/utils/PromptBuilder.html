@@ -19,7 +19,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9};
+var methods = {"i0":9,"i1":9,"i2":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -77,13 +77,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -137,24 +137,15 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#DEFAULT_SYSTEM">DEFAULT_SYSTEM</a></span></code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#DEFAULT_ALPACA_SYSTEM">DEFAULT_ALPACA_SYSTEM</a></span></code>
+<div class="block">Default prompt of Alpaca model.</div>
+</td>
 </tr>
-</table>
-</li>
-</ul>
-<!-- ======== CONSTRUCTOR SUMMARY ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.summary">
-<!--   -->
-</a>
-<h3>Constructor Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
-<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colOne" scope="col">Constructor and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#PromptBuilder--">PromptBuilder</a></span>()</code>&nbsp;</td>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#DEFAULT_COMMON_SYSTEM">DEFAULT_COMMON_SYSTEM</a></span></code>
+<div class="block">Default common prompt.</div>
+</td>
 </tr>
 </table>
 </li>
@@ -173,17 +164,24 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#toPrompt-chat.octet.model.enums.ModelType-java.lang.String-">toPrompt</a></span>(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
-        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</code>
-<div class="block">Create prompt text</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#format-chat.octet.model.enums.ModelType-chat.octet.model.beans.ChatMessage...-">format</a></span>(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
+      <a href="../../../../chat/octet/model/beans/ChatMessage.html" title="class in chat.octet.model.beans">ChatMessage</a>...&nbsp;messages)</code>
+<div class="block">Format chat messages as prompt text.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>static <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#toPrompt-chat.octet.model.enums.ModelType-java.lang.String-java.lang.String-">toPrompt</a></span>(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
-        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;system,
-        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</code>
-<div class="block">Create prompt text</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#format-chat.octet.model.enums.ModelType-java.lang.String-">format</a></span>(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
+      <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</code>
+<div class="block">Format user question as prompt text.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>static <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../chat/octet/model/utils/PromptBuilder.html#format-chat.octet.model.enums.ModelType-java.lang.String-java.lang.String-">format</a></span>(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
+      <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;system,
+      <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</code>
+<div class="block">Format user question as prompt text.</div>
 </td>
 </tr>
 </table>
@@ -208,34 +206,32 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <!--   -->
 </a>
 <h3>Field Detail</h3>
-<a name="DEFAULT_SYSTEM">
+<a name="DEFAULT_ALPACA_SYSTEM">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
-<h4>DEFAULT_SYSTEM</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> DEFAULT_SYSTEM</pre>
+<h4>DEFAULT_ALPACA_SYSTEM</h4>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> DEFAULT_ALPACA_SYSTEM</pre>
+<div class="block">Default prompt of Alpaca model.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../constant-values.html#chat.octet.model.utils.PromptBuilder.DEFAULT_SYSTEM">Constant Field Values</a></dd>
+<dd><a href="../../../../constant-values.html#chat.octet.model.utils.PromptBuilder.DEFAULT_ALPACA_SYSTEM">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
-</li>
-</ul>
-<!-- ========= CONSTRUCTOR DETAIL ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.detail">
-<!--   -->
-</a>
-<h3>Constructor Detail</h3>
-<a name="PromptBuilder--">
+<a name="DEFAULT_COMMON_SYSTEM">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
-<h4>PromptBuilder</h4>
-<pre>public&nbsp;PromptBuilder()</pre>
+<h4>DEFAULT_COMMON_SYSTEM</h4>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> DEFAULT_COMMON_SYSTEM</pre>
+<div class="block">Default common prompt.</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../constant-values.html#chat.octet.model.utils.PromptBuilder.DEFAULT_COMMON_SYSTEM">Constant Field Values</a></dd>
+</dl>
 </li>
 </ul>
 </li>
@@ -246,15 +242,15 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="toPrompt-chat.octet.model.enums.ModelType-java.lang.String-">
+<a name="format-chat.octet.model.enums.ModelType-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>toPrompt</h4>
-<pre>public static&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;toPrompt(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
-                              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</pre>
-<div class="block">Create prompt text</div>
+<h4>format</h4>
+<pre>public static&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;format(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
+                            <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</pre>
+<div class="block">Format user question as prompt text.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>modelType</code> - Model type.</dd>
@@ -266,25 +262,43 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 </dl>
 </li>
 </ul>
-<a name="toPrompt-chat.octet.model.enums.ModelType-java.lang.String-java.lang.String-">
+<a name="format-chat.octet.model.enums.ModelType-java.lang.String-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
-<h4>toPrompt</h4>
-<pre>public static&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;toPrompt(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
-                              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;system,
-                              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</pre>
-<div class="block">Create prompt text</div>
+<h4>format</h4>
+<pre>public static&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;format(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
+                            <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;system,
+                            <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;question)</pre>
+<div class="block">Format user question as prompt text.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>modelType</code> - Model type.</dd>
-<dd><code>system</code> - System prompt (optional).</dd>
+<dd><code>system</code> - System prompt.</dd>
 <dd><code>question</code> - User question.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Prompt text.</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums"><code>ModelType</code></a></dd>
+</dl>
+</li>
+</ul>
+<a name="format-chat.octet.model.enums.ModelType-chat.octet.model.beans.ChatMessage...-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>format</h4>
+<pre>public static&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;format(<a href="../../../../chat/octet/model/enums/ModelType.html" title="enum in chat.octet.model.enums">ModelType</a>&nbsp;modelType,
+                            <a href="../../../../chat/octet/model/beans/ChatMessage.html" title="class in chat.octet.model.beans">ChatMessage</a>...&nbsp;messages)</pre>
+<div class="block">Format chat messages as prompt text.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>modelType</code> - Model type.</dd>
+<dd><code>messages</code> - Chat messages.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>String</dd>
 </dl>
 </li>
 </ul>
@@ -343,13 +357,13 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>

@@ -58,23 +58,23 @@ jfieldID FIELD_SAMPLE_COUNT;
 jfieldID FIELD_PROMPT_EVAL_COUNT;
 jfieldID FIELD_EVAL_COUNT;
 
-jstring ToJString(JNIEnv *env, const char *value) {
+static jstring ToJString(JNIEnv *env, const char *value) {
     return env->NewStringUTF(value);
 }
 
-const char *ToCString(JNIEnv *env, jstring value) {
+static const char *ToCString(JNIEnv *env, jstring value) {
     return env->GetStringUTFChars(value, JNI_FALSE);
 }
 
-jboolean ToJBoolean(bool value) {
+static jboolean ToJBoolean(bool value) {
     return value ? JNI_TRUE : JNI_FALSE;
 }
 
-bool ToCBool(jboolean value) {
+static bool ToCBool(jboolean value) {
     return value == JNI_TRUE;
 }
 
-void ThrowByName(JNIEnv *env, const char *name, const char *msg) {
+static void ThrowByName(JNIEnv *env, const char *name, const char *msg) {
     jclass cls = env->FindClass(name);
     if (cls) {
         env->ThrowNew(cls, msg);
@@ -82,7 +82,7 @@ void ThrowByName(JNIEnv *env, const char *name, const char *msg) {
     env->DeleteLocalRef(cls);
 }
 
-struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama_model_params) {
+static struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama_model_params) {
     float *tensor_split = nullptr;
     jfloatArray arrays_data = (jfloatArray) env->GetObjectField(jllama_model_params, FIELD_TENSOR_SPLIT);
     if (arrays_data != nullptr) {
@@ -105,7 +105,7 @@ struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama_model_
     return params;
 }
 
-struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jllama_context_params) {
+static struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jllama_context_params) {
     llama_context_params params = {
             /*.seed                        =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_SEED),
             /*.n_ctx                       =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_CTX),
@@ -122,7 +122,7 @@ struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jllama_co
     return params;
 }
 
-jobject GetLlamaTimingsToMetrics(JNIEnv *env, struct llama_timings timings) {
+static jobject GetLlamaTimingsToMetrics(JNIEnv *env, struct llama_timings timings) {
     jclass metrics_class = env->FindClass("chat/octet/model/beans/Metrics");
     jmethodID method_init = env->GetMethodID(metrics_class, "<init>", "()V");
     jobject jMetrics = env->NewObject(metrics_class, method_init);
@@ -362,7 +362,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
         (JNIEnv *env, jclass thisClass, jint index) {
-    if (index < 0 || index > llama_ctx_params.n_ctx) {
+    int n_batch = llama_ctx_params.n_batch;
+    if (index < 0 || index > n_batch) {
         std::string msg = "Invalid index, range 0 to " + std::to_string(llama_ctx_params.n_ctx);
         ThrowByName(env, model_exception, msg.c_str());
         return nullptr;
@@ -381,9 +382,9 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getEmbeddings
+ * Method:    getEmbedding
  */
-JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
+JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbedding
         (JNIEnv *env, jclass thisClass) {
     float *embeddings = llama_get_embeddings(llama_ctx);
     const int embd_size = llama_n_embd(model);
@@ -636,10 +637,11 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     int past_tokens = past_token_size;
     int decode_status = 0;
     int default_n_seq_max = 1;
+    int n_batch = llama_ctx_params.n_batch;
     while (past_tokens < input_length) {
         int decode_size = input_length - past_tokens;
-        if (decode_size > llama_ctx_params.n_batch) {
-            decode_size = llama_ctx_params.n_batch;
+        if (decode_size > n_batch) {
+            decode_size = n_batch;
         }
         int end_index = decode_size + past_tokens;
         std::vector<llama_token> batch_tokens(src_tokens.begin() + past_tokens, src_tokens.begin() + end_index);

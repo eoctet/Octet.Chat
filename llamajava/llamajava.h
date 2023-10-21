@@ -108,9 +108,9 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getEmbeddings
+ * Method:    getEmbedding
  */
-JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbeddings
+JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbedding
         (JNIEnv *, jclass);
 
 /*
