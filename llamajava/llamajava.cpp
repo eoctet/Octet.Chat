@@ -519,10 +519,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         llama_token *last_tokens = (llama_token *) env->GetIntArrayElements(last_tokens_array, JNI_FALSE);
 
         //repetition penalty
-        llama_sample_repetition_penalty(llama_ctx, &candidates_p, last_tokens, last_tokens_size, penalty);
-        llama_sample_frequency_and_presence_penalties(llama_ctx, &candidates_p, last_tokens, last_tokens_size,
-                                                      alpha_frequency,
-                                                      alpha_presence);
+        llama_sample_repetition_penalties(llama_ctx,
+                                          &candidates_p,
+                                          last_tokens,
+                                          last_tokens_size,
+                                          penalty,
+                                          alpha_frequency,
+                                          alpha_presence);
         env->ReleaseIntArrayElements(last_tokens_array, last_tokens, 0);
     }
 
