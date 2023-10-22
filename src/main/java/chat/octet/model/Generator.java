@@ -5,7 +5,7 @@ import chat.octet.model.beans.Status;
 import chat.octet.model.beans.Token;
 import chat.octet.model.enums.FinishReason;
 import chat.octet.model.exceptions.DecodeException;
-import chat.octet.model.exceptions.ModelException;
+import chat.octet.model.exceptions.GenerationException;
 import chat.octet.model.parameters.GenerateParameter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -75,7 +75,7 @@ public class Generator implements Iterable<Token> {
                 System.out.print(token.getText());
             }
         } catch (Exception e) {
-            throw new ModelException("Generate next token error ", e);
+            throw new GenerationException("Generate next token error ", e);
         } finally {
             if (chatStatus != null) {
                 //copy last generated status
