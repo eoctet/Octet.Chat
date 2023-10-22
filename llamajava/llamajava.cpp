@@ -362,9 +362,9 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
         (JNIEnv *env, jclass thisClass, jint index) {
-    int n_batch = llama_ctx_params.n_batch;
-    if (index < 0 || index > n_batch) {
-        std::string msg = "Invalid index, range 0 to " + std::to_string(llama_ctx_params.n_ctx);
+    int n_ctx = llama_ctx_params.n_ctx;
+    if (index < 0 || index > n_ctx) {
+        std::string msg = "Invalid index, range 0 to " + std::to_string(n_ctx);
         ThrowByName(env, model_exception, msg.c_str());
         return nullptr;
     }
