@@ -20,7 +20,7 @@ import java.text.MessageFormat;
  * <p>C++ source: llamajava.h, llamajava.cpp</p>
  *
  * @author <a href="https://github.com/eoctet">William</a>
- * @since b1407
+ * @since b1419
  */
 public class LlamaService {
 

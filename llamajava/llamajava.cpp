@@ -400,7 +400,7 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbedding
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
         (JNIEnv *env, jclass thisClass, jint token) {
-    return llama_token_get_type(llama_ctx, token);
+    return llama_token_get_type(model, token);
 }
 
 /*
@@ -409,7 +409,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
         (JNIEnv *env, jclass thisClass) {
-    return llama_token_bos(llama_ctx);
+    return llama_token_bos(model);
 }
 
 /*
@@ -418,7 +418,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
         (JNIEnv *env, jclass thisClass) {
-    return llama_token_eos(llama_ctx);
+    return llama_token_eos(model);
 }
 
 /*
@@ -504,7 +504,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
 
     float *logits = env->GetFloatArrayElements(jlogits, JNI_FALSE);
     const int n_vocab = llama_n_vocab(model);
-    const int token_nl = llama_token_nl(llama_ctx);
+    const int token_nl = llama_token_nl(model);
     const float nl_logit = logits[token_nl];
     const int32_t final_top_k = top_k <= 0 ? n_vocab : top_k;
 
@@ -568,7 +568,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     }
 
     int decode_status = 0;
-    if (token != llama_token_eos(llama_ctx)) {
+    if (token != llama_token_eos(model)) {
         //decode the next new token
         int default_n_seq_max = 1;
         llama_batch batch = llama_batch_init(1, 0, default_n_seq_max);
