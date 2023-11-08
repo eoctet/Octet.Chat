@@ -29,11 +29,11 @@ public enum LlamaRoPEScalingType {
     /**
      * Scaling YaRN type.
      */
-    LLAMA_ROPE_SCALING_YARN(2),
-    /**
-     * Max value type.
-     */
-    LLAMA_ROPE_SCALING_MAX_VALUE(2);
+    LLAMA_ROPE_SCALING_YARN(2);
+//    /**
+//     * Max value type.
+//     */
+//    LLAMA_ROPE_SCALING_MAX_VALUE(2);
 
     private final int type;
 
