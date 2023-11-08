@@ -2,6 +2,7 @@ package chat.octet.model.parameters;
 
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
+import chat.octet.model.enums.LlamaRoPEScalingType;
 import chat.octet.model.enums.ModelType;
 import lombok.Builder;
 import lombok.Getter;
@@ -203,9 +204,52 @@ public class ModelParameter {
 
     /**
      * <b>verbose</b><br/>
-     * Print verbose output to stderr
+     * Print verbose output to stderr.
      */
     @Builder.Default
     private boolean verbose = false;
+
+    /**
+     * <b>rope_scaling_type</b><br/>
+     * RoPE scaling type, from `enum llama_rope_scaling_type`.
+     *
+     * @see LlamaRoPEScalingType
+     */
+    @Builder.Default
+    private int ropeScalingType = LlamaRoPEScalingType.LLAMA_ROPE_SCALING_UNSPECIFIED.getType();
+
+    /**
+     * <b>yarn_ext_factor</b><br/>
+     * YaRN extrapolation mix factor, NaN = from model.
+     */
+    @Builder.Default
+    private float yarnExtFactor = -1.0f;
+
+    /**
+     * <b>yarn_attn_factor</b><br/>
+     * YaRN magnitude scaling factor.
+     */
+    @Builder.Default
+    private float yarnAttnFactor = 1.0f;
+
+    /**
+     * <b>yarn_beta_fast</b><br/>
+     * YaRN low correction dim.
+     */
+    @Builder.Default
+    private float yarnBetaFast = 32.0f;
+
+    /**
+     * <b>yarn_beta_slow</b><br/>
+     * YaRN high correction dim.
+     */
+    @Builder.Default
+    private float yarnBetaSlow = 1.0f;
+
+    /**
+     * <b>yarn_orig_ctx</b><br/>
+     * YaRN original context size.
+     */
+    private int yarnOrigCtx;
 
 }

@@ -104,6 +104,12 @@ public class Model implements AutoCloseable {
         llamaContextParams.batch = modelParams.getBatchSize();
         llamaContextParams.threads = modelParams.getThreads();
         llamaContextParams.threadsBatch = modelParams.getThreadsBatch() == -1 ? modelParams.getThreads() : modelParams.getThreadsBatch();
+        llamaContextParams.ropeScalingType = modelParams.getRopeScalingType();
+        llamaContextParams.yarnExtFactor = modelParams.getYarnExtFactor();
+        llamaContextParams.yarnAttnFactor = modelParams.getYarnAttnFactor();
+        llamaContextParams.yarnBetaFast = modelParams.getYarnBetaFast();
+        llamaContextParams.yarnBetaSlow = modelParams.getYarnBetaSlow();
+        llamaContextParams.yarnOrigCtx = modelParams.getYarnOrigCtx();
         llamaContextParams.ropeFreqBase = modelParams.getRopeFreqBase();
         llamaContextParams.ropeFreqScale = modelParams.getRopeFreqScale();
         llamaContextParams.mulMatQ = modelParams.isMulMatQ();

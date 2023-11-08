@@ -1,5 +1,6 @@
 package chat.octet.model.beans;
 
+import chat.octet.model.enums.LlamaRoPEScalingType;
 import lombok.ToString;
 
 /**
@@ -29,6 +30,39 @@ public class LlamaContextParams {
      * number of threads used for prompt and batch processing.
      */
     public int threadsBatch;
+
+    /**
+     * RoPE scaling type, from `enum llama_rope_scaling_type`.
+     *
+     * @see LlamaRoPEScalingType
+     */
+    public int ropeScalingType;
+
+    /**
+     * YaRN extrapolation mix factor, NaN = from model.
+     */
+    public float yarnExtFactor;
+
+    /**
+     * YaRN magnitude scaling factor.
+     */
+    public float yarnAttnFactor;
+
+    /**
+     * YaRN low correction dim.
+     */
+    public float yarnBetaFast;
+
+    /**
+     * YaRN high correction dim.
+     */
+    public float yarnBetaSlow;
+
+    /**
+     * YaRN original context size.
+     */
+    public int yarnOrigCtx;
+
     /**
      * RoPE base frequency.
      */

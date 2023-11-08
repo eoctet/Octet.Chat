@@ -30,6 +30,12 @@ jfieldID FIELD_CTX;
 jfieldID FIELD_BATCH;
 jfieldID FIELD_THREADS;
 jfieldID FIELD_THREADS_BATCH;
+jfieldID FIELD_ROPE_SCALING_TYPE;
+jfieldID FIELD_YARN_EXT_FACTOR;
+jfieldID FIELD_YARN_ATTN_FACTOR;
+jfieldID FIELD_YARN_BETA_FAST;
+jfieldID FIELD_YARN_BETA_SLOW;
+jfieldID FIELD_YARN_ORIG_CTX;
 jfieldID FIELD_ROPE_FREQ_BASE;
 jfieldID FIELD_ROPE_FREQ_SCALE;
 jfieldID FIELD_MUL_MAT_Q;
@@ -106,14 +112,20 @@ static struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama
 }
 
 static struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jllama_context_params) {
-    llama_context_params params = {
+    struct llama_context_params params = {
             /*.seed                        =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_SEED),
             /*.n_ctx                       =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_CTX),
             /*.n_batch                     =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_BATCH),
             /*.n_threads                   =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_THREADS),
             /*.n_threads_batch             =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_THREADS_BATCH),
+            /*.rope_scaling_type           =*/ (int8_t) env->GetIntField(jllama_context_params, FIELD_ROPE_SCALING_TYPE),
             /*.rope_freq_base              =*/ env->GetFloatField(jllama_context_params, FIELD_ROPE_FREQ_BASE),
             /*.rope_freq_scale             =*/ env->GetFloatField(jllama_context_params, FIELD_ROPE_FREQ_SCALE),
+            /*.yarn_ext_factor             =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_EXT_FACTOR),
+            /*.yarn_attn_factor            =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_ATTN_FACTOR),
+            /*.yarn_beta_fast              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_FAST),
+            /*.yarn_beta_slow              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_SLOW),
+            /*.yarn_orig_ctx               =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_YARN_ORIG_CTX),
             /*.mul_mat_q                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_MUL_MAT_Q)),
             /*.f16_kv                      =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_F16_KV)),
             /*.logits_all                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_LOGITS_ALL)),
@@ -157,6 +169,12 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_BATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "batch", "I");
     FIELD_THREADS = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "threads", "I");
     FIELD_THREADS_BATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "threadsBatch", "I");
+    FIELD_ROPE_SCALING_TYPE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeScalingType", "I");
+    FIELD_YARN_EXT_FACTOR = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnExtFactor", "F");
+    FIELD_YARN_ATTN_FACTOR = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnAttnFactor", "F");
+    FIELD_YARN_BETA_FAST = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnBetaFast", "F");
+    FIELD_YARN_BETA_SLOW = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnBetaSlow", "F");
+    FIELD_YARN_ORIG_CTX = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnOrigCtx", "I");
     FIELD_ROPE_FREQ_BASE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqBase", "F");
     FIELD_ROPE_FREQ_SCALE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqScale", "F");
     FIELD_MUL_MAT_Q = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "mulMatQ", "Z");
@@ -228,6 +246,12 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
     env->SetIntField(llama_context_params, FIELD_BATCH, defaults.n_batch);
     env->SetIntField(llama_context_params, FIELD_THREADS, defaults.n_threads);
     env->SetIntField(llama_context_params, FIELD_THREADS_BATCH, defaults.n_threads_batch);
+    env->SetIntField(llama_context_params, FIELD_ROPE_SCALING_TYPE, defaults.rope_scaling_type);
+    env->SetFloatField(llama_context_params, FIELD_YARN_EXT_FACTOR, defaults.yarn_ext_factor);
+    env->SetFloatField(llama_context_params, FIELD_YARN_ATTN_FACTOR, defaults.yarn_attn_factor);
+    env->SetFloatField(llama_context_params, FIELD_YARN_BETA_FAST, defaults.yarn_beta_fast);
+    env->SetFloatField(llama_context_params, FIELD_YARN_BETA_SLOW, defaults.yarn_beta_slow);
+    env->SetIntField(llama_context_params, FIELD_YARN_ORIG_CTX, defaults.yarn_orig_ctx);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_BASE, defaults.rope_freq_base);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_SCALE, defaults.rope_freq_scale);
     env->SetBooleanField(llama_context_params, FIELD_MUL_MAT_Q, ToJBoolean(defaults.mul_mat_q));
