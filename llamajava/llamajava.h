@@ -168,7 +168,7 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getSystemInfo
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         (JNIEnv *, jclass, jfloatArray, jintArray, jint, jfloat, jfloat, jfloat, jboolean, jint, jfloat,
-         jfloat, jfloat, jint, jfloat, jfloat, jfloat, jint, jint);
+         jfloat, jfloat, jint, jfloat, jfloat, jfloat, jfloat, jint, jint);
 
 /*
  * Class:     chat_octet_model_LlamaService

@@ -89,6 +89,13 @@ public final class GenerateParameter {
     private float typical = 1.0f;
 
     /**
+     * <b>Min P Sampling</b><br/>
+     * Sets a minimum base probability threshold for token selection (default: 0.05).
+     */
+    @Builder.Default
+    private float minP = 0.05f;
+
+    /**
      * <b>Mirostat Sampling</b><br/>
      * Enable Mirostat sampling, controlling perplexity during text generation
      * (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0).

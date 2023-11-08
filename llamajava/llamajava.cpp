@@ -523,6 +523,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
          jfloat top_p,
          jfloat tsf,
          jfloat typical,
+         jfloat min_p,
          jint sequence_id,
          jint past_token_size) {
 
@@ -582,6 +583,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
             llama_sample_tail_free(llama_ctx, &candidates_p, tsf, 1);
             llama_sample_typical(llama_ctx, &candidates_p, typical, 1);
             llama_sample_top_p(llama_ctx, &candidates_p, top_p, 1);
+            llama_sample_min_p(llama_ctx, &candidates_p, min_p, 1);
             llama_sample_temp(llama_ctx, &candidates_p, temperature);
             token = llama_sample_token(llama_ctx, &candidates_p);
         }

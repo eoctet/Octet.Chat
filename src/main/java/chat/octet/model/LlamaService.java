@@ -20,7 +20,7 @@ import java.text.MessageFormat;
  * <p>C++ source: llamajava.h, llamajava.cpp</p>
  *
  * @author <a href="https://github.com/eoctet">William</a>
- * @since b1419
+ * @since b1497
  */
 public class LlamaService {
 
@@ -224,12 +224,13 @@ public class LlamaService {
      * @param topP           <code>TOP-P Sampling</code> Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.
      * @param tsf            <code>Tail Free Sampling (TFS)</code> Enable tail free sampling with parameter z.
      * @param typical        <code>Typical Sampling</code> Enable typical sampling sampling with parameter p.
+     * @param minP           <code>MIN-P Sampling</code> Sets a minimum base probability threshold for token selection.
      * @param sequenceId     Generation sequence id.
      * @param pastTokenSize  Past token size.
      * @return int, Returns the sampled token id.
      * @see GenerateParameter
      */
-    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, int sequenceId, int pastTokenSize) throws DecodeException;
+    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, float minP, int sequenceId, int pastTokenSize) throws DecodeException;
 
     /**
      * Load llama grammar by rules.
