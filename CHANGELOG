@@ -1,3 +1,3 @@
-1. Fix an incorrect parameter.
-2. Update llama API.
+1. Add Min-P sampling support.
+2. Add YaRN RoPE scaling support.
 3. Update llama.cpp libs version.

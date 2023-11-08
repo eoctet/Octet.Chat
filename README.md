@@ -19,7 +19,8 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 #### Last updated
   - [X] 🚀 Custom model prompt templates (such as Vicuna, Alpaca, etc.)
   - [X] 🚀 Parallel batch decoding
-  - [X] 🚀 Llama grammar
+  - [X] 🚀 Min-P sampling support
+  - [X] 🚀 YaRN RoPE scaling support
 
 
 ## Quick start
@@ -30,7 +31,7 @@ Another simple Java bindings for 🦙 [**llama.cpp**](https://github.com/ggergan
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
 </dependency>
 ```
 

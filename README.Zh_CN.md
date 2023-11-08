@@ -19,7 +19,8 @@
 #### 最近更新
   - [X] 🚀 自定义模型的提示词模版（例如：Vicuna、Alpaca等等）
   - [X] 🚀 并行批处理解码
-  - [X] 🚀 Llama 语法解析
+  - [X] 🚀 Min-P 采样支持
+  - [X] 🚀 YaRN RoPE 支持
 
 
 ## 快速开始
@@ -30,7 +31,7 @@
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
 </dependency>
 ```
 
