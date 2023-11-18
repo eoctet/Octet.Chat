@@ -210,21 +210,21 @@ public class LlamaService {
      * Inference sampling the next token.
      *
      * @param logits         User-defined logits, Adjustments can be made via LogitsProcessor.
-     * @param lastTokens     <code>last_tokens</code> Last token array.
-     * @param lastTokensSize <code>last_tokens_size</code> Last token array size.
-     * @param penalty        <code>repeat-penalty</code> Control the repetition of token sequences in the generated text.
-     * @param alphaFrequency <code>frequency-penalty</code> Repeat alpha frequency penalty.
-     * @param alphaPresence  <code>presence-penalty</code> Repeat alpha presence penalty.
-     * @param penalizeNL     <code>no-penalize-nl</code> Disable penalization for newline tokens when applying the repeat penalty.
-     * @param mirostatMode   <code>Mirostat Sampling</code> Use Mirostat sampling, controlling perplexity during text generation.
-     * @param mirostatTAU    <code>mirostat-ent</code> Set the Mirostat target entropy.
-     * @param mirostatETA    <code>mirostat-lr</code> Set the Mirostat learning rate.
-     * @param temperature    <code>temperature</code> Adjust the randomness of the generated text.
-     * @param topK           <code>TOP-K Sampling</code> Limit the next token selection to the K most probable tokens.
-     * @param topP           <code>TOP-P Sampling</code> Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.
-     * @param tsf            <code>Tail Free Sampling (TFS)</code> Enable tail free sampling with parameter z.
-     * @param typical        <code>Typical Sampling</code> Enable typical sampling sampling with parameter p.
-     * @param minP           <code>MIN-P Sampling</code> Sets a minimum base probability threshold for token selection.
+     * @param lastTokens     Last token array.
+     * @param lastTokensSize Last token array size.
+     * @param penalty        Control the repetition of token sequences in the generated text.
+     * @param alphaFrequency Repeat alpha frequency penalty.
+     * @param alphaPresence  Repeat alpha presence penalty.
+     * @param penalizeNL     Disable penalization for newline tokens when applying the repeat penalty.
+     * @param mirostatMode   <b>Mirostat Sampling</b> Use Mirostat sampling, controlling perplexity during text generation.
+     * @param mirostatTAU    <b>Mirostat Sampling</b> Set the Mirostat target entropy.
+     * @param mirostatETA    <b>Mirostat Sampling</b> Set the Mirostat learning rate.
+     * @param temperature    Adjust the randomness of the generated text.
+     * @param topK           <b>TOP-K Sampling</b> Limit the next token selection to the K most probable tokens.
+     * @param topP           <b>TOP-P Sampling</b> Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.
+     * @param tsf            <b>Tail Free Sampling (TFS)</b> Enable tail free sampling with parameter z.
+     * @param typical        <b>Typical Sampling</b> Enable typical sampling sampling with parameter p.
+     * @param minP           <b>MIN-P Sampling</b> Sets a minimum base probability threshold for token selection.
      * @param sequenceId     Generation sequence id.
      * @param pastTokenSize  Past token size.
      * @return int, Returns the sampled token id.
