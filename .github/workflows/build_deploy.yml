@@ -32,8 +32,8 @@ jobs:
         id: checkout_project
         uses: actions/checkout@v4
 
-      - name: Checkout llama.cpp
-        id: checkout_llamacpp
+      - name: Checkout & Build
+        id: make_build
         shell: cmd
         run: |
           @echo off
@@ -47,22 +47,12 @@ jobs:
           copy /y llamajava llama.cpp
           cd llama.cpp
           echo "add_subdirectory(llamajava)">>CMakeLists.txt
-          pwd
           echo "=> Checkout llama.cpp finished."
-
-      - name: Build
-        id: make_build
-        shell: cmd
-        run: |
-          @echo off
-          set PATH=%~dp0
-          cd %PATH%
-          cd llama.cpp
           mkdir build
           cd build
           cmake .. ${env:BUILD_ARGS}
           cmake --build . --config Release
-          
+
       - name: Upload lib file
         uses: actions/upload-artifact@v3
         with:
