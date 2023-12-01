@@ -460,7 +460,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
     const char *text = (char *) buffer;
 
     int code = llama_tokenize(model, text, buffer_length, tokens, maxTokens, ToCBool(addBos), ToCBool(specialTokens));
-    env->ReleaseIntArrayElements(tokens_arrays, tokens, 0);
+    env->ReleaseIntArrayElements(tokens_arrays, (jint *)tokens, 0);
     env->ReleaseByteArrayElements(buf, buffer, 0);
     return code;
 }
@@ -552,7 +552,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
                                           penalty,
                                           alpha_frequency,
                                           alpha_presence);
-        env->ReleaseIntArrayElements(last_tokens_array, last_tokens, 0);
+        env->ReleaseIntArrayElements(last_tokens_array, (jint *)last_tokens, 0);
     }
 
     if (!penalize_nl) {
@@ -699,7 +699,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         past_tokens += decode_size;
     }
     //clear all resources
-    env->ReleaseIntArrayElements(tokens_arrays, tokens, 0);
+    env->ReleaseIntArrayElements(tokens_arrays, (jint *)tokens, 0);
     return decode_status;
 }
 
