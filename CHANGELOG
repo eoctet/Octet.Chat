@@ -1,1 +1,2 @@
-1. Update llama.cpp libs version.
+1. Fix: issue #2 Update libllama file for Win x86-64.
+3. Update llama.cpp libs version.
