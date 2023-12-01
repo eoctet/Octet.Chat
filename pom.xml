@@ -7,7 +7,7 @@
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.7</version>
+    <version>1.2.8-SNAPSHOT</version>
 
     <name>llama-java-core</name>
     <description>Another simple Java bindings for llama.cpp, The goal is to integrate the capabilities of LLMs into the

@@ -30,42 +30,25 @@ jobs:
             echo "Git clone llama.cpp failed."
             exit 1
           fi
-          
-          cp llamajava/* llama.cpp
+
+          cp -r llamajava llama.cpp
           cd llama.cpp
           LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "=> Llama.cpp latest tag: $LATEST_TAG"
           git checkout $LATEST_TAG
+          echo "add_subdirectory(llamajava)">>CMakeLists.txt
           echo "=> Checkout llama.cpp $LATEST_TAG finished."
 
-      - name: Update MakeFile
-        id: makefile
-        shell: bash
-        run: |
-          cd llama.cpp
-          if [ ! -f "llamajava.cpp" ]; then
-            echo "llamajava.cpp not found"
-            exit 1
-          fi
-
-          if [ ! -f "Makefile_backup" ]; then
-            cp "Makefile" "Makefile_backup"
-          fi
-
-          BUILD_LLAMA_JAVA_CMD="llamajava.o: llamajava.cpp llamajava.h jni.h jni_md.h \n\t\$(CXX) \$(CXXFLAGS) -c $< -o \$@\n"
-          LIB_LLAMA_CMD="libllama.so: llama.o ggml.o \$(OBJS)"
-          BUILD_LLAMA_JAVA_SO_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.so: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS)"
-          echo $BUILD_LLAMA_JAVA_SO_CMD
-          sed -i "s/$LIB_LLAMA_CMD/$BUILD_LLAMA_JAVA_SO_CMD/g" "Makefile"
-
       - name: Build
-        id: make_build
+        id: cmake_build
         shell: bash
         run: |
           cd llama.cpp
-          make clean
-          make LLAMA_OPENBLAS=1 libllama.so
-          if [ -f "libllama.so" ]; then
+          mkdir build
+          cd build
+          cmake .. -DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS 
+          cmake --build . --config Release
+          if [ -f "llamajava/libllama_java.so" ]; then
             ls -l
             echo "Build libllama.so success"
           fi
@@ -74,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: linux-libllama
-          path: llama.cpp/libllama.so
+          path: llama.cpp/build/llamajava/libllama_java.so
 
   #build macos lib
   build-macos-lib:
@@ -93,42 +76,25 @@ jobs:
             echo "Git clone llama.cpp failed."
             exit 1
           fi
-          
-          cp llamajava/* llama.cpp
+
+          cp -r llamajava llama.cpp
           cd llama.cpp
           LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "=> Llama.cpp latest tag: $LATEST_TAG"
           git checkout $LATEST_TAG
+          echo "add_subdirectory(llamajava)">>CMakeLists.txt
           echo "=> Checkout llama.cpp $LATEST_TAG finished."
 
-      - name: Update MakeFile
-        id: makefile
-        shell: bash
-        run: |
-          cd llama.cpp
-          if [ ! -f "llamajava.cpp" ]; then
-            echo "llamajava.cpp not found"
-            exit 1
-          fi
-
-          if [ ! -f "Makefile_backup" ]; then
-            cp "Makefile" "Makefile_backup"
-          fi
-          
-          BUILD_LLAMA_JAVA_CMD="llamajava.o: llamajava.cpp llamajava.h jni.h jni_md.h \n\t\$(CXX) \$(CXXFLAGS) -c $< -o \$@\n"
-          BUILD_LLAMA_JAVA_DYLIB_CMD="$BUILD_LLAMA_JAVA_CMD\nlibllama.dylib: llama.o ggml.o grammar-parser.o llamajava.o \$(OBJS) \n\t\$(CXX) \$(CXXFLAGS) -shared -fPIC -o \$@ $^ \$(LDFLAGS)\n"
-          BUILD_LLAMA_CMD="$BUILD_LLAMA_JAVA_DYLIB_CMD\nclean:"
-          echo $BUILD_LLAMA_CMD
-          sed -i "" -e "s/clean:/$BUILD_LLAMA_CMD/g" "Makefile"
-
       - name: Build
-        id: make_build
+        id: cmake_build
         shell: bash
         run: |
           cd llama.cpp
-          make clean
-          make libllama.dylib
-          if [ -f "libllama.dylib" ]; then
+          mkdir build
+          cd build
+          cmake .. -DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS 
+          cmake --build . --config Release
+          if [ -f "llamajava/libllama_java.dylib" ]; then
             ls -l
             echo "Build libllama.dylib success"
           fi
@@ -137,7 +103,59 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: macos-libllama
-          path: llama.cpp/libllama.dylib
+          path: llama.cpp/build/llamajava/libllama_java.dylib
+
+  #build windows lib
+  build-windows-lib:
+    runs-on: windows-latest
+    env:
+      OPENBLAS_VERSION: 0.3.23
+      BUILD_ARGS: '-DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS -DBLAS_INCLUDE_DIRS="$env:RUNNER_TEMP/openblas/include" -DBLAS_LIBRARIES="$env:RUNNER_TEMP/openblas/lib/openblas.lib"'
+
+    steps:
+      - name: Download OpenBLAS
+        id: get_openblas
+        run: |
+          curl.exe -o $env:RUNNER_TEMP/openblas.zip -L "https://github.com/xianyi/OpenBLAS/releases/download/v${env:OPENBLAS_VERSION}/OpenBLAS-${env:OPENBLAS_VERSION}-x64.zip"
+          curl.exe -o $env:RUNNER_TEMP/OpenBLAS.LICENSE.txt -L "https://github.com/xianyi/OpenBLAS/raw/v${env:OPENBLAS_VERSION}/LICENSE"
+          mkdir $env:RUNNER_TEMP/openblas
+          tar.exe -xvf $env:RUNNER_TEMP/openblas.zip -C $env:RUNNER_TEMP/openblas
+          $vcdir = $(vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)
+          $msvc = $(join-path $vcdir $('VC\Tools\MSVC\'+$(gc -raw $(join-path $vcdir 'VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt')).Trim()))
+          $lib =  $(join-path $msvc 'bin\Hostx64\x64\lib.exe')
+          & $lib /machine:x64 "/def:${env:RUNNER_TEMP}/openblas/lib/libopenblas.def" "/out:${env:RUNNER_TEMP}/openblas/lib/openblas.lib" /name:openblas.dll
+
+      - name: Checkout project
+        id: checkout_project
+        uses: actions/checkout@v4
+
+      - name: Checkout & Build
+        id: cmake_build
+        run: |
+          git.exe clone https://github.com/ggerganov/llama.cpp.git
+          if (!(Test-Path -Path "llama.cpp")) {
+            echo "Git clone llama.cpp failed."
+            exit 1
+          }
+          Copy-Item -Path llamajava/* -Destination llama.cpp/llamajava -Force
+          Copy-Item -Path llamajava/win/* -Destination llama.cpp/llamajava -Force
+          cd llama.cpp
+          $LATEST_TAG=(git.exe describe --tags)
+          echo "=> Llama.cpp latest tag: $LATEST_TAG"
+          git.exe checkout $LATEST_TAG
+          Add-Content CMakeLists.txt "add_subdirectory(llamajava)"
+          echo "=> Checkout llama.cpp $LATEST_TAG finished."
+
+          mkdir build
+          cd build
+          cmake.exe .. ${env:BUILD_ARGS}
+          cmake.exe --build . --config Release
+
+      - name: Upload lib file
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-libllama
+          path: llama.cpp/build/llamajava/libllama_java.dll
 
   # maven build & deploy
   maven-build-deploy:
@@ -146,6 +164,7 @@ jobs:
     needs:
       - build-linux-lib
       - build-macos-lib
+      - build-windows-lib
 
     steps:
       - uses: actions/checkout@v4
@@ -175,6 +194,13 @@ jobs:
         with:
           name: macos-libllama
           path: src/main/resources/darwin-x86-64
+
+      - name: Download windows lib
+        id: download_windows_lib
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-libllama
+          path: src/main/resources/win32-x86-64
 
       - name: Show libs
         id: show_libs

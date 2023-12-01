@@ -86,11 +86,11 @@ public class Platform {
 
         String libraryName;
         if (isMac()) {
-            libraryName = "libllama.dylib";
+            libraryName = "libllama_java.dylib";
         } else if (isLinux()) {
-            libraryName = "libllama.so";
+            libraryName = "libllama_java.so";
         } else if (isWindows()) {
-            libraryName = "libllama.dll";
+            libraryName = "libllama_java.dll";
         } else {
             throw new ModelException("Unsupported operating system");
         }
