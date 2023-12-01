@@ -90,7 +90,7 @@ public class Platform {
         } else if (isLinux()) {
             libraryName = "libllama_java.so";
         } else if (isWindows()) {
-            libraryName = "libllama_java.dll";
+            libraryName = "llama_java.dll";
         } else {
             throw new ModelException("Unsupported operating system");
         }
