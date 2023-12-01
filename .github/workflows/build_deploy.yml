@@ -8,6 +8,106 @@ on:
         type: boolean
 
 jobs:
+  #build linux lib
+  build-linux-lib:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dependencies
+        id: depends
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential
+          sudo apt-get install libopenblas-dev
+          sudo apt-get install libopenblas64-dev
+
+      - name: Checkout project
+        id: checkout_project
+        uses: actions/checkout@v4
+
+      - name: Checkout llama.cpp
+        id: checkout_llamacpp
+        shell: bash
+        run: |
+          git clone https://github.com/ggerganov/llama.cpp.git
+          if [ ! -d "llama.cpp" ]; then
+            echo "Git clone llama.cpp failed."
+            exit 1
+          fi
+
+          cp -r llamajava llama.cpp
+          cd llama.cpp
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "=> Llama.cpp latest tag: $LATEST_TAG"
+          git checkout $LATEST_TAG
+          echo "add_subdirectory(llamajava)">>CMakeLists.txt
+          echo "=> Checkout llama.cpp $LATEST_TAG finished."
+
+      - name: Build
+        id: cmake_build
+        shell: bash
+        run: |
+          cd llama.cpp
+          mkdir build
+          cd build
+          cmake .. -DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS 
+          cmake --build . --config Release
+          if [ -f "llamajava/libllama_java.so" ]; then
+            ls -l
+            echo "Build libllama.so success"
+          fi
+
+      - name: Upload lib file
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-libllama
+          path: llama.cpp/build/llamajava/libllama_java.so
+
+  #build macos lib
+  build-macos-lib:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout project
+        id: checkout_project
+        uses: actions/checkout@v4
+
+      - name: Checkout llama.cpp
+        id: checkout_llamacpp
+        shell: bash
+        run: |
+          git clone https://github.com/ggerganov/llama.cpp.git
+          if [ ! -d "llama.cpp" ]; then
+            echo "Git clone llama.cpp failed."
+            exit 1
+          fi
+
+          cp -r llamajava llama.cpp
+          cd llama.cpp
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "=> Llama.cpp latest tag: $LATEST_TAG"
+          git checkout $LATEST_TAG
+          echo "add_subdirectory(llamajava)">>CMakeLists.txt
+          echo "=> Checkout llama.cpp $LATEST_TAG finished."
+
+      - name: Build
+        id: cmake_build
+        shell: bash
+        run: |
+          cd llama.cpp
+          mkdir build
+          cd build
+          cmake .. -DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS 
+          cmake --build . --config Release
+          if [ -f "llamajava/libllama_java.dylib" ]; then
+            ls -l
+            echo "Build libllama.dylib success"
+          fi
+
+      - name: Upload lib file
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-libllama
+          path: llama.cpp/build/llamajava/libllama_java.dylib
+
   #build windows lib
   build-windows-lib:
     runs-on: windows-latest
@@ -33,7 +133,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout & Build
-        id: make_build
+        id: cmake_build
         run: |
           git.exe clone https://github.com/ggerganov/llama.cpp.git
           if (!(Test-Path -Path "llama.cpp")) {
@@ -48,7 +148,7 @@ jobs:
           git.exe checkout $LATEST_TAG
           Add-Content CMakeLists.txt "add_subdirectory(llamajava)"
           echo "=> Checkout llama.cpp $LATEST_TAG finished."
-          
+
           mkdir build
           cd build
           cmake.exe .. ${env:BUILD_ARGS}
