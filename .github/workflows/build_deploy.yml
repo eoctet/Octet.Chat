@@ -55,5 +55,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: windows-libllama
-          path: llama.cpp/llamajava/libllama_java.dll
+          path: llama.cpp/build/llamajava/libllama_java.dll
 
