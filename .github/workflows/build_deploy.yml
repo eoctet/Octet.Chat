@@ -35,21 +35,19 @@ jobs:
       - name: Checkout & Build
         id: make_build
         run: |
-          set PATH=%~dp0
-          cd %PATH%
           git.exe clone https://github.com/ggerganov/llama.cpp.git
-          if not exist "%PATH%\llama.cpp" (
+          if (!(Test-Path -Path "llama.cpp")) {
             echo "Git clone llama.cpp failed."
             exit 1
-          )
-          copy /y llamajava llama.cpp
+          }
+          Copy-Item -Path llamajava/* -Destination llama.cpp/llamajava -Force
           cd llama.cpp
-          echo "add_subdirectory(llamajava)">>CMakeLists.txt
+          Add-Content CMakeLists.txt "add_subdirectory(llamajava)"
           echo "=> Checkout llama.cpp finished."
           mkdir build
           cd build
-          cmake .. ${env:BUILD_ARGS}
-          cmake --build . --config Release
+          cmake.exe .. -DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON 
+          cmake.exe --build . --config Release
 
       - name: Upload lib file
         uses: actions/upload-artifact@v3
