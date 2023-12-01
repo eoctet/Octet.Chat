@@ -34,9 +34,7 @@ jobs:
 
       - name: Checkout & Build
         id: make_build
-        shell: cmd
         run: |
-          @echo off
           set PATH=%~dp0
           cd %PATH%
           "C:\Program Files\Git\bin\git.exe" clone https://github.com/ggerganov/llama.cpp.git
