@@ -42,11 +42,15 @@ jobs:
           }
           Copy-Item -Path llamajava/* -Destination llama.cpp/llamajava -Force
           cd llama.cpp
+          $LATEST_TAG=(git.exe rev-list --tags --max-count=1 | git.exe describe --tags)
+          echo "=> Llama.cpp latest tag: $LATEST_TAG"
+          git.exe checkout $LATEST_TAG
           Add-Content CMakeLists.txt "add_subdirectory(llamajava)"
-          echo "=> Checkout llama.cpp finished."
+          echo "=> Checkout llama.cpp $LATEST_TAG finished."
+          
           mkdir build
           cd build
-          cmake.exe .. -DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON 
+          cmake.exe .. ${env:BUILD_ARGS}
           cmake.exe --build . --config Release
 
       - name: Upload lib file

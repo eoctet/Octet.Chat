@@ -1,8 +1,8 @@
 set(TARGET llama_java)
 if (WIN32)
-    set(JNI_MD win/jni_md.h)
+    set(JNI_MD ${PROJECT_SOURCE_DIR}/llamajava/win/jni_md.h)
 else()
-    set(JNI_MD jni_md.h)
+    set(JNI_MD ${PROJECT_SOURCE_DIR}/llamajava/jni_md.h)
 endif()
 
 add_library(${TARGET}
