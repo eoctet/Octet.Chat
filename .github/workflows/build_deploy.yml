@@ -39,16 +39,16 @@ jobs:
           @echo off
           set PATH=%~dp0
           cd %PATH%
-          git clone https://github.com/ggerganov/llama.cpp.git
+          "C:\Program Files\Git\bin\git.exe" clone https://github.com/ggerganov/llama.cpp.git
           if not exist "%PATH%\llama.cpp" (
             echo "Git clone llama.cpp failed."
             exit 1
           )
           xcopy /y llamajava llama.cpp
           cd llama.cpp
-          set LATEST_TAG=<git describe --tags `git rev-list --tags --max-count=1`
+          set LATEST_TAG=<"C:\Program Files\Git\bin\git.exe" describe --tags `"C:\Program Files\Git\bin\git.exe" rev-list --tags --max-count=1`
           echo "=> Llama.cpp latest tag: %LATEST_TAG%"
-          git checkout %LATEST_TAG%
+          "C:\Program Files\Git\bin\git.exe" checkout %LATEST_TAG%
           echo "add_subdirectory(llamajava)">>CMakeLists.txt
           echo "=> Checkout llama.cpp %LATEST_TAG% finished."
 
