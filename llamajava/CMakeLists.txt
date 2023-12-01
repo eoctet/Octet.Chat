@@ -1,16 +1,11 @@
 set(TARGET llama_java)
-if (WIN32)
-    set(JNI_MD ${PROJECT_SOURCE_DIR}/llamajava/win/jni_md.h)
-else()
-    set(JNI_MD ${PROJECT_SOURCE_DIR}/llamajava/jni_md.h)
-endif()
 
 add_library(${TARGET}
             SHARED
             llamajava.cpp
             llamajava.h
             jni.h
-            ${JNI_MD}
+            jni_md.h
             ${PROJECT_SOURCE_DIR}/common/grammar-parser.h
             ${PROJECT_SOURCE_DIR}/common/grammar-parser.cpp
             )

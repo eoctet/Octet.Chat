@@ -41,6 +41,7 @@ jobs:
             exit 1
           }
           Copy-Item -Path llamajava/* -Destination llama.cpp/llamajava -Force
+          Copy-Item -Path llamajava/win/* -Destination llama.cpp/llamajava -Force
           cd llama.cpp
           $LATEST_TAG=(git.exe rev-list --tags --max-count=1 | git.exe describe --tags)
           echo "=> Llama.cpp latest tag: $LATEST_TAG"
