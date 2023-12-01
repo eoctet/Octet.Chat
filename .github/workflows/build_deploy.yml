@@ -1,0 +1,69 @@
+name: Test-CI
+on:
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create new release'
+        required: true
+        type: boolean
+
+jobs:
+  #build windows lib
+  build-windows-lib:
+    runs-on: windows-latest
+    env:
+      OPENBLAS_VERSION: 0.3.23
+      BUILD_ARGS: '-DLLAMA_NATIVE=OFF -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS -DBLAS_INCLUDE_DIRS="$env:RUNNER_TEMP/openblas/include" -DBLAS_LIBRARIES="$env:RUNNER_TEMP/openblas/lib/openblas.lib"'
+
+    steps:
+      - name: Download OpenBLAS
+        id: get_openblas
+        run: |
+          curl.exe -o $env:RUNNER_TEMP/openblas.zip -L "https://github.com/xianyi/OpenBLAS/releases/download/v${env:OPENBLAS_VERSION}/OpenBLAS-${env:OPENBLAS_VERSION}-x64.zip"
+          curl.exe -o $env:RUNNER_TEMP/OpenBLAS.LICENSE.txt -L "https://github.com/xianyi/OpenBLAS/raw/v${env:OPENBLAS_VERSION}/LICENSE"
+          mkdir $env:RUNNER_TEMP/openblas
+          tar.exe -xvf $env:RUNNER_TEMP/openblas.zip -C $env:RUNNER_TEMP/openblas
+          $vcdir = $(vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)
+          $msvc = $(join-path $vcdir $('VC\Tools\MSVC\'+$(gc -raw $(join-path $vcdir 'VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt')).Trim()))
+          $lib =  $(join-path $msvc 'bin\Hostx64\x64\lib.exe')
+          & $lib /machine:x64 "/def:${env:RUNNER_TEMP}/openblas/lib/libopenblas.def" "/out:${env:RUNNER_TEMP}/openblas/lib/openblas.lib" /name:openblas.dll
+
+      - name: Checkout project
+        id: checkout_project
+        uses: actions/checkout@v4
+
+      - name: Checkout llama.cpp
+        id: checkout_llamacpp
+        shell: cmd
+        run: |
+          @echo off
+          set PATH=%~dp0
+          cd %PATH%
+          git clone https://github.com/ggerganov/llama.cpp.git
+          if not exist "%PATH%\llama.cpp" (
+            echo "Git clone llama.cpp failed."
+            exit 1
+          )
+          xcopy /y llamajava llama.cpp
+          cd llama.cpp
+          set LATEST_TAG=<git describe --tags `git rev-list --tags --max-count=1`
+          echo "=> Llama.cpp latest tag: %LATEST_TAG%"
+          git checkout %LATEST_TAG%
+          echo "add_subdirectory(llamajava)">>CMakeLists.txt
+          echo "=> Checkout llama.cpp %LATEST_TAG% finished."
+
+      - name: Build
+        id: make_build
+        run: |
+          cd llama.cpp
+          mkdir build
+          cd build
+          cmake .. ${env:BUILD_ARGS}
+          cmake --build . --config Release
+          
+      - name: Upload lib file
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-libllama
+          path: llama.cpp/llamajava/libllama_java.dll
+
