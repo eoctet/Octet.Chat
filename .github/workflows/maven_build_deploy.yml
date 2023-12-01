@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: windows-libllama
-          path: llama.cpp/build/llamajava/libllama_java.dll
+          path: llama.cpp/build/bin/Release/llama_java.dll
 
   # maven build & deploy
   maven-build-deploy:
