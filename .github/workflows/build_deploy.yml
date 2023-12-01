@@ -47,11 +47,16 @@ jobs:
           copy /y llamajava llama.cpp
           cd llama.cpp
           echo "add_subdirectory(llamajava)">>CMakeLists.txt
+          pwd
           echo "=> Checkout llama.cpp finished."
 
       - name: Build
         id: make_build
+        shell: cmd
         run: |
+          @echo off
+          set PATH=%~dp0
+          cd %PATH%
           cd llama.cpp
           mkdir build
           cd build
