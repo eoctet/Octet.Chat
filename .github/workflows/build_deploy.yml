@@ -37,7 +37,7 @@ jobs:
         run: |
           set PATH=%~dp0
           cd %PATH%
-          "C:\Program Files\Git\bin\git.exe" clone https://github.com/ggerganov/llama.cpp.git
+          git.exe clone https://github.com/ggerganov/llama.cpp.git
           if not exist "%PATH%\llama.cpp" (
             echo "Git clone llama.cpp failed."
             exit 1
