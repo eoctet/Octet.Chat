@@ -1,2 +1,3 @@
-1. Fix: issue #2 Update libllama file for Win x86-64.
+1. Fix NPE due to incorrect path.
+2. Restore workflows & Rebuild libllama.
 3. Update llama.cpp libs version.

@@ -31,7 +31,7 @@
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.2.8</version>
+    <version>1.2.9</version>
 </dependency>
 ```
 
