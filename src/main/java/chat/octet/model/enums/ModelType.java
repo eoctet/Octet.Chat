@@ -58,6 +58,11 @@ public enum ModelType {
             "",
             "{0}User: {1}\nAssistant: "
     ),
+    QWEN(
+            "\n",
+            "",
+            "{0}User: {1}\nAssistant: "
+    ),
     COMMON(
             "\n",
             "",
