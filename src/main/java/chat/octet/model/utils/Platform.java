@@ -110,7 +110,7 @@ public class Platform {
             throw new ModelException("Delete old library file error ", e);
         }
 
-        try (InputStream in = Platform.class.getClassLoader().getResourceAsStream( libraryPath + File.separator + libraryName);
+        try (InputStream in = Platform.class.getClassLoader().getResourceAsStream( libraryPath + "/" + libraryName);
              BufferedInputStream reader = new BufferedInputStream(Objects.requireNonNull(in));
              FileOutputStream out = new FileOutputStream(libraryFile)
         ) {
