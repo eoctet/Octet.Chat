@@ -86,9 +86,9 @@ public class Platform {
 
         String libraryName;
         if (isMac()) {
-            libraryName = "libllama_java.dylib";
+            libraryName = "libllama.dylib";
         } else if (isLinux()) {
-            libraryName = "libllama_java.so";
+            libraryName = "libllama.so";
         } else if (isWindows()) {
             libraryName = "llama_java.dll";
         } else {
