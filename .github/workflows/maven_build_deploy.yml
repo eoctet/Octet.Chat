@@ -31,7 +31,7 @@ jobs:
             exit 1
           fi
           
-          cp llamajava/* llama.cpp
+          cp -r llamajava/* llama.cpp
           cd llama.cpp
           LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "=> Llama.cpp latest tag: $LATEST_TAG"
@@ -94,7 +94,7 @@ jobs:
             exit 1
           fi
           
-          cp llamajava/* llama.cpp
+          cp -r llamajava/* llama.cpp
           cd llama.cpp
           LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           echo "=> Llama.cpp latest tag: $LATEST_TAG"
