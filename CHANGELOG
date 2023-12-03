@@ -1,3 +1,4 @@
-1. Fix NPE due to incorrect path.
-2. Restore workflows & Rebuild libllama.
-3. Update llama.cpp libs version.
+1. Optimized workflow rules.
+2. Add QWen prompt template.
+3. Fix incorrect path separator.
+4. Update llama.cpp libs version.

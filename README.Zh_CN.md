@@ -31,7 +31,7 @@
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.2.9</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
@@ -171,7 +171,7 @@ GenerateParameter generateParams = GenerateParameter.builder()
 
 默认已包含各系统版本库，可以直接使用。
 
-> 如果需要支持`GPU`或更加灵活的编译方式，请参考 `llama.cpp` **Build** 文档。
+> 如果更加灵活的编译方式，请参考 `llama.cpp` **Build** 文档。
 
 ```ini
 # 加载外部库文件
