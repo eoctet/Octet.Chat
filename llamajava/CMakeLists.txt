@@ -1,6 +1,7 @@
 set(TARGET llamajava)
 
 add_library(${TARGET}
+            SHARED
             llamajava.cpp
             llamajava.h
             jni.h
