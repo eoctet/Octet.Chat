@@ -1,4 +1,4 @@
-set(TARGET llama_java)
+set(TARGET llamajava)
 
 add_library(${TARGET}
             SHARED
