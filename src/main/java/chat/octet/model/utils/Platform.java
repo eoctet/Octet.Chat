@@ -107,11 +107,12 @@ public class Platform {
                 Files.createDirectory(libraryFile.getParentFile().toPath());
             }
         } catch (Exception e) {
-            throw new ModelException("Delete old library file error ", e);
+            throw new ModelException("Delete old library file error: " + libraryFile.toPath(), e);
         }
 
-        try (InputStream in = Platform.class.getClassLoader().getResourceAsStream( libraryPath + "/" + libraryName);
-             BufferedInputStream reader = new BufferedInputStream(Objects.requireNonNull(in));
+        String interLibraryPath = libraryPath + "/" + libraryName;
+        try (InputStream in = Platform.class.getClassLoader().getResourceAsStream(interLibraryPath);
+             BufferedInputStream reader = new BufferedInputStream(Objects.requireNonNull(in, "File not found: " + interLibraryPath));
              FileOutputStream out = new FileOutputStream(libraryFile)
         ) {
             byte[] buf = new byte[1024];
