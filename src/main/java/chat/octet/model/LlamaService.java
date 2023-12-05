@@ -3,8 +3,10 @@ package chat.octet.model;
 
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
+import chat.octet.model.beans.LlamaModelQuantizeParams;
 import chat.octet.model.beans.Metrics;
 import chat.octet.model.enums.LlamaTokenType;
+import chat.octet.model.enums.ModelFileType;
 import chat.octet.model.exceptions.DecodeException;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
@@ -12,7 +14,9 @@ import chat.octet.model.utils.Platform;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 
 /**
@@ -48,6 +52,13 @@ public class LlamaService {
      * @return LlamaContextParams
      */
     public static native LlamaContextParams getLlamaContextDefaultParams();
+
+    /**
+     * Get llama model quantize default params.
+     *
+     * @return LlamaModelQuantizeParams
+     */
+    public static native LlamaModelQuantizeParams getLlamaModelQuantizeDefaultParams();
 
     /**
      * Initialize the llama + ggml backend
@@ -267,6 +278,34 @@ public class LlamaService {
      */
     public static void clearCache(int sequenceId) {
         clearCache(sequenceId, 0, getContextSize());
+    }
+
+    /**
+     * Quantize the model.
+     *
+     * @param sourceModelFilePath Source model file path.
+     * @param outputModelFilePath Output model file path.
+     * @param params              Quantize parameters.
+     * @return int, Returns 0 on success, else failed.
+     */
+    public static native int llamaModelQuantize(String sourceModelFilePath, String outputModelFilePath, LlamaModelQuantizeParams params);
+
+    /**
+     * Quantize the model.
+     *
+     * @param sourceModelFilePath Source model file path.
+     * @param outputModelFilePath Output model file path.
+     * @param modelFileType       Model file type.
+     * @return int, Returns 0 on success, else failed.
+     * @see ModelFileType
+     */
+    public static int llamaModelQuantize(String sourceModelFilePath, String outputModelFilePath, ModelFileType modelFileType) {
+        if (!Files.exists(new File(sourceModelFilePath).toPath())) {
+            throw new ModelException("Source model file is not exists, please check the file path");
+        }
+        LlamaModelQuantizeParams defaultParams = LlamaService.getLlamaModelQuantizeDefaultParams();
+        defaultParams.modelFileType = modelFileType.getType();
+        return llamaModelQuantize(sourceModelFilePath, outputModelFilePath, defaultParams);
     }
 
     /**

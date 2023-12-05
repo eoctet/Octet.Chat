@@ -6,6 +6,7 @@
 #include "common/grammar-parser.h"
 #include <vector>
 #include <string>
+#include <iostream>
 
 //Global define
 llama_model *model = nullptr;
@@ -51,6 +52,15 @@ jfieldID FIELD_TENSOR_SPLIT;
 jfieldID FIELD_VOCAB_ONLY;
 jfieldID FIELD_USE_MMAP;
 jfieldID FIELD_USE_MLOCK;
+
+//Class LlamaModelQuantizeParams:
+jclass LLAMA_MODEL_QUANTIZE_PARAMS_CLASS;
+jfieldID FIELD_THREAD;
+jfieldID FIELD_MODEL_FILE_TYPE;
+jfieldID FIELD_ALLOW_REQUANTIZE;
+jfieldID FIELD_QUANTIZE_OUTPUT_TENSOR;
+jfieldID FIELD_ONLY_COPY;
+jfieldID FIELD_PURE;
 
 //Class Metrics
 jclass METRICS_CLASS;
@@ -191,6 +201,15 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_USE_MMAP = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mmap", "Z");
     FIELD_USE_MLOCK = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mlock", "Z");
 
+    //Class LlamaModelQuantizeParams
+    LLAMA_MODEL_QUANTIZE_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelQuantizeParams");
+    FIELD_THREAD = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "thread", "I");
+    FIELD_MODEL_FILE_TYPE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "modelFileType", "I");
+    FIELD_ALLOW_REQUANTIZE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "allowRequantize", "Z");
+    FIELD_QUANTIZE_OUTPUT_TENSOR = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "quantizeOutputTensor", "Z");
+    FIELD_ONLY_COPY = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "onlyCopy", "Z");
+    FIELD_PURE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "pure", "Z");
+
     //Class Metrics
     METRICS_CLASS = env->FindClass("chat/octet/model/beans/Metrics");
     FIELD_START_TIME_MS = env->GetFieldID(METRICS_CLASS, "startTimeMs", "D");
@@ -260,6 +279,28 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
     env->SetBooleanField(llama_context_params, FIELD_EMBEDDING, ToJBoolean(defaults.embedding));
     env->DeleteLocalRef(llama_context_params_class);
     return llama_context_params;
+}
+
+/*
+* Class:     chat_octet_model_LlamaService
+* Method:    getLlamaModelQuantizeDefaultParams
+*/
+JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuantizeDefaultParams
+        (JNIEnv *env, jclass thisClass) {
+    llama_model_quantize_params defaults = llama_model_quantize_default_params();
+
+    jclass llama_model_quantize_params_class = env->FindClass("chat/octet/model/beans/LlamaModelQuantizeParams");
+    jmethodID method_init_quantize_params = env->GetMethodID(llama_model_quantize_params_class, "<init>", "()V");
+    jobject llama_model_quantize_params = env->NewObject(llama_model_quantize_params_class, method_init_quantize_params);
+
+    env->SetIntField(llama_model_quantize_params, FIELD_THREAD, defaults.nthread);
+    env->SetIntField(llama_model_quantize_params, FIELD_MODEL_FILE_TYPE, defaults.ftype);
+    env->SetBooleanField(llama_model_quantize_params, FIELD_ALLOW_REQUANTIZE, ToJBoolean(defaults.allow_requantize));
+    env->SetBooleanField(llama_model_quantize_params, FIELD_QUANTIZE_OUTPUT_TENSOR, ToJBoolean(defaults.quantize_output_tensor));
+    env->SetBooleanField(llama_model_quantize_params, FIELD_ONLY_COPY, ToJBoolean(defaults.only_copy));
+    env->SetBooleanField(llama_model_quantize_params, FIELD_PURE, ToJBoolean(defaults.pure));
+    env->DeleteLocalRef(llama_model_quantize_params_class);
+    return llama_model_quantize_params;
 }
 
 /*
@@ -712,3 +753,23 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
     llama_kv_cache_seq_rm(llama_ctx, sequence_id, pos_start, pos_end);
 }
 
+/*
+ * Class:     chat_octet_model_LlamaServicen
+ * Method:    llamaModelQuantize
+ */
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
+        (JNIEnv *env, jclass thisClass, jstring source_model_file_path, jstring output_model_file_path, jobject quantize_params) {
+    int model_ftype = env->GetIntField(quantize_params, FIELD_MODEL_FILE_TYPE);
+    llama_ftype ftype = static_cast<enum llama_ftype>(model_ftype);
+
+    struct llama_model_quantize_params params = {
+        /*.nthread                     =*/ env->GetIntField(quantize_params, FIELD_THREAD),
+        /*.ftype                       =*/ ftype,
+        /*.allow_requantize            =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_ALLOW_REQUANTIZE)),
+        /*.quantize_output_tensor      =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_QUANTIZE_OUTPUT_TENSOR)),
+        /*.only_copy                   =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_ONLY_COPY)),
+        /*.pure                        =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_PURE)),
+    };
+
+   return llama_model_quantize(ToCString(env, source_model_file_path), ToCString(env, output_model_file_path), &params);
+}

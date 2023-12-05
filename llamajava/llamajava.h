@@ -30,6 +30,13 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
         (JNIEnv *, jclass);
 
 /*
+* Class:     chat_octet_model_LlamaService
+* Method:    getLlamaModelQuantizeDefaultParams
+*/
+JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuantizeDefaultParams
+        (JNIEnv *, jclass);
+
+/*
  * Class:     chat_octet_model_LlamaService
  * Method:    llamaBackendInit
  */
@@ -190,6 +197,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
         (JNIEnv *, jclass, jint, jint, jint);
+
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    llamaModelQuantize
+ */
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
+        (JNIEnv *, jclass, jstring, jstring, jobject);
 
 
 #ifdef __cplusplus
