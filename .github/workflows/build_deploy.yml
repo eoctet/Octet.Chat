@@ -27,7 +27,8 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
-          /bin/bash llama-java-core/build.sh
+          cd llama-java-core
+          /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v3
@@ -46,7 +47,8 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
-          /bin/bash llama-java-core/build.sh
+          cd llama-java-core
+          /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v3
