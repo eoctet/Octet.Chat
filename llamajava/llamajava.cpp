@@ -111,6 +111,7 @@ static struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama
             /*.tensor_split                =*/ tensor_split,
             /*.progress_callback           =*/ nullptr,
             /*.progress_callback_user_data =*/ nullptr,
+            /*.kv_overrides                =*/ nullptr,
             /*.vocab_only                  =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_VOCAB_ONLY)),
             /*.use_mmap                    =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_USE_MMAP)),
             /*.use_mlock                   =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_USE_MLOCK)),
