@@ -1,0 +1,10 @@
+chat.octet.model
+chat.octet.model.beans
+chat.octet.model.components.criteria
+chat.octet.model.components.criteria.impl
+chat.octet.model.components.processor
+chat.octet.model.components.processor.impl
+chat.octet.model.enums
+chat.octet.model.exceptions
+chat.octet.model.parameters
+chat.octet.model.utils

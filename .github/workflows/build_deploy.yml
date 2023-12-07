@@ -27,13 +27,13 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
-          /bin/bash build.sh
+          /bin/bash llama-java-core/build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v3
         with:
           name: linux-libllama
-          path: llama.cpp/build/llamajava/libllamajava.so
+          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.so
 
   #build macos lib
   build-macos-lib:
@@ -46,13 +46,13 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
-          /bin/bash build.sh
+          /bin/bash llama-java-core/build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v3
         with:
           name: macos-libllama
-          path: llama.cpp/build/llamajava/libllamajava.dylib
+          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
 
   #build windows lib
   build-windows-lib:
@@ -81,6 +81,7 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
+          cd llama-java-core
           git.exe clone https://github.com/ggerganov/llama.cpp.git
           if (!(Test-Path -Path "llama.cpp")) {
             echo "Git clone llama.cpp failed."
@@ -104,4 +105,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: windows-libllama
-          path: llama.cpp/build/bin/Release/llamajava.dll
+          path: llama-java-core/llama.cpp/build/bin/Release/llamajava.dll
