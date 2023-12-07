@@ -113,9 +113,9 @@ public class Model implements AutoCloseable {
         llamaContextParams.ropeFreqBase = modelParams.getRopeFreqBase();
         llamaContextParams.ropeFreqScale = modelParams.getRopeFreqScale();
         llamaContextParams.mulMatQ = modelParams.isMulMatQ();
-        llamaContextParams.f16KV = modelParams.isF16KV();
         llamaContextParams.logitsAll = modelParams.isLogitsAll();
         llamaContextParams.embedding = modelParams.isEmbedding();
+        llamaContextParams.offloadKqv = modelParams.isOffloadKqv();
         return llamaContextParams;
     }
 

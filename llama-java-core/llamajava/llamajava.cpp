@@ -40,9 +40,11 @@ jfieldID FIELD_YARN_ORIG_CTX;
 jfieldID FIELD_ROPE_FREQ_BASE;
 jfieldID FIELD_ROPE_FREQ_SCALE;
 jfieldID FIELD_MUL_MAT_Q;
-jfieldID FIELD_F16_KV;
+jfieldID FIELD_DATA_TYPE_K;
+jfieldID FIELD_DATA_TYPE_V;
 jfieldID FIELD_LOGITS_ALL;
 jfieldID FIELD_EMBEDDING;
+jfieldID FIELD_OFFLOAD_KQV;
 
 //Class LlamaModelParams:
 jclass LLAMA_MODEL_PARAMS_CLASS;
@@ -137,10 +139,12 @@ static struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jl
             /*.yarn_beta_fast              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_FAST),
             /*.yarn_beta_slow              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_SLOW),
             /*.yarn_orig_ctx               =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_YARN_ORIG_CTX),
+            /*.type_k                      =*/ static_cast<enum ggml_type>(env->GetIntField(jllama_context_params, FIELD_DATA_TYPE_K)),
+            /*.type_v                      =*/ static_cast<enum ggml_type>(env->GetIntField(jllama_context_params, FIELD_DATA_TYPE_V)),
             /*.mul_mat_q                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_MUL_MAT_Q)),
-            /*.f16_kv                      =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_F16_KV)),
             /*.logits_all                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_LOGITS_ALL)),
-            /*.embedding                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_EMBEDDING))
+            /*.embedding                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_EMBEDDING)),
+            /*.offload_kqv                 =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_OFFLOAD_KQV)),
     };
     return params;
 }
@@ -188,10 +192,12 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_YARN_ORIG_CTX = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnOrigCtx", "I");
     FIELD_ROPE_FREQ_BASE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqBase", "F");
     FIELD_ROPE_FREQ_SCALE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqScale", "F");
+    FIELD_DATA_TYPE_K = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "dataTypeK", "I");
+    FIELD_DATA_TYPE_V = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "dataTypeV", "I");
     FIELD_MUL_MAT_Q = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "mulMatQ", "Z");
-    FIELD_F16_KV = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "f16KV", "Z");
     FIELD_LOGITS_ALL = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "logitsAll", "Z");
     FIELD_EMBEDDING = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "embedding", "Z");
+    FIELD_OFFLOAD_KQV = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "offloadKqv", "Z");
 
     //Class LlamaContextParams
     LLAMA_MODEL_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelParams");
@@ -274,10 +280,12 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
     env->SetIntField(llama_context_params, FIELD_YARN_ORIG_CTX, defaults.yarn_orig_ctx);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_BASE, defaults.rope_freq_base);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_SCALE, defaults.rope_freq_scale);
+    env->SetIntField(llama_context_params, FIELD_DATA_TYPE_K, defaults.type_k);
+    env->SetIntField(llama_context_params, FIELD_DATA_TYPE_V, defaults.type_v);
     env->SetBooleanField(llama_context_params, FIELD_MUL_MAT_Q, ToJBoolean(defaults.mul_mat_q));
-    env->SetBooleanField(llama_context_params, FIELD_F16_KV, ToJBoolean(defaults.f16_kv));
     env->SetBooleanField(llama_context_params, FIELD_LOGITS_ALL, ToJBoolean(defaults.logits_all));
     env->SetBooleanField(llama_context_params, FIELD_EMBEDDING, ToJBoolean(defaults.embedding));
+    env->SetBooleanField(llama_context_params, FIELD_OFFLOAD_KQV, ToJBoolean(defaults.offload_kqv));
     env->DeleteLocalRef(llama_context_params_class);
     return llama_context_params;
 }

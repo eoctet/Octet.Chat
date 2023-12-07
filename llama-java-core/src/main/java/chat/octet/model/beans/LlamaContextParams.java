@@ -30,39 +30,32 @@ public class LlamaContextParams {
      * number of threads used for prompt and batch processing.
      */
     public int threadsBatch;
-
     /**
      * RoPE scaling type, from `enum llama_rope_scaling_type`.
      *
      * @see LlamaRoPEScalingType
      */
     public int ropeScalingType;
-
     /**
      * YaRN extrapolation mix factor, NaN = from model.
      */
     public float yarnExtFactor;
-
     /**
      * YaRN magnitude scaling factor.
      */
     public float yarnAttnFactor;
-
     /**
      * YaRN low correction dim.
      */
     public float yarnBetaFast;
-
     /**
      * YaRN high correction dim.
      */
     public float yarnBetaSlow;
-
     /**
      * YaRN original context size.
      */
     public int yarnOrigCtx;
-
     /**
      * RoPE base frequency.
      */
@@ -72,13 +65,17 @@ public class LlamaContextParams {
      */
     public float ropeFreqScale;
     /**
+     * data type for K cache.
+     */
+    public int dataTypeK;
+    /**
+     * data type for V cache.
+     */
+    public int dataTypeV;
+    /**
      * if true, use experimental mul_mat_q kernels.
      */
     public boolean mulMatQ;
-    /**
-     * use fp16 for KV cache.
-     */
-    public boolean f16KV;
     /**
      * the llama_eval() call computes all logits, not just the last one.
      */
@@ -87,5 +84,9 @@ public class LlamaContextParams {
      * embedding mode only.
      */
     public boolean embedding;
+    /**
+     * whether to offload the KQV ops (including the KV cache) to GPU.
+     */
+    public boolean offloadKqv;
 
 }

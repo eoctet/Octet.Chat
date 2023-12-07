@@ -71,13 +71,6 @@ public class ModelParameter {
     private int seed = -1;
 
     /**
-     * <b>f16-kv</b><br/>
-     * Use half-precision for key/value cache.
-     */
-    @Builder.Default
-    private boolean f16KV = true;
-
-    /**
      * <b>logits-all</b><br/>
      * Return logits for all tokens, not just the last token.
      */
@@ -251,5 +244,12 @@ public class ModelParameter {
      * YaRN original context size.
      */
     private int yarnOrigCtx;
+
+    /**
+     * <b>offload_kqv</b><br/>
+     * whether to offload the KQV ops (including the KV cache) to GPU.
+     */
+    @Builder.Default
+    private boolean offloadKqv = true;
 
 }
