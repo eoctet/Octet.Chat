@@ -24,13 +24,14 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
+          cd llama-java-core
           /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v3
         with:
           name: linux-libllama
-          path: llama.cpp/build/llamajava/libllamajava.so
+          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.so
 
   #build macos lib
   build-macos-lib:
@@ -43,13 +44,14 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
+          cd llama-java-core
           /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v3
         with:
           name: macos-libllama
-          path: llama.cpp/build/llamajava/libllamajava.dylib
+          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
 
   #build windows lib
   build-windows-lib:
@@ -78,6 +80,7 @@ jobs:
       - name: Build lib
         id: build_lib
         run: |
+          cd llama-java-core
           git.exe clone https://github.com/ggerganov/llama.cpp.git
           if (!(Test-Path -Path "llama.cpp")) {
             echo "Git clone llama.cpp failed."
@@ -101,7 +104,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: windows-libllama
-          path: llama.cpp/build/bin/Release/llamajava.dll
+          path: llama-java-core/llama.cpp/build/bin/Release/llamajava.dll
 
   # maven build & deploy
   maven-build-deploy:
@@ -132,33 +135,67 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: linux-libllama
-          path: src/main/resources/linux-x86-64
+          path: llama-java-core/src/main/resources/linux-x86-64
 
       - name: Download macos lib
         id: download_macos_lib
         uses: actions/download-artifact@v3
         with:
           name: macos-libllama
-          path: src/main/resources/darwin-x86-64
+          path: llama-java-core/src/main/resources/darwin-x86-64
 
       - name: Download windows lib
         id: download_windows_lib
         uses: actions/download-artifact@v3
         with:
           name: windows-libllama
-          path: src/main/resources/win32-x86-64
+          path: llama-java-core/src/main/resources/win32-x86-64
 
       - name: Show libs
         id: show_libs
         run: |
-          ls -l src/main/resources/*
+          ls -l llama-java-core/src/main/resources/*
 
       - name: Build with Maven
-        run: mvn clean package deploy
+        run: |
+          cd llama-java-core
+          mvn clean package deploy
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_CODE }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
+
+      - name: Build console app
+        id: build_console_app
+        run: |
+          cd llama-java-app
+          mvn clean package -P console
+
+      - name: Make console package
+        id: make_console_package
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          cd vendor
+          mkdir -p llama-java-app/conf
+          mv ../llama-java-app/target/*.jar llama-java-app/llama-java-console.jar
+          cp ../llama-java-app/conf/setting.default.json llama-java-app/conf
+
+      - name: Build server app
+        id: build_server_app
+        run: |
+          cd llama-java-app
+          mvn clean package -P server
+
+      - name: Make server package
+        id: make_server_package
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          cd vendor
+          mv ../llama-java-app/target/*.jar llama-java-app/llama-java-api.jar
+          cp ../llama-java-app/app_server.sh llama-java-app
+          zip -r llama-java-app-$TAG_NAME.zip llama-java-app
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -166,3 +203,5 @@ jobs:
         with:
           body_path: CHANGELOG
           token: ${{ secrets.DEV_TOKEN }}
+          files: |
+            vendor/llama-java-app-${{ github.ref_name }}.zip
