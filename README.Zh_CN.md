@@ -10,11 +10,13 @@
 
 #### 主要特点
 - 🦙 基于  [`llama.cpp`](https://github.com/ggerganov/llama.cpp) 构建
-- 🚀 支持 `OpenAPI`，快速实现私有化服务
+- ☕️ 使用 `JNI` 开发Java库，提供与 `Llama.cpp` 一致的接口
+- 🚀 支持 `服务端部署`，快速实现私有化服务
+- 💻 支持 `命令行交互`，简单的本地聊天交互
 - 🤖 支持 `并行推理`、`连续对话` 和 `文本生成`
 - 📦 支持 `Llama2` 系列模型和其他开源模型，例如：`Baichuan 7B`、`QWen 7B`
-- ☕️ 使用 `JNI` 开发本地库，提供与 `Llama.cpp` 一致的接口
-- 💻 支持 `命令行交互` 和 `服务端部署`
+
+----
 
 #### 最近更新
 - [X] 🚀 提供模型量化接口
@@ -167,14 +169,19 @@ usage: LLAMA-JAVA-APP
 
 ## 开发手册
 
-#### Maven POM
+#### Maven
 
 ```xml
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.3.0</version>
+    <version>LAST_RELEASE_VERSION</version>
 </dependency>
+```
+
+#### Gradle
+```txt
+implementation group: 'chat.octet', name: 'llama-java-core', version: 'LAST_RELEASE_VERSION'
 ```
 
 #### Examples

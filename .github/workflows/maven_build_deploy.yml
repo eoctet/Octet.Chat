@@ -185,7 +185,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          body_path: CHANGELOG
+          body_path: CHANGELOG.md
           token: ${{ secrets.DEV_TOKEN }}
           files: |
             vendor/llama-java-app-${{ github.ref_name }}.zip

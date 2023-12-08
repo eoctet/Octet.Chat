@@ -10,11 +10,13 @@ This is a 🦙 `LLaMA Java` project. Provides a Java library `llama-java-core` a
 
 #### Features
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
-- 🚀 Support `OpenAPI` for fast implementation of privatization services
+- ☕️ Develop using `JNI`, Provides a consistent API with `Llama.cpp`
+- 🚀 Support `Server deployment` to quickly realize privatized services
+- 💻 Support `CLI Interaction`, simple local chat interaction
 - 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`
 - 📦 Support for `Llama2` series models and other open source models, such as `Baichuan 7B`,`QWen 7B`
-- ☕️ Develop using `JNI`, Provides a consistent API with `Llama.cpp`
-- 💻 Support for `CLI interaction` and `Server deployment`
+
+----
 
 #### Last updated
 - [X] 🚀 Provide model quantification API
@@ -167,14 +169,19 @@ usage: LLAMA-JAVA-APP
 
 ## Development
 
-#### Maven POM
+#### Maven
 
 ```xml
 <dependency>
     <groupId>chat.octet</groupId>
     <artifactId>llama-java-core</artifactId>
-    <version>1.3.0</version>
+    <version>LAST_RELEASE_VERSION</version>
 </dependency>
+```
+
+#### Gradle
+```txt
+implementation group: 'chat.octet', name: 'llama-java-core', version: 'LAST_RELEASE_VERSION'
 ```
 
 #### Examples
