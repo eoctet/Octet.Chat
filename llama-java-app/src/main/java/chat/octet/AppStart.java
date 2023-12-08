@@ -83,7 +83,7 @@ public class AppStart {
             formatter.printHelp("LLAMA-JAVA-APP", OPTIONS);
             System.exit(0);
         }
-        String mode = cmd.getOptionValue("app", "api");
+        String mode = cmd.getOptionValue("app", "cli");
         if ("api".equalsIgnoreCase(StringUtils.trimToEmpty(mode))) {
             SpringApplication.run(AppStart.class, args);
         } else {
