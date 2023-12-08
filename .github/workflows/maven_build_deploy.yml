@@ -159,43 +159,29 @@ jobs:
       - name: Build with Maven
         run: |
           cd llama-java-core
-          mvn clean package install deploy
+          mvn clean package deploy
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_CODE }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_PRIVATE_KEY_PASS }}
 
-      - name: Build console app
-        id: build_console_app
+      - name: Build app
+        id: build_app
+        env:
+          TAG_NAME: ${{ github.ref_name }}
         run: |
-          cd llama-java-app
+          mkdir -p vendor/llama-java-app/conf
+          cp llama-java-app/conf/setting.default.json vendor/llama-java-app/conf
+          cp llama-java-app/app_server.sh vendor/llama-java-app
+          
           mvn clean package -P console
-
-      - name: Make console package
-        id: make_console_package
-        env:
-          TAG_NAME: ${{ github.ref_name }}
-        run: |
-          cd vendor
-          mkdir -p llama-java-app/conf
-          mv ../llama-java-app/target/*.jar llama-java-app/llama-java-console.jar
-          cp ../llama-java-app/conf/setting.default.json llama-java-app/conf
-
-      - name: Build server app
-        id: build_server_app
-        run: |
-          cd llama-java-app
+          mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-console.jar
           mvn clean package -P server
-
-      - name: Make server package
-        id: make_server_package
-        env:
-          TAG_NAME: ${{ github.ref_name }}
-        run: |
+          mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-api.jar
+          
           cd vendor
-          mv ../llama-java-app/target/*.jar llama-java-app/llama-java-api.jar
-          cp ../llama-java-app/app_server.sh llama-java-app
           zip -r llama-java-app-$TAG_NAME.zip llama-java-app
+          ls -l *
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
