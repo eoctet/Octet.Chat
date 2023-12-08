@@ -17,7 +17,6 @@
 - 💻 支持 `命令行交互` 和 `服务端部署`
 
 #### 最近更新
-- [X] 🚀 合并 `llama-java-chat` 项目
 - [X] 🚀 提供模型量化接口
 - [X] 🚀 自定义模型的提示词模版（例如：Vicuna、Alpaca等等）
 - [X] 🚀 并行批处理解码
@@ -33,15 +32,15 @@
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
 
-cd <YOUR_PATH>/llama-java-app & bash app_server.sh start
+cd <YOUR_PATH>/llama-java-app
+bash app_server.sh start
 ```
 
 - 目录示例
 
 ```text
 => llama-java-app
-   ⌊___ llama-java-api.jar
-   ⌊___ llama-java-console.jar
+   ⌊___ llama-java-app.jar
    ⌊___ app_server.sh
    ⌊___ conf
         ⌊___ setting.json
@@ -110,7 +109,7 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
 运行命令行交互，指定需要加载的语言模型。
 
 ```bash
-java -jar llama-java-console.jar --model llama2-chat --system 'YOUR_PROMPT'
+java -jar llama-java-app.jar --model llama2-chat --system 'YOUR_PROMPT'
 ```
 
 ```txt
@@ -124,17 +123,19 @@ AI: 作为一个 AI，我不知道我是谁。我的设计者和创建者创造�
 > 使用 `help` 查看更多参数，示例如下：
 
 ```bash
-java -jar llama-java-console.jar --help
+java -jar llama-java-app.jar --help
 
-usage: LLAMA-JAVA-CONSOLE v1.3.0
+usage: LLAMA-JAVA-APP
+    --app <arg>                 App launch type: cli | api (default: cli).
  -c,--completions               Use completions mode.
     --frequency-penalty <arg>   Repeat alpha frequency penalty (default:
                                 0.0, 0.0 = disabled)
  -h,--help                      Show this help message and exit.
-    --keep <arg>                Number of tokens to keep from the context.
  -m,--model <arg>               Load model name, default: llama2-chat.
     --max-new-tokens <arg>      Maximum new token generation size
                                 (default: 0 unlimited).
+    --min-p <arg>               Min-p sampling (default: 0.05, 0 =
+                                disabled).
     --mirostat <arg>            Enable Mirostat sampling, controlling
                                 perplexity during text generation
                                 (default: 0, 0 = disabled, 1 = Mirostat, 2
@@ -158,7 +159,6 @@ usage: LLAMA-JAVA-CONSOLE v1.3.0
     --top-k <arg>               Top-k sampling (default: 40, 0 =
                                 disabled).
     --top-p <arg>               Top-p sampling (default: 0.9).
-    --min-p <arg>               Min-p sampling (default: 0.05, 0 = disabled).
     --typical <arg>             Enable typical sampling sampling with
                                 parameter p (default: 1.0, 1.0 =
                                 disabled).

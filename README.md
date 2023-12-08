@@ -17,7 +17,6 @@ This is a 🦙 `LLaMA Java` project. Provides a Java library `llama-java-core` a
 - 💻 Support for `CLI interaction` and `Server deployment`
 
 #### Last updated
-- [X] 🚀 Merge the `llama-java-chat` project
 - [X] 🚀 Provide model quantification API
 - [X] 🚀 Custom model prompt templates (such as Vicuna, Alpaca, etc.)
 - [X] 🚀 Parallel batch decoding
@@ -33,15 +32,15 @@ This is a 🦙 `LLaMA Java` project. Provides a Java library `llama-java-core` a
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
 
-cd <YOUR_PATH>/llama-java-app & bash app_server.sh start
+cd <YOUR_PATH>/llama-java-app
+bash app_server.sh start
 ```
 
 - Directory
 
 ```text
 => llama-java-app
-   ⌊___ llama-java-api.jar
-   ⌊___ llama-java-console.jar
+   ⌊___ llama-java-app.jar
    ⌊___ app_server.sh
    ⌊___ conf
         ⌊___ setting.json
@@ -110,7 +109,7 @@ The API will return data in a stream format:
 Run command line interaction and specify the language model that needs to be loaded.
 
 ```bash
-java -jar llama-java-console.jar --model llama2-chat --system 'YOUR_PROMPT'
+java -jar llama-java-app.jar --model llama2-chat --system 'YOUR_PROMPT'
 ```
 
 ```txt
@@ -124,17 +123,19 @@ However, I am a virtual assistant designed to provide assistance and answer ques
 > Use `help` to view more generate parameters, for example:
 
 ```bash
-java -jar llama-java-console.jar --help
+java -jar llama-java-app.jar --help
 
-usage: LLAMA-JAVA-CONSOLE v1.3.0
+usage: LLAMA-JAVA-APP
+    --app <arg>                 App launch type: cli | api (default: cli).
  -c,--completions               Use completions mode.
     --frequency-penalty <arg>   Repeat alpha frequency penalty (default:
                                 0.0, 0.0 = disabled)
  -h,--help                      Show this help message and exit.
-    --keep <arg>                Number of tokens to keep from the context.
  -m,--model <arg>               Load model name, default: llama2-chat.
     --max-new-tokens <arg>      Maximum new token generation size
                                 (default: 0 unlimited).
+    --min-p <arg>               Min-p sampling (default: 0.05, 0 =
+                                disabled).
     --mirostat <arg>            Enable Mirostat sampling, controlling
                                 perplexity during text generation
                                 (default: 0, 0 = disabled, 1 = Mirostat, 2
@@ -158,7 +159,6 @@ usage: LLAMA-JAVA-CONSOLE v1.3.0
     --top-k <arg>               Top-k sampling (default: 40, 0 =
                                 disabled).
     --top-p <arg>               Top-p sampling (default: 0.9).
-    --min-p <arg>               Min-p sampling (default: 0.05, 0 = disabled).
     --typical <arg>             Enable typical sampling sampling with
                                 parameter p (default: 1.0, 1.0 =
                                 disabled).

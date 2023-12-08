@@ -110,7 +110,7 @@ start_proc() {
   else
     echo "${INFO_TAG} Starting ${PROC_TAG} ..."
     #set_classpath
-    nohup ${JAVA_HOME}/bin/java -Diname=${PROC_TAG} ${JAVA_OPTS} ${PROC_OPTS} -jar ${JAR_FILE} 1>&- 2>${LOG_FILE} &
+    nohup ${JAVA_HOME}/bin/java -Diname=${PROC_TAG} ${JAVA_OPTS} ${PROC_OPTS} -jar ${JAR_FILE} --app api 1>&- 2>${LOG_FILE} &
     sleep 3
     is_proc_run
     if [ $? -eq 0 ]; then
