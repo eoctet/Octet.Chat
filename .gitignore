@@ -2,7 +2,6 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-src/main/resources/**
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -46,3 +45,4 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/llama-java-core/src/main/resources/**
