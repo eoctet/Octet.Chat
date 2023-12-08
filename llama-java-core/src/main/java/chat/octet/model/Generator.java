@@ -61,11 +61,6 @@ public class Generator implements Iterable<Token> {
         return inference;
     }
 
-    @Override
-    public Spliterator<Token> spliterator() {
-        throw new RuntimeException("Unsupported operation.");
-    }
-
     /**
      * Stream outputs the generated text.
      */
