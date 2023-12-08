@@ -6,4 +6,4 @@ swagger:
   enabled: true
 spring:
   lifecycle:
-    timeout-per-shutdown-phase: 15s
+    timeout-per-shutdown-phase: 30s

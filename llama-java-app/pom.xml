@@ -13,7 +13,9 @@
     <packaging>jar</packaging>
 
     <name>llama-java-app</name>
-    <description>This is a 🦙 `LLaMA Java` project. Provides a Java library `llama-java-core` and a complete API service, You can use it to deploy your own private services, support `Llama2` series models and other open source models.</description>
+    <description>This is a 🦙 `LLaMA Java` project. Provides a Java library `llama-java-core` and a complete API service,
+        You can use it to deploy your own private services, support `Llama2` series models and other open source models.
+    </description>
     <url>https://github.com/eoctet/llama-java</url>
 
     <licenses>
@@ -133,28 +135,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <profile>
-            <id>server</id>
-            <properties>
-                <profile.id>server</profile.id>
-                <main.class>chat.octet.AppServer</main.class>
-                <file.prefix>api</file.prefix>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>console</id>
-            <properties>
-                <profile.id>console</profile.id>
-                <main.class>chat.octet.AppConsole</main.class>
-                <file.prefix>console</file.prefix>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
@@ -172,7 +152,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>${main.class}</mainClass>
+                    <mainClass>chat.octet.AppStart</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -184,7 +164,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>llama-java-${file.prefix}-${project.version}</finalName>
     </build>
 
 </project>

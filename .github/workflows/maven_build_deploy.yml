@@ -174,10 +174,8 @@ jobs:
           cp llama-java-app/conf/setting.default.json vendor/llama-java-app/conf
           cp llama-java-app/app_server.sh vendor/llama-java-app
           
-          mvn clean package -P console
-          mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-console.jar
-          mvn clean package -P server
-          mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-api.jar
+          mvn clean package
+          mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-app.jar
           
           cd vendor
           zip -r llama-java-app-$TAG_NAME.zip llama-java-app
