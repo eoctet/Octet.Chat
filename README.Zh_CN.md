@@ -1,10 +1,11 @@
 # 🦙 LLaMA Java ☕️
 
 
-[![CI](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml)
+[![CI](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/chat.octet/llama-java-core?color=orange)](https://mvnrepository.com/artifact/chat.octet/llama-java-core)
 [![README English](https://img.shields.io/badge/Lang-English-red)](./README.md)
-[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core?color=green)](https://opensource.org/licenses/MIT)
+[![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
+![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
 这个是一个 🦙 `LLaMA Java` 实现。提供了一个Java库 `llama-java-core` 以及一个完整的API服务，你可以用它部署自己的私有服务，支持 `Llama2` 系列模型及其他开源模型。
 

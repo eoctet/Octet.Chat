@@ -1,10 +1,11 @@
 # 🦙 LLaMA Java ☕️
 
 
-[![CI](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java-core/actions/workflows/maven_build_deploy.yml)
+[![CI](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/chat.octet/llama-java-core?color=orange)](https://mvnrepository.com/artifact/chat.octet/llama-java-core)
 [![README Zh_CN](https://img.shields.io/badge/Lang-中文-red)](./README.Zh_CN.md)
-[![GitHub](https://img.shields.io/github/license/eoctet/llama-java-core?color=green)](https://opensource.org/licenses/MIT)
+[![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
+![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
 This is a 🦙 `LLaMA Java` project. Provides a Java library `llama-java-core` and a complete API service, You can use it to deploy your own private services, support `Llama2` series models and other open source models.
 
