@@ -321,6 +321,13 @@ By default, each system version library is included.
 -Doctet.llama.lib=<YOUR_LIB_PATH>
 ```
 
+## Disclaimer
+
+- This project is for reference only and is not responsible for any issues.
+- This project does not provide any models. Please obtain the model files yourself and comply with relevant agreements.
+- Please do not use this project for illegal purposes, including but not limited to commercial use, profit-making use, or use that violates Chinese laws and regulations.
+- Any legal liability arising from the use of this project shall be borne by the user, and this project shall not bear any legal liability.
+
 ## Feedback
 
 - If you have any questions, please submit them in GitHub Issue.
