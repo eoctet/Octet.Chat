@@ -7,13 +7,17 @@
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
 ![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
-这个是一个 🦙 `LLaMA Java` 实现。提供了一个Java库 `llama-java-core` 以及一个完整的API服务，你可以用它部署自己的私有服务，支持 `Llama2` 系列模型及其他开源模型。
+这个是一个 🦙 `LLaMA` Java项目。你可以用它部署自己的私有服务，支持 `Llama2` 系列模型及其他开源模型。
+
+#### 提供
+- 简单易用的Java库 `llama-java-core`
+- 完整的API服务 `llama-java-app` 用于私有服务
+  - `服务端部署`，快速实现私有化服务
+  - `命令行交互`，简单的本地聊天交互
 
 #### 主要特点
 - 🦙 基于  [`llama.cpp`](https://github.com/ggerganov/llama.cpp) 构建
 - ☕️ 使用 `JNI` 开发Java库，提供与 `Llama.cpp` 一致的接口
-- 🚀 支持 `服务端部署`，快速实现私有化服务
-- 💻 支持 `命令行交互`，简单的本地聊天交互
 - 🤖 支持 `并行推理`、`连续对话` 和 `文本生成`
 - 📦 支持 `Llama2` 系列模型和其他开源模型，例如：`Baichuan 7B`、`QWen 7B`
 

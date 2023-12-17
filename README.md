@@ -7,13 +7,17 @@
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
 ![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
-This is a 🦙 `LLaMA Java` project. Provides a Java library `llama-java-core` and a complete API service, You can use it to deploy your own private services, support `Llama2` series models and other open source models.
+This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private services, support `Llama2` series models and other open source models.
+
+#### Provides
+- Simple Java library `llama-java-core`
+- Complete API services `llama-java-app` for private services
+  - `Server deployment` to quickly realize privatized services
+  - `CLI Interaction`, simple local chat interaction
 
 #### Features
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 - ☕️ Develop using `JNI`, Provides a consistent API with `Llama.cpp`
-- 🚀 Support `Server deployment` to quickly realize privatized services
-- 💻 Support `CLI Interaction`, simple local chat interaction
 - 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`
 - 📦 Support for `Llama2` series models and other open source models, such as `Baichuan 7B`,`QWen 7B`
 
