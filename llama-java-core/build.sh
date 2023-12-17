@@ -14,6 +14,6 @@ echo "=> Checkout llama.cpp $LATEST_TAG finished."
 
 mkdir -p build
 cd build
-cmake .. -DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS -DBUILD_SHARED_LIBS=ON -DLLAMA_NATIVE=OFF -DLLAMA_CUBLAS=ON
+cmake .. -DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS -DBUILD_SHARED_LIBS=ON -DLLAMA_NATIVE=OFF
 cmake --build . --config Release
 echo "=> Build lib finished."
