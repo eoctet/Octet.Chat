@@ -11,7 +11,7 @@ This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private s
 
 #### Provides
 - Simple Java library `llama-java-core`
-- Complete API services `llama-java-app` for private services
+- Complete API services `llama-java-app`
   - `Server deployment` to quickly realize privatized services
   - `CLI Interaction`, simple local chat interaction
 
@@ -65,7 +65,7 @@ Following the interface specifications of `ChatGPT`, only the main interfaces ar
 >
 > > More information: [`API Docs`](docs/API.md).
 
-![webui.png](docs%2Fwebui.png)
+![webui.png](docs/webui.png)
 
 For example
 
@@ -285,7 +285,7 @@ You can use `LogitsProcessor` and `StoppingCriteria` to customize and control th
 
 **chat.octet.model.components.processor.LogitsProcessor**
 
-Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor.java](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
+Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor.java](llama-java-core/src/main/java/chat/octet/model/components/processor/impl/NoBadWordsLogitsProcessor.java)
 
 ```java
     Map<Integer, String> logitBias = Maps.newLinkedHashMap();
@@ -300,7 +300,7 @@ Customize a processor to adjust the probability distribution of words and contro
 
 **chat.octet.model.components.criteria.StoppingCriteria**
 
-Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
+Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](llama-java-core/src/main/java/chat/octet/model/components/criteria/impl/MaxTimeCriteria.java)
 
 ```java
     long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
@@ -311,7 +311,7 @@ Customize a controller to implement stop rule control for model inference, such 
             .build();
 ```
 
-> More information: [Java docs](docs%2Fapidocs%2Findex.html)
+> More information: `Java docs`
 
 #### Build
 

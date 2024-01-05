@@ -11,7 +11,7 @@
 
 #### 提供
 - 简单易用的Java库 `llama-java-core`
-- 完整的API服务 `llama-java-app` 用于私有服务
+- 完整的API服务 `llama-java-app`
   - `服务端部署`，快速实现私有化服务
   - `命令行交互`，简单的本地聊天交互
 
@@ -65,7 +65,7 @@ bash app_server.sh start
 >
 > > 完整的API信息请参考[`API 文档`](docs/API.md)。
 
-![webui.png](docs%2Fwebui.png)
+![webui.png](docs/webui.png)
 
 举个栗子
 
@@ -285,7 +285,7 @@ public class ContinuousChatExample {
 
 **chat.octet.model.components.processor.LogitsProcessor**
 
-自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor.java](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fprocessor%2Fimpl%2FNoBadWordsLogitsProcessor.java)
+自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor.java](llama-java-core/src/main/java/chat/octet/model/components/processor/impl/NoBadWordsLogitsProcessor.java)
 
 ```java
     Map<Integer, String> logitBias = Maps.newLinkedHashMap();
@@ -300,7 +300,7 @@ public class ContinuousChatExample {
 
 **chat.octet.model.components.criteria.StoppingCriteria**
 
-自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](src%2Fmain%2Fjava%2Fchat%2Foctet%2Fmodel%2Fcomponents%2Fcriteria%2Fimpl%2FMaxTimeCriteria.java)
+自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](llama-java-core/src/main/java/chat/octet/model/components/criteria/impl/MaxTimeCriteria.java)
 
 ```java
     long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
@@ -311,7 +311,7 @@ public class ContinuousChatExample {
             .build();
 ```
 
-> 完整的文档请参考 [Java docs](docs%2Fapidocs%2Findex.html)
+> 完整的文档请参考 `Java docs`
 
 #### 如何编译
 

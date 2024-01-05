@@ -6,7 +6,7 @@
     <parent>
         <groupId>chat.octet</groupId>
         <artifactId>llama-java</artifactId>
-        <version>1.3.2</version>
+        <version>1.3.3</version>
     </parent>
 
     <artifactId>llama-java-app</artifactId>
@@ -43,6 +43,7 @@
         <lombok.version>1.18.26</lombok.version>
         <guava.version>32.1.2-jre</guava.version>
         <spring-boot.version>2.7.16</spring-boot.version>
+        <llama.java.version>1.3.3</llama.java.version>
     </properties>
 
     <dependencies>
@@ -114,7 +115,7 @@
         <dependency>
             <groupId>chat.octet</groupId>
             <artifactId>llama-java-core</artifactId>
-            <version>1.3.2</version>
+            <version>${llama.java.version}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
