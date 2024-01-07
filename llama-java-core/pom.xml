@@ -13,24 +13,6 @@
     <packaging>jar</packaging>
 
     <name>llama-java-core</name>
-    <description>This is a LLaMA Java project. Provides a Java library llama-java-core and a complete API service,
-        You can use it to deploy your own private services, support Llama2 series models and other open source models.</description>
-    <url>https://github.com/eoctet/llama-java</url>
-
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>https://www.opensource.org/licenses/mit-license.php</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>William</name>
-            <url>https://github.com/eoctet</url>
-            <organization>Octet Tech</organization>
-        </developer>
-    </developers>
 
     <dependencies>
         <dependency>
