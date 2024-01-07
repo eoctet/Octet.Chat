@@ -158,7 +158,6 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd llama-java-core
           mvn clean package deploy
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_NAME }}
@@ -174,7 +173,6 @@ jobs:
           cp llama-java-app/conf/setting.default.json vendor/llama-java-app/conf
           cp llama-java-app/app_server.sh vendor/llama-java-app
           
-          mvn clean package
           mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-app.jar
           
           cd vendor

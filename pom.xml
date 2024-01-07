@@ -7,7 +7,40 @@
     <groupId>chat.octet</groupId>
     <artifactId>llama-java</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.3</version>
+    <version>1.3.3-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <maven-compiler.version>3.8.1</maven-compiler.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <lombok.version>1.18.26</lombok.version>
+        <guava.version>32.1.2-jre</guava.version>
+        <spring-boot.version>2.7.16</spring-boot.version>
+        <llama.java.version>1.3.3-SNAPSHOT</llama.java.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <scm>
+        <url>https://github.com/eoctet/llama-java</url>
+        <connection>https://github.com/eoctet/llama-java.git</connection>
+        <developerConnection>https://github.com/eoctet/llama-java.git</developerConnection>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <name>Central Repository OSSRH</name>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <name>Central Repository OSSRH</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <modules>
         <module>llama-java-core</module>
