@@ -2,6 +2,7 @@ package chat.octet.model.parameters;
 
 import chat.octet.model.components.criteria.StoppingCriteriaList;
 import chat.octet.model.components.processor.LogitsProcessorList;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import javax.annotation.Nullable;
 @Getter
 @Builder
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class GenerateParameter {
 
     /**

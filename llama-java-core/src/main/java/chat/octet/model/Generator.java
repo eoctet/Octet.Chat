@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Spliterator;
 
 /**
  * Model inference generator,
@@ -25,8 +24,8 @@ import java.util.Spliterator;
  */
 @Slf4j
 public class Generator implements Iterable<Token> {
-    private Inference inference;
-    private Status chatStatus;
+    private final Inference inference;
+    private final Status chatStatus;
 
     /**
      * Create inference generator.
@@ -47,7 +46,7 @@ public class Generator implements Iterable<Token> {
      * @param prompt         Prompt text.
      */
     public Generator(GenerateParameter generateParams, String prompt) {
-        new Generator(generateParams, prompt, null);
+        this(generateParams, prompt, null);
     }
 
     /**
