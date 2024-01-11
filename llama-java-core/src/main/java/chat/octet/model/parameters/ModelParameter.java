@@ -4,6 +4,7 @@ import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.enums.LlamaRoPEScalingType;
 import chat.octet.model.enums.ModelType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,6 +23,7 @@ import javax.annotation.Nullable;
 @Builder
 @ToString
 @Jacksonized
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ModelParameter {
 
     /**
