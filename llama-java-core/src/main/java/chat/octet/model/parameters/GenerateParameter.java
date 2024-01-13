@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
 
 import javax.annotation.Nullable;
 
@@ -23,6 +24,7 @@ import javax.annotation.Nullable;
 @Getter
 @Builder
 @ToString
+@Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class GenerateParameter {
 
