@@ -1,4 +1,4 @@
-## LLama Java parameters
+## Llama Java parameters
 
 The following is a list of all the parameters involved in this project.
 
