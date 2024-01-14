@@ -49,6 +49,7 @@ jfieldID FIELD_OFFLOAD_KQV;
 //Class LlamaModelParams:
 jclass LLAMA_MODEL_PARAMS_CLASS;
 jfieldID FIELD_GPU_LAYERS;
+jfieldID FIELD_SPLIT_MODE;
 jfieldID FIELD_MAIN_GPU;
 jfieldID FIELD_TENSOR_SPLIT;
 jfieldID FIELD_VOCAB_ONLY;
@@ -109,6 +110,7 @@ static struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama
 
     struct llama_model_params params = {
             /*.n_gpu_layers                =*/ env->GetIntField(jllama_model_params, FIELD_GPU_LAYERS),
+            /*.split_mode                  =*/ static_cast<enum llama_split_mode>(env->GetIntField(jllama_model_params, FIELD_SPLIT_MODE)),
             /*.main_gpu                    =*/ env->GetIntField(jllama_model_params, FIELD_MAIN_GPU),
             /*.tensor_split                =*/ tensor_split,
             /*.progress_callback           =*/ nullptr,
@@ -202,6 +204,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     //Class LlamaContextParams
     LLAMA_MODEL_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelParams");
     FIELD_GPU_LAYERS = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "gpuLayers", "I");
+    FIELD_SPLIT_MODE = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "splitMode", "I");
     FIELD_MAIN_GPU = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mainGpu", "I");
     FIELD_TENSOR_SPLIT = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "tensorSplit", "[F");
     FIELD_VOCAB_ONLY = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "vocabOnly", "Z");
@@ -245,6 +248,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelDefaul
     jobject llama_model_params = env->NewObject(llama_model_params_class, method_init_model_params);
 
     env->SetIntField(llama_model_params, FIELD_GPU_LAYERS, defaults.n_gpu_layers);
+    env->SetIntField(llama_model_params, FIELD_SPLIT_MODE, defaults.split_mode);
     env->SetIntField(llama_model_params, FIELD_MAIN_GPU, defaults.main_gpu);
     env->SetBooleanField(llama_model_params, FIELD_VOCAB_ONLY, ToJBoolean(defaults.vocab_only));
     env->SetBooleanField(llama_model_params, FIELD_USE_MMAP, ToJBoolean(defaults.use_mmap));

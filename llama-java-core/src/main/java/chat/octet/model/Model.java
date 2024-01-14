@@ -52,7 +52,7 @@ public class Model implements AutoCloseable {
         this.modelName = modelParams.getModelName();
         this.modelType = modelParams.getModelType();
         Preconditions.checkNotNull(modelType, "Model type cannot be null");
-        this.lastTokensSize = modelParams.getLastNTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastNTokensSize();
+        this.lastTokensSize = modelParams.getLastTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastTokensSize();
         //setting model parameters
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
         LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);
@@ -79,6 +79,7 @@ public class Model implements AutoCloseable {
     private LlamaModelParams getLlamaModelParameters(ModelParameter modelParams) {
         LlamaModelParams llamaModelParams = LlamaService.getLlamaModelDefaultParams();
         llamaModelParams.gpuLayers = modelParams.getGpuLayers();
+        llamaModelParams.splitMode = modelParams.getSplitMode();
         llamaModelParams.vocabOnly = modelParams.isVocabOnly();
         boolean mmap = (StringUtils.isBlank(modelParams.getLoraPath()) && modelParams.isMmap());
         if (mmap && LlamaService.isMmapSupported()) {

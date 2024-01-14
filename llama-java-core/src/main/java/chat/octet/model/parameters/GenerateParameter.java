@@ -3,6 +3,8 @@ package chat.octet.model.parameters;
 import chat.octet.model.components.criteria.StoppingCriteriaList;
 import chat.octet.model.components.processor.LogitsProcessorList;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,38 +28,34 @@ import javax.annotation.Nullable;
 @ToString
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class GenerateParameter {
 
     /**
-     * <b>temperature</b><br/>
      * Adjust the randomness of the generated text (default: 0.8).
      */
     @Builder.Default
     private float temperature = 0.8f;
 
     /**
-     * <b>repeat-penalty</b><br/>
      * Control the repetition of token sequences in the generated text (default: 1.1).
      */
     @Builder.Default
     private float repeatPenalty = 1.1f;
 
     /**
-     * <b>no-penalize-nl</b><br/>
      * Disable penalization for newline tokens when applying the repeat penalty
      */
     @Builder.Default
     private boolean penalizeNl = true;
 
     /**
-     * <b>frequency-penalty</b><br/>
      * Repeat alpha frequency penalty (default: 0.0, 0.0 = disabled)
      */
     @Builder.Default
     private float frequencyPenalty = 0.0f;
 
     /**
-     * <b>presence-penalty</b><br/>
      * Repeat alpha presence penalty (default: 0.0, 0.0 = disabled)")
      */
     @Builder.Default
@@ -108,21 +106,20 @@ public final class GenerateParameter {
     private MirostatMode mirostatMode = MirostatMode.DISABLED;
 
     /**
-     * <b>mirostat-lr</b><br/>
+     * <b>Mirostat Sampling</b><br/>
      * Set the Mirostat learning rate, parameter eta (default: 0.1).
      */
     @Builder.Default
     private float mirostatETA = 0.1f;
 
     /**
-     * <b>mirostat-ent</b><br/>
+     * <b>Mirostat Sampling</b><br/>
      * Set the Mirostat target entropy, parameter tau (default: 5.0).
      */
     @Builder.Default
     private float mirostatTAU = 5.0f;
 
     /**
-     * <b>grammars</b><br/>
      * Specify a grammar (defined inline or in a file) to constrain model output to a specific format.
      * For example, you could force the model to output JSON or to speak only in emojis
      */
@@ -130,40 +127,36 @@ public final class GenerateParameter {
     private String grammarRules;
 
     /**
-     * <b>max-new-tokens</b><br/>
      * Maximum new token generation size.
      */
     @Builder.Default
     private int maxNewTokenSize = 0;
 
     /**
-     * <b>verbose prompt</b><br/>
      * Print the prompt before generating text.
      */
     @Builder.Default
     private boolean verbosePrompt = false;
 
     /**
-     * <b>logits processor list</b><br/>
+     * logits processor list.
      */
     @Nullable
     private LogitsProcessorList logitsProcessorList;
 
     /**
-     * <b>stopping criteria list</b><br/>
+     * stopping criteria list.
      */
     @Nullable
     private StoppingCriteriaList stoppingCriteriaList;
 
     /**
-     * <b>user</b><br/>
      * Specify user nickname, default: User.
      */
     @Builder.Default
     private String user = "User";
 
     /**
-     * <b>assistant</b><br/>
      * Specify bot nickname, default: Assistant.
      */
     @Builder.Default
