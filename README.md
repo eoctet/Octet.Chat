@@ -23,12 +23,17 @@ This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private s
 
 ----
 
-#### Last updated
+<details>
+
+<summary>Last updated</summary>
+
 - [X] 🚀 Provide model quantification API
 - [X] 🚀 Custom model prompt templates (such as Vicuna, Alpaca, etc.)
 - [X] 🚀 Parallel batch decoding
 - [X] 🚀 Min-P sampling support
 - [X] 🚀 YaRN RoPE scaling support
+
+</details>
 
 ## Quick start
 
@@ -57,13 +62,13 @@ bash app_server.sh start
 
 Following the interface specifications of `ChatGPT`, only the main interfaces are implemented, It can be integrated with [`ChatGPT Next Web`](https://github.com/Yidadaa/ChatGPT-Next-Web), WebUI, and App for use.
 
-> ℹ️ __Differences__
+> [!NOTE]
 > 1. Added parameters for the Llama series model and removed unsupported GPT parameters;
 > 2. By default, the `Llama2-chat` prompt template is used. If you need to adapt to other models, you can adjust it yourself;
 > 3. There are no unnecessary functions such as requesting authentication and usage queries;
 > 4. Optimize the conversation and chat API, without the need to pass on historical conversation context, only the current conversation content is sufficient.
 >
-> > More information: [`API Docs`](docs/API.md).
+> More information: [`API Docs`](docs/API.md).
 
 ![webui.png](docs/webui.png)
 
@@ -127,6 +132,8 @@ AI: As an AI, I don't know who I am. My designers and creators created me.
 However, I am a virtual assistant designed to provide assistance and answer questions.
 ```
 
+> [!TIP]
+> 
 > Use `help` to view more generate parameters, for example:
 
 ```bash
@@ -272,6 +279,8 @@ public class ContinuousChatExample {
 }
 ```
 
+> [!TIP]
+>
 > More examples: `chat.octet.examples.*`
 
 
@@ -330,12 +339,15 @@ By default, each system version library is included.
 - __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
 
 
+
 ## Disclaimer
 
-- This project is for reference only and is not responsible for any issues.
-- This project does not provide any models. Please obtain the model files yourself and comply with relevant agreements.
-- Please do not use this project for illegal purposes, including but not limited to commercial use, profit-making use, or use that violates Chinese laws and regulations.
-- Any legal liability arising from the use of this project shall be borne by the user, and this project shall not bear any legal liability.
+> [!IMPORTANT]
+>
+> - This project is for reference only and is not responsible for any issues.
+> - This project does not provide any models. Please obtain the model files yourself and comply with relevant agreements.
+> - Please do not use this project for illegal purposes, including but not limited to commercial use, profit-making use, or use that violates Chinese laws and regulations.
+> - Any legal liability arising from the use of this project shall be borne by the user, and this project shall not bear any legal liability.
 
 ## Feedback
 
