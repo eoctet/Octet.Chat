@@ -325,6 +325,11 @@ By default, each system version library is included.
 -Doctet.llama.lib=<YOUR_LIB_PATH>
 ```
 
+#### Wiki
+
+- __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
+
+
 ## Disclaimer
 
 - This project is for reference only and is not responsible for any issues.

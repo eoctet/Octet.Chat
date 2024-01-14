@@ -325,6 +325,11 @@ public class ContinuousChatExample {
 -Doctet.llama.lib=<YOUR_LIB_PATH>
 ```
 
+#### 帮助文档
+
+- __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
+
+
 ## 免责声明
 
 - 本项目仅供参考，不对任何问题负责。
