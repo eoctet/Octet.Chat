@@ -1,7 +1,9 @@
-[
-  {
+{
+  "name": "llama_java",
+  "prompt": "Answer the questions.",
+  "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
-    "model_name": "Llama2",
+    "model_name": "llama2-chat",
     "model_type": "LLAMA2",
     "context_size": 512,
     "main_gpu": null,
@@ -34,5 +36,27 @@
     "yarn_beta_slow": 1.0,
     "yarn_orig_ctx": 0,
     "offload_kqv": true
+  },
+  "generate_parameter": {
+    "temperature": 0.8,
+    "repeat_penalty": 1.1,
+    "penalize_nl": true,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0,
+    "top_k": 40,
+    "top_p": 0.9,
+    "tsf": 1.0,
+    "typical": 1.0,
+    "min_p": 0.05,
+    "mirostat_mode": "DISABLED",
+    "mirostat_eta": 0.1,
+    "mirostat_tau": 5.0,
+    "grammar_rules": null,
+    "max_new_token_size": 0,
+    "verbose_prompt": false,
+    "logits_processor_list": null,
+    "stopping_criteria_list": null,
+    "user": "User",
+    "assistant": "Assistant"
   }
-]
+}

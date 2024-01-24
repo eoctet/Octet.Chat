@@ -1,0 +1,23 @@
+{
+  "name": "Octet",
+  "prompt": "Answer the questions.",
+  "model_parameter": {
+    "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
+    "model_type": "LLAMA2",
+    "context_size": 4096,
+    "threads": 6,
+    "threads_batch": 6,
+    "mmap": true,
+    "mlock": false,
+    "verbose": true
+  },
+  "generate_parameter": {
+    "temperature": 0.85,
+    "repeat_penalty": 1.2,
+    "top_k": 40,
+    "top_p": 0.9,
+    "verbose_prompt": true,
+    "user": "User",
+    "assistant": "Octet"
+  }
+}
