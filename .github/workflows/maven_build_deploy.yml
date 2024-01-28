@@ -28,7 +28,7 @@ jobs:
           /bin/bash build.sh
 
       - name: Upload lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-libllama
           path: llama-java-core/llama.cpp/build/llamajava/libllamajava.so
@@ -48,7 +48,7 @@ jobs:
           /bin/bash build.sh
 
       - name: Upload lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-libllama
           path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
@@ -101,7 +101,7 @@ jobs:
           cmake.exe --build . --config Release
 
       - name: Upload lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-libllama
           path: llama-java-core/llama.cpp/build/bin/Release/llamajava.dll
@@ -169,8 +169,8 @@ jobs:
         env:
           TAG_NAME: ${{ github.ref_name }}
         run: |
-          mkdir -p vendor/llama-java-app/conf
-          cp llama-java-app/conf/setting.default.json vendor/llama-java-app/conf
+          mkdir -p vendor/llama-java-app/characters
+          cp llama-java-app/characters/*.json vendor/llama-java-app/characters
           cp llama-java-app/app_server.sh vendor/llama-java-app
           
           mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-app.jar

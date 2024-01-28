@@ -31,7 +31,7 @@ jobs:
           /bin/bash build.sh
 
       - name: Upload lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-libllama
           path: llama-java-core/llama.cpp/build/llamajava/libllamajava.so
@@ -51,7 +51,7 @@ jobs:
           /bin/bash build.sh
 
       - name: Upload lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-libllama
           path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
@@ -104,7 +104,7 @@ jobs:
           cmake.exe --build . --config Release
 
       - name: Upload lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-libllama
           path: llama-java-core/llama.cpp/build/bin/Release/llamajava.dll
