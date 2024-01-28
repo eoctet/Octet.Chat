@@ -29,17 +29,63 @@
 
 - [X] 🚀 提供模型量化接口
 - [X] 🚀 自定义模型的提示词模版（例如：Vicuna、Alpaca等等）
-- [X] 🚀 并行批处理解码
+- [X] 🚀 并行批处理解码（PS：默认已启用批处理解码）
 - [X] 🚀 Min-P 采样支持
 - [X] 🚀 YaRN RoPE 支持
+- [X] 🚀 增加自定义AI角色、优化OpenAPI
 
 </details>
 
 ## 快速开始
 
-#### 🖥 服务端部署
+> [!NOTE] 
+>
+> 支持 `llama.cpp` 量化的模型文件，你可以自行量化原始模型或搜索 `huggingface` 获取开源模型。
 
-- 下载并启动服务
+### 🖥 服务端部署
+
+
+#### ① 设置一个角色
+
+编辑 `characters.template.json` 设置一个自定义的AI角色。
+
+<details>
+
+<summary>示例角色</summary>
+
+```json
+{
+  "name": "Octet",
+  "prompt": "Answer the questions.",
+  "model_parameter": {
+    "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
+    "model_type": "LLAMA2",
+    "context_size": 4096,
+    "threads": 6,
+    "threads_batch": 6,
+    "mmap": true,
+    "mlock": false,
+    "verbose": true
+  },
+  "generate_parameter": {
+    "temperature": 0.85,
+    "repeat_penalty": 1.2,
+    "top_k": 40,
+    "top_p": 0.9,
+    "verbose_prompt": true,
+    "user": "User",
+    "assistant": "Octet"
+  }
+}
+```
+
+> [!NOTE]
+>
+> [完整参数说明](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)
+
+</details>
+
+#### ② 启动服务
 
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
@@ -48,31 +94,7 @@ cd <YOUR_PATH>/llama-java-app
 bash app_server.sh start
 ```
 
-- 目录示例
-
-```text
-=> llama-java-app
-   ⌊___ llama-java-app.jar
-   ⌊___ app_server.sh
-   ⌊___ conf
-        ⌊___ setting.json
-
-···
-```
-
-与 `ChatGPT` 的接口规范保持一致，仅实现主要的接口，可以与 [`ChatGPT Next Web`](https://github.com/Yidadaa/ChatGPT-Next-Web) 等WebUI、App集成使用。
-
-> [!NOTE]
-> 1. 新增了Llama系列模型的参数，删除了不支持的GPT参数；
-> 2. 默认使用了 `Llama2-chat` 提示词模版，如需适配其他模型，可自行调整；
-> 3. 没有请求认证、使用量查询等不需要的功能；
-> 4. 优化对话聊天接口，不需要传递历史对话上下文，仅当前对话内容即可。
->
-> 完整的API信息请参考 [`API 文档`](docs/API.md)。
-
-![webui.png](docs/webui.png)
-
-举个栗子
+#### ③ 开始访问
 
 > `POST` **/v1/chat/completions**
 
@@ -82,22 +104,18 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
 --data '{
     "messages": [
         {
-            "role": "SYSTEM",
-            "content": "<YOUR_PROMPT>"
-        },
-        {
             "role": "USER",
             "content": "Who are you?"
         }
     ],
-    "user": "william",
-    "verbose": true,
     "stream": true,
-    "model": "Llama2-chat"
+    "character": "octet"
 }'
 ```
 
-接口将以流的方式返回数据：
+<details>
+
+<summary>接口将以流的方式返回数据</summary>
 
 ```json
 {
@@ -116,21 +134,26 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
 }
 ```
 
-#### 🤖 命令行交互
+</details>
 
-运行命令行交互，指定需要加载的语言模型。
+### 🤖 命令行交互
+
+#### ① 设置一个角色
+
+编辑 `characters.template.json` 设置一个自定义的AI角色。
+
+#### ② 启动服务
+
+运行命令行，指定刚才设置的角色名称。
 
 ```bash
-java -jar llama-java-app.jar --model llama2-chat --system 'YOUR_PROMPT'
+java -jar llama-java-app.jar --character octet
 ```
 
-```txt
-... ...
+#### ③ 开始访问
 
-User: 你是谁
-AI: 作为一个 AI，我不知道我是谁。我的设计者和创建者创造了我。
-但是，我是一个虚拟助手，旨在提供帮助和回答问题。
-```
+![cmd.png](docs/cmd.png)
+
 
 > [!TIP]
 >
@@ -142,41 +165,8 @@ java -jar llama-java-app.jar --help
 usage: LLAMA-JAVA-APP
     --app <arg>                 App launch type: cli | api (default: cli).
  -c,--completions               Use completions mode.
-    --frequency-penalty <arg>   Repeat alpha frequency penalty (default:
-                                0.0, 0.0 = disabled)
  -h,--help                      Show this help message and exit.
- -m,--model <arg>               Load model name, default: llama2-chat.
-    --max-new-tokens <arg>      Maximum new token generation size
-                                (default: 0 unlimited).
-    --min-p <arg>               Min-p sampling (default: 0.05, 0 =
-                                disabled).
-    --mirostat <arg>            Enable Mirostat sampling, controlling
-                                perplexity during text generation
-                                (default: 0, 0 = disabled, 1 = Mirostat, 2
-                                = Mirostat 2.0).
-    --mirostat-ent <arg>        Set the Mirostat target entropy, parameter
-                                tau (default: 5.0).
-    --mirostat-lr <arg>         Set the Mirostat learning rate, parameter
-                                eta (default: 0.1).
-    --no-penalize-nl <arg>      Disable penalization for newline tokens
-                                when applying the repeat penalty (default:
-                                true).
-    --presence-penalty <arg>    Repeat alpha presence penalty (default:
-                                0.0, 0.0 = disabled)
-    --repeat-penalty <arg>      Control the repetition of token sequences
-                                in the generated text (default: 1.1).
-    --system <arg>              Set a system prompt.
-    --temperature <arg>         Adjust the randomness of the generated
-                                text (default: 0.8).
-    --tfs <arg>                 Enable tail free sampling with parameter z
-                                (default: 1.0, 1.0 = disabled).
-    --top-k <arg>               Top-k sampling (default: 40, 0 =
-                                disabled).
-    --top-p <arg>               Top-p sampling (default: 0.9).
-    --typical <arg>             Enable typical sampling sampling with
-                                parameter p (default: 1.0, 1.0 =
-                                disabled).
-    --verbose-prompt            Print the prompt before generating text.
+ -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
 ```
 
 ## 开发手册
