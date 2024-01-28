@@ -3,7 +3,7 @@ package chat.octet.api;
 import chat.octet.api.model.ChatCompletionChunk;
 import chat.octet.api.model.ChatCompletionData;
 import chat.octet.api.model.ChatCompletionRequestParameter;
-import chat.octet.config.ModelConfig;
+import chat.octet.config.CharacterConfig;
 import chat.octet.model.LlamaService;
 import chat.octet.model.Model;
 import chat.octet.model.TokenDecoder;
@@ -39,12 +39,14 @@ public class ChatCompletionService {
                 RequestPredicates.POST("/v1/chat/completions").and(RequestPredicates.accept(MediaType.TEXT_EVENT_STREAM)),
                 serverRequest -> serverRequest.bodyToMono(ChatCompletionRequestParameter.class).flatMap(requestParams -> {
                     long startTime = System.currentTimeMillis();
-                    ChatMessage messages = requestParams.getMessages();
-                    if (messages == null) {
+
+                    List<ChatMessage> messages = requestParams.getMessages();
+                    if (messages == null || messages.isEmpty()) {
                         return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON)
                                 .body(BodyInserters.fromValue("Request parameter 'messages' cannot be empty"));
                     }
-                    return doCompletions(requestParams, messages.getContent(), startTime, true);
+                    String input = messages.get(messages.size() - 1).getContent();
+                    return doCompletions(requestParams, input, startTime, true);
                 })
         );
     }
@@ -89,8 +91,8 @@ public class ChatCompletionService {
 
     private Mono<ServerResponse> doCompletions(ChatCompletionRequestParameter requestParams, String input, long startTime, boolean chat) {
         String id = chat ? CommonUtils.randomString("octetchat") : CommonUtils.randomString("octetcmpl");
-        Model model = ModelBuilder.getInstance().getModel(requestParams.getModelName());
-        ModelConfig config = ModelBuilder.getInstance().getModelConfig();
+        Model model = CharacterModelBuilder.getInstance().getCharacterModel(requestParams.getCharacter());
+        CharacterConfig config = CharacterModelBuilder.getInstance().getCharacterConfig();
 
         GenerateParameter generateParams = config.getGenerateParameter();
         String system = config.getPrompt();

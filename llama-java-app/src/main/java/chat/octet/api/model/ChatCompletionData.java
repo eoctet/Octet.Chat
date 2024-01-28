@@ -2,18 +2,19 @@ package chat.octet.api.model;
 
 import chat.octet.model.beans.ChatMessage;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatCompletionData {
     private int index;
     private String text;
     private Pair<String, String> delta;
     private ChatMessage message;
-    @JsonProperty("finish_reason")
     private String finishReason;
 
     public ChatCompletionData() {

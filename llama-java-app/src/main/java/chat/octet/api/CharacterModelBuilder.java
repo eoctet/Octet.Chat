@@ -1,6 +1,6 @@
 package chat.octet.api;
 
-import chat.octet.config.ModelConfig;
+import chat.octet.config.CharacterConfig;
 import chat.octet.exceptions.ServerException;
 import chat.octet.model.Model;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,62 +16,61 @@ import java.util.stream.Collectors;
 
 @Getter
 @Slf4j
-public final class ModelBuilder implements AutoCloseable {
+public final class CharacterModelBuilder implements AutoCloseable {
 
-    public static final String DEFAULT_MODEL_NAME = "Llama2-chat";
     private static volatile Model model;
-    private static volatile ModelBuilder builder;
+    private static volatile CharacterModelBuilder builder;
 
-    private ModelConfig modelConfig;
+    private CharacterConfig characterConfig;
 
-    private ModelBuilder() {
+    private CharacterModelBuilder() {
     }
 
-    public static ModelBuilder getInstance() {
+    public static CharacterModelBuilder getInstance() {
         if (builder == null) {
-            synchronized (ModelBuilder.class) {
+            synchronized (CharacterModelBuilder.class) {
                 if (builder == null) {
-                    builder = new ModelBuilder();
+                    builder = new CharacterModelBuilder();
                 }
             }
         }
         return builder;
     }
 
-    public Model getModel(String name) {
+    public Model getCharacterModel(String characterName) {
         if (model == null) {
-            synchronized (ModelBuilder.class) {
+            synchronized (CharacterModelBuilder.class) {
                 if (model == null) {
-                    modelConfig = getModelConfig(name);
-                    model = new Model(modelConfig.getModelParameter());
+                    characterConfig = getCharacterConfig(characterName);
+                    model = new Model(characterConfig.getModelParameter());
                 }
             }
         }
         return model;
     }
 
-    public Model reloadModel(String name) {
-        synchronized (ModelBuilder.class) {
+    public Model reloadCharacterModel(String characterName) {
+        synchronized (CharacterModelBuilder.class) {
             if (model != null) {
                 model.close();
                 model = null;
             }
         }
-        return getModel(name);
+        return getCharacterModel(characterName);
     }
 
-    private ModelConfig getModelConfig(String name) {
-        String filePath = StringUtils.join(Paths.get("").toAbsolutePath().toString(), File.separator, "conf", File.separator, name, ".json");
+    private CharacterConfig getCharacterConfig(String characterName) {
+        String filePath = StringUtils.join(Paths.get("").toAbsolutePath().toString(), File.separator, "characters", File.separator, characterName, ".json");
         File file = new File(filePath);
         if (!file.isFile() || !file.exists()) {
-            throw new ServerException("Can not read model configuration file, please make sure it is valid");
+            throw new ServerException("Can not read character configuration file, please make sure it is valid");
         }
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             ObjectMapper mapper = new ObjectMapper();
             String json = bufferedReader.lines().collect(Collectors.joining());
-            return mapper.readValue(json, ModelConfig.class);
+            return mapper.readValue(json, CharacterConfig.class);
         } catch (Exception e) {
-            throw new ServerException("Parse model configuration file error", e);
+            throw new ServerException("Parse characters configuration file error", e);
         }
     }
 

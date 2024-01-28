@@ -1,10 +1,12 @@
 package chat.octet;
 
 
-import chat.octet.api.ModelBuilder;
-import chat.octet.config.ModelConfig;
+import chat.octet.api.CharacterModelBuilder;
+import chat.octet.config.CharacterConfig;
 import chat.octet.model.Model;
 import chat.octet.model.parameters.GenerateParameter;
+import chat.octet.model.utils.ColorConsole;
+import chat.octet.model.utils.PromptBuilder;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @SpringBootApplication
 public class AppStart {
 
+    private static final String DEFAULT_CHARACTER_NAME = "llama2-chat";
     private static final Options OPTIONS = new Options();
 
     static {
@@ -25,7 +28,7 @@ public class AppStart {
         OPTIONS.addOption("h", "help", false, "Show this help message and exit.");
         OPTIONS.addOption(null, "app", true, "App launch type: cli | api (default: cli).");
         OPTIONS.addOption("c", "completions", false, "Use completions mode.");
-        OPTIONS.addOption("m", "model", true, "Load model name, default: llama2-chat.");
+        OPTIONS.addOption("ch", "character", true, "Load the specified AI character, default: llama2-chat.");
     }
 
     public static void main(String[] args) throws ParseException {
@@ -41,18 +44,19 @@ public class AppStart {
         if ("api".equalsIgnoreCase(StringUtils.trimToEmpty(mode))) {
             SpringApplication.run(AppStart.class, args);
         } else {
-            String modelName = cmd.getOptionValue("model", "flows");
+            String characterName = cmd.getOptionValue("character", DEFAULT_CHARACTER_NAME);
             boolean completions = cmd.hasOption("completions");
 
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-                 Model model = ModelBuilder.getInstance().getModel(modelName)) {
+                 Model model = CharacterModelBuilder.getInstance().getCharacterModel(characterName)) {
 
-                ModelConfig config = ModelBuilder.getInstance().getModelConfig();
+                CharacterConfig config = CharacterModelBuilder.getInstance().getCharacterConfig();
                 GenerateParameter generateParams = config.getGenerateParameter();
-                String system = Optional.ofNullable(config.getPrompt()).orElse("Answer the questions.");
+                String system = Optional.ofNullable(config.getPrompt()).orElse(PromptBuilder.DEFAULT_COMMON_SYSTEM);
 
                 while (true) {
-                    System.out.print("\n\n" + generateParams.getUser() + ": ");
+                    String userInputPrefix = ColorConsole.green(generateParams.getUser() + ": ");
+                    System.out.print("\n" + userInputPrefix);
                     String input = bufferedReader.readLine();
 
                     if (StringUtils.trimToEmpty(input).equalsIgnoreCase("exit")) {
@@ -60,10 +64,11 @@ public class AppStart {
                     }
 
                     if (!completions) {
-                        System.out.print(generateParams.getAssistant() + ": ");
+                        String botInputPrefix = ColorConsole.cyan(generateParams.getAssistant() + ": ");
+                        System.out.print(botInputPrefix);
                         model.chat(generateParams, system, input).output();
                     } else {
-                        System.err.print(input);
+                        System.out.print(ColorConsole.green(input));
                         model.generate(generateParams, input).output();
                     }
                     System.out.print("\n");
