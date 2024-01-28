@@ -141,6 +141,8 @@ static struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jl
             /*.yarn_beta_fast              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_FAST),
             /*.yarn_beta_slow              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_SLOW),
             /*.yarn_orig_ctx               =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_YARN_ORIG_CTX),
+            /*.cb_eval                     =*/ nullptr,
+            /*.cb_eval_user_data           =*/ nullptr,
             /*.type_k                      =*/ static_cast<enum ggml_type>(env->GetIntField(jllama_context_params, FIELD_DATA_TYPE_K)),
             /*.type_v                      =*/ static_cast<enum ggml_type>(env->GetIntField(jllama_context_params, FIELD_DATA_TYPE_V)),
             /*.mul_mat_q                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_MUL_MAT_Q)),
