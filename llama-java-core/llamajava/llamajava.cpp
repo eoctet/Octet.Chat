@@ -782,6 +782,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
         /*.quantize_output_tensor      =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_QUANTIZE_OUTPUT_TENSOR)),
         /*.only_copy                   =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_ONLY_COPY)),
         /*.pure                        =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_PURE)),
+        /*.imatrix                     =*/ nullptr
     };
 
    return llama_model_quantize(ToCString(env, source_model_file_path), ToCString(env, output_model_file_path), &params);
