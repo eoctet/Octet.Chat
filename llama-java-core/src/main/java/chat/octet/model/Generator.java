@@ -7,6 +7,7 @@ import chat.octet.model.enums.FinishReason;
 import chat.octet.model.exceptions.DecodeException;
 import chat.octet.model.exceptions.GenerationException;
 import chat.octet.model.parameters.GenerateParameter;
+import chat.octet.model.utils.ColorConsole;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,7 +67,7 @@ public class Generator implements Iterable<Token> {
     public void output() {
         try {
             for (Token token : this) {
-                System.out.print(token.getText());
+                System.out.print(ColorConsole.cyan(token.getText()));
             }
         } catch (Exception e) {
             throw new GenerationException("Generate next token error ", e);
@@ -203,6 +204,27 @@ public class Generator implements Iterable<Token> {
         }
 
         /**
+         * Append multibyte token buffer
+         *
+         * @param buffer Byte buffer
+         * @param length Byte buffer length
+         * @return String, Token text.
+         */
+        private String appendMultiByteTokenBuffer(byte[] buffer, int length) {
+            System.arraycopy(buffer, 0, multiByteTokenBuffer, multiByteTokenIndex, length);
+            multiByteTokenIndex += length;
+            if (multiByteTokenIndex == multiByteTokenLength) {
+                String text = new String(multiByteTokenBuffer, 0, multiByteTokenLength, StandardCharsets.UTF_8);
+                multiByteTokenIndex = 0;
+                multiByteTokenLength = 0;
+                Arrays.fill(multiByteTokenBuffer, (byte) 0);
+                return text;
+            }
+            return StringUtils.EMPTY;
+        }
+
+
+        /**
          * Converts the specified token id to text.
          *
          * @param token Token id.
@@ -211,24 +233,19 @@ public class Generator implements Iterable<Token> {
         private String tokenToText(int token) {
             byte[] buffer = new byte[64];
             int length = LlamaService.tokenToPiece(token, buffer, buffer.length);
-            byte code = buffer[0];
 
-            if (length == 1 && !Character.isValidCodePoint(code)) {
-                if (multiByteTokenLength == 0) {
-                    multiByteTokenLength = TokenDecoder.getUtf8ByteLength(code);
-                }
-                multiByteTokenBuffer[multiByteTokenIndex] = code;
-                ++multiByteTokenIndex;
-                if (multiByteTokenIndex == multiByteTokenLength) {
-                    String text = new String(multiByteTokenBuffer, 0, multiByteTokenLength, StandardCharsets.UTF_8);
-                    multiByteTokenIndex = 0;
-                    multiByteTokenLength = 0;
-                    Arrays.fill(multiByteTokenBuffer, (byte) 0);
-                    return text;
-                }
-                return StringUtils.EMPTY;
+            if (multiByteTokenLength > 0) {
+                return appendMultiByteTokenBuffer(buffer, length);
             }
-            return new String(buffer, 0, length, StandardCharsets.UTF_8);
+
+            int byteLength = TokenDecoder.getByteLength(buffer, length);
+            if (byteLength != length) {
+                multiByteTokenIndex = 0;
+                multiByteTokenLength = byteLength;
+                return appendMultiByteTokenBuffer(buffer, length);
+            } else {
+                return new String(buffer, 0, length, StandardCharsets.UTF_8);
+            }
         }
 
         @Override

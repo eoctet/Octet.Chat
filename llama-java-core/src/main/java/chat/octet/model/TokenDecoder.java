@@ -25,19 +25,20 @@ public class TokenDecoder {
         return new String(buffer, 0, length, StandardCharsets.UTF_8);
     }
 
-    public static int isMultiByte(int token) {
-        byte[] buffer = new byte[64];
-        int size = LlamaService.tokenToPiece(token, buffer, buffer.length);
-        byte code = buffer[0];
-        if (size == 1 && !Character.isValidCodePoint(code)) {
-            try {
-                return getUtf8ByteLength(code);
-            } catch (Exception e) {
-                //just return -1 and ignore the exception
-                return -1;
+    public static int getByteLength(byte[] buffer, int length) {
+        int len = 0;
+        for (int i = 0; i < length; i++) {
+            byte code = buffer[i];
+            if (!Character.isValidCodePoint(code)) {
+                try {
+                    len += getUtf8ByteLength(code);
+                } catch (Exception ignored) {
+                }
+            } else {
+                len++;
             }
         }
-        return 0;
+        return len;
     }
 
     public static int getUtf8ByteLength(byte bytes) {
