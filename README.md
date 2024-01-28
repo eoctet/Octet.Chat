@@ -29,17 +29,61 @@ This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private s
 
 - [X] 🚀 Provide model quantification API
 - [X] 🚀 Custom model prompt templates (such as Vicuna, Alpaca, etc.)
-- [X] 🚀 Parallel batch decoding
+- [X] 🚀 Parallel batch decoding (PS: Batch decoding is enabled by default)
 - [X] 🚀 Min-P sampling support
 - [X] 🚀 YaRN RoPE scaling support
+- [X] 🚀 Add custom AI character and optimize OpenAPI
 
 </details>
 
 ## Quick start
 
-#### 🖥 Server deployment
+> [!NOTE]
+>
+> Support the model files for `llama.cpp`, you can quantify the original model yourself or search for `huggingface` to obtain open-source models.
 
-- Download & Starting server
+### 🖥 Server deployment
+
+
+#### ① Set up an AI character
+
+Edit `characters.template.json` to set a custom AI character.
+
+<details>
+
+<summary>Example</summary>
+
+```json
+{
+  "name": "Octet",
+  "prompt": "Answer the questions.",
+  "model_parameter": {
+    "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
+    "model_type": "LLAMA2",
+    "context_size": 4096,
+    "threads": 6,
+    "threads_batch": 6,
+    "mmap": true,
+    "mlock": false,
+    "verbose": true
+  },
+  "generate_parameter": {
+    "temperature": 0.85,
+    "repeat_penalty": 1.2,
+    "top_k": 40,
+    "top_p": 0.9,
+    "verbose_prompt": true,
+    "user": "User",
+    "assistant": "Octet"
+  }
+}
+```
+
+> [Character parameter help](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)
+
+</details>
+
+#### ② Launch the app
 
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
@@ -48,31 +92,7 @@ cd <YOUR_PATH>/llama-java-app
 bash app_server.sh start
 ```
 
-- Directory
-
-```text
-=> llama-java-app
-   ⌊___ llama-java-app.jar
-   ⌊___ app_server.sh
-   ⌊___ conf
-        ⌊___ setting.json
-
-···
-```
-
-Following the interface specifications of `ChatGPT`, only the main interfaces are implemented, It can be integrated with [`ChatGPT Next Web`](https://github.com/Yidadaa/ChatGPT-Next-Web), WebUI, and App for use.
-
-> [!NOTE]
-> 1. Added parameters for the Llama series model and removed unsupported GPT parameters;
-> 2. By default, the `Llama2-chat` prompt template is used. If you need to adapt to other models, you can adjust it yourself;
-> 3. There are no unnecessary functions such as requesting authentication and usage queries;
-> 4. Optimize the conversation and chat API, without the need to pass on historical conversation context, only the current conversation content is sufficient.
->
-> More information: [`API Docs`](docs/API.md).
-
-![webui.png](docs/webui.png)
-
-For example
+#### ③ Get started
 
 > `POST` **/v1/chat/completions**
 
@@ -82,22 +102,18 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
 --data '{
     "messages": [
         {
-            "role": "SYSTEM",
-            "content": "<YOUR_PROMPT>"
-        },
-        {
             "role": "USER",
             "content": "Who are you?"
         }
     ],
-    "user": "william",
-    "verbose": true,
     "stream": true,
-    "model": "Llama2-chat"
+    "character": "octet"
 }'
 ```
 
-The API will return data in a stream format:
+<details>
+
+<summary>The API will return data in a stream format</summary>
 
 ```json
 {
@@ -116,21 +132,25 @@ The API will return data in a stream format:
 }
 ```
 
-#### 🤖 CLI interaction
+</details>
 
-Run command line interaction and specify the language model that needs to be loaded.
+### 🤖 CLI interaction
+
+#### ① Set up an AI character
+
+Edit `characters.template.json` to set a custom AI character.
+
+#### ② Launch the app
+
+Run the command line interaction and specify the set AI character name.
 
 ```bash
-java -jar llama-java-app.jar --model llama2-chat --system 'YOUR_PROMPT'
+java -jar llama-java-app.jar --character octet
 ```
 
-```txt
-... ...
+#### ③ Start chatting
 
-User: Who are you
-AI: As an AI, I don't know who I am. My designers and creators created me. 
-However, I am a virtual assistant designed to provide assistance and answer questions.
-```
+![cmd.png](docs/cmd.png)
 
 > [!TIP]
 > 
@@ -142,41 +162,8 @@ java -jar llama-java-app.jar --help
 usage: LLAMA-JAVA-APP
     --app <arg>                 App launch type: cli | api (default: cli).
  -c,--completions               Use completions mode.
-    --frequency-penalty <arg>   Repeat alpha frequency penalty (default:
-                                0.0, 0.0 = disabled)
  -h,--help                      Show this help message and exit.
- -m,--model <arg>               Load model name, default: llama2-chat.
-    --max-new-tokens <arg>      Maximum new token generation size
-                                (default: 0 unlimited).
-    --min-p <arg>               Min-p sampling (default: 0.05, 0 =
-                                disabled).
-    --mirostat <arg>            Enable Mirostat sampling, controlling
-                                perplexity during text generation
-                                (default: 0, 0 = disabled, 1 = Mirostat, 2
-                                = Mirostat 2.0).
-    --mirostat-ent <arg>        Set the Mirostat target entropy, parameter
-                                tau (default: 5.0).
-    --mirostat-lr <arg>         Set the Mirostat learning rate, parameter
-                                eta (default: 0.1).
-    --no-penalize-nl <arg>      Disable penalization for newline tokens
-                                when applying the repeat penalty (default:
-                                true).
-    --presence-penalty <arg>    Repeat alpha presence penalty (default:
-                                0.0, 0.0 = disabled)
-    --repeat-penalty <arg>      Control the repetition of token sequences
-                                in the generated text (default: 1.1).
-    --system <arg>              Set a system prompt.
-    --temperature <arg>         Adjust the randomness of the generated
-                                text (default: 0.8).
-    --tfs <arg>                 Enable tail free sampling with parameter z
-                                (default: 1.0, 1.0 = disabled).
-    --top-k <arg>               Top-k sampling (default: 40, 0 =
-                                disabled).
-    --top-p <arg>               Top-p sampling (default: 0.9).
-    --typical <arg>             Enable typical sampling sampling with
-                                parameter p (default: 1.0, 1.0 =
-                                disabled).
-    --verbose-prompt            Print the prompt before generating text.
+ -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
 ```
 
 ## Development
@@ -337,7 +324,6 @@ By default, each system version library is included.
 #### Wiki
 
 - __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
-
 
 
 ## Disclaimer

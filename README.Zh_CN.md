@@ -79,9 +79,7 @@
 }
 ```
 
-> [!NOTE]
->
-> [完整参数说明](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)
+> [角色参数说明](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)
 
 </details>
 
@@ -150,10 +148,9 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
 java -jar llama-java-app.jar --character octet
 ```
 
-#### ③ 开始访问
+#### ③ 开始聊天
 
 ![cmd.png](docs/cmd.png)
-
 
 > [!TIP]
 >
