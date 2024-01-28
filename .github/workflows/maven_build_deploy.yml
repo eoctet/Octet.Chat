@@ -132,21 +132,21 @@ jobs:
 
       - name: Download linux lib
         id: download_linux_lib
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-libllama
           path: llama-java-core/src/main/resources/linux-x86-64
 
       - name: Download macos lib
         id: download_macos_lib
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macos-libllama
           path: llama-java-core/src/main/resources/darwin-x86-64
 
       - name: Download windows lib
         id: download_windows_lib
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: windows-libllama
           path: llama-java-core/src/main/resources/win32-x86-64
