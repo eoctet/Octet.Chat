@@ -15,7 +15,9 @@ import lombok.extern.jackson.Jacksonized;
 import javax.annotation.Nullable;
 
 /**
- * Llama model parameters
+ * <p>Llama model parameters</p>
+ * For more information, please refer to
+ * <a href="https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters">Llama-Java-parameters</a>
  *
  * @author <a href="https://github.com/eoctet">William</a>
  * @see LlamaModelParams

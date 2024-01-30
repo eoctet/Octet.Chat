@@ -5,6 +5,8 @@ import chat.octet.model.beans.CompletionResult;
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.beans.Status;
+import chat.octet.model.components.criteria.impl.StoppingWordCriteria;
+import chat.octet.model.components.processor.impl.CustomBiasLogitsProcessor;
 import chat.octet.model.enums.ModelType;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
@@ -193,6 +195,12 @@ public class Model implements AutoCloseable {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(text, "Text cannot be null");
         generateParams.setLastTokensSize(lastTokensSize);
+        if (generateParams.getLogitBias() != null && !generateParams.getLogitBias().isEmpty()) {
+            generateParams.getLogitsProcessorList().add(new CustomBiasLogitsProcessor(generateParams.getLogitBias(), LlamaService.getVocabSize()));
+        }
+        if (generateParams.getStoppingWord() != null) {
+            generateParams.getStoppingCriteriaList().add(new StoppingWordCriteria(generateParams.getStoppingWord()));
+        }
         return new Generator(generateParams, text);
     }
 
@@ -281,6 +289,12 @@ public class Model implements AutoCloseable {
         Preconditions.checkNotNull(question, "Question cannot be null");
         Preconditions.checkNotNull(generateParams.getUser(), "User id cannot be null");
         generateParams.setLastTokensSize(lastTokensSize);
+        if (generateParams.getLogitBias() != null && !generateParams.getLogitBias().isEmpty()) {
+            generateParams.getLogitsProcessorList().add(new CustomBiasLogitsProcessor(generateParams.getLogitBias(), LlamaService.getVocabSize()));
+        }
+        if (generateParams.getStoppingWord() != null) {
+            generateParams.getStoppingCriteriaList().add(new StoppingWordCriteria(generateParams.getStoppingWord()));
+        }
 
         boolean exists = chatStatus.containsKey(generateParams.getUser());
         if (!exists) {

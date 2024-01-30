@@ -1,8 +1,9 @@
 package chat.octet.model.components.processor.impl;
 
 
+import chat.octet.model.beans.LogitBias;
 import chat.octet.model.components.processor.LogitsProcessor;
-import com.google.common.collect.Maps;
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nonnull;
@@ -12,13 +13,11 @@ import java.util.Map;
 @Slf4j
 public class CustomBiasLogitsProcessor implements LogitsProcessor {
 
-    private final Map<Integer, String> logitBias;
+    private final LogitBias logitBias;
     private final int vocabSize;
 
-    public CustomBiasLogitsProcessor(Map<Integer, String> logitBias, int vocabSize) {
-        if (logitBias == null) {
-            logitBias = Maps.newLinkedHashMap();
-        }
+    public CustomBiasLogitsProcessor(LogitBias logitBias, int vocabSize) {
+        Preconditions.checkNotNull(logitBias, "Logit bias cannot be null");
         this.logitBias = logitBias;
         this.vocabSize = vocabSize;
     }

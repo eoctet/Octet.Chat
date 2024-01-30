@@ -128,7 +128,7 @@ public class Generator implements Iterable<Token> {
             this.contextSize = LlamaService.getContextSize();
             this.status = srcStatus == null ? new Status() : new Status(srcStatus);
 
-            int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, true, true) : new int[]{LlamaService.getTokenBOS()};
+            int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, generateParams.isAddBos(), generateParams.isSpecialTokens()) : new int[]{LlamaService.getTokenBOS()};
             if (tokens.length >= contextSize) {
                 throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
             }
@@ -184,8 +184,8 @@ public class Generator implements Iterable<Token> {
                 token.updateFinishReason(FinishReason.FINISHED);
                 return true;
             }
-            if (generateParams.getStoppingCriteriaList() != null) {
-                boolean matched = generateParams.getStoppingCriteriaList().criteria(status.getInputIds(), logits);
+            if (generateParams.getStoppingCriteriaList() != null && !generateParams.getStoppingCriteriaList().isEmpty()) {
+                boolean matched = generateParams.getStoppingCriteriaList().criteria(status.getInputIds(), logits, token);
                 if (matched) {
                     token.updateFinishReason(FinishReason.STOP);
                     return true;
@@ -213,7 +213,7 @@ public class Generator implements Iterable<Token> {
         private String appendMultiByteTokenBuffer(byte[] buffer, int length) {
             System.arraycopy(buffer, 0, multiByteTokenBuffer, multiByteTokenIndex, length);
             multiByteTokenIndex += length;
-            if (multiByteTokenIndex == multiByteTokenLength) {
+            if (multiByteTokenIndex >= multiByteTokenLength) {
                 String text = new String(multiByteTokenBuffer, 0, multiByteTokenLength, StandardCharsets.UTF_8);
                 multiByteTokenIndex = 0;
                 multiByteTokenLength = 0;
@@ -233,6 +233,9 @@ public class Generator implements Iterable<Token> {
         private String tokenToText(int token) {
             byte[] buffer = new byte[64];
             int length = LlamaService.tokenToPiece(token, buffer, buffer.length);
+            if (length == 0) {
+                return StringUtils.EMPTY;
+            }
 
             if (multiByteTokenLength > 0) {
                 return appendMultiByteTokenBuffer(buffer, length);
@@ -263,7 +266,7 @@ public class Generator implements Iterable<Token> {
         public Token next() {
             float[] logits = LlamaService.getLogits(status.getLogitsIndex());
             //execute logits processor
-            if (generateParams.getLogitsProcessorList() != null) {
+            if (generateParams.getLogitsProcessorList() != null && !generateParams.getLogitsProcessorList().isEmpty()) {
                 logits = generateParams.getLogitsProcessorList().processor(status.getInputIds(), logits);
             }
             //do sampling

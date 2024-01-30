@@ -1,7 +1,9 @@
 package chat.octet.model.parameters;
 
+import chat.octet.model.beans.LogitBias;
 import chat.octet.model.components.criteria.StoppingCriteriaList;
 import chat.octet.model.components.processor.LogitsProcessorList;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -17,9 +19,7 @@ import javax.annotation.Nullable;
 /**
  * <p>Generate parameter</p>
  * For more information, please refer to
- * <a href="https://github.com/ggerganov/llama.cpp/blob/master/examples/main/README.md">Llama.cpp docs</a>
- * and
- * <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">Transformers docs</a>.
+ * <a href="https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters">Llama-Java-parameters</a>
  *
  * @author <a href="https://github.com/eoctet">William</a>
  */
@@ -127,10 +127,10 @@ public final class GenerateParameter {
     private String grammarRules;
 
     /**
-     * Maximum new token generation size.
+     * Maximum new token generation size  (default: 512).
      */
     @Builder.Default
-    private int maxNewTokenSize = 0;
+    private int maxNewTokenSize = 512;
 
     /**
      * Print the prompt before generating text.
@@ -141,14 +141,16 @@ public final class GenerateParameter {
     /**
      * logits processor list.
      */
-    @Nullable
-    private LogitsProcessorList logitsProcessorList;
+    @JsonIgnore
+    @Builder.Default
+    private LogitsProcessorList logitsProcessorList = new LogitsProcessorList();
 
     /**
      * stopping criteria list.
      */
-    @Nullable
-    private StoppingCriteriaList stoppingCriteriaList;
+    @JsonIgnore
+    @Builder.Default
+    private StoppingCriteriaList stoppingCriteriaList = new StoppingCriteriaList();
 
     /**
      * Specify user nickname, default: User.
@@ -167,7 +169,34 @@ public final class GenerateParameter {
      */
     @Setter
     @Builder.Default
+    @JsonIgnore
     private int lastTokensSize = 64;
+
+    /**
+     * Add BOS token.
+     */
+    @Setter
+    @Builder.Default
+    private boolean addBos = true;
+
+    /**
+     * Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext.
+     */
+    @Setter
+    @Builder.Default
+    private boolean specialTokens = true;
+
+    /**
+     * Adjust the probability distribution of words.
+     */
+    @Nullable
+    private LogitBias logitBias;
+
+    /**
+     * Control the stop word list for generating stops, with values that can be text or token IDs.
+     */
+    @Nullable
+    private String[] stoppingWord;
 
     /**
      * Mirostat sampling mode define

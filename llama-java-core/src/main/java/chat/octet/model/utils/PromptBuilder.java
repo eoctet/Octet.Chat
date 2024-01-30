@@ -54,9 +54,9 @@ public class PromptBuilder {
         String formatSystem = StringUtils.EMPTY;
         if (StringUtils.isNotBlank(system)) {
             if (StringUtils.isNotBlank(modelType.getSystemTemplate())) {
-                formatSystem = MessageFormat.format(modelType.getSystemTemplate(), system) + "\n\n";
+                formatSystem = MessageFormat.format(modelType.getSystemTemplate(), system) + "\n";
             } else {
-                formatSystem = system + "\n\n";
+                formatSystem = system + "\n";
             }
         }
         return MessageFormat.format(modelType.getPromptTemplate(), formatSystem, question);

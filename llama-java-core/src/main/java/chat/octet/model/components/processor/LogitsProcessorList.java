@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Stopping criteria list
@@ -30,6 +31,6 @@ public final class LogitsProcessorList extends ArrayList<LogitsProcessor> implem
         for (LogitsProcessor pro : this) {
             result = pro.processor(inputTokenIds, scores, args);
         }
-        return result;
+        return Optional.ofNullable(result).orElse(scores);
     }
 }

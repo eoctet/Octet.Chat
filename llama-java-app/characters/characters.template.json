@@ -52,11 +52,13 @@
     "mirostat_eta": 0.1,
     "mirostat_tau": 5.0,
     "grammar_rules": null,
-    "max_new_token_size": 0,
+    "max_new_token_size": 512,
     "verbose_prompt": false,
-    "logits_processor_list": null,
-    "stopping_criteria_list": null,
     "user": "User",
-    "assistant": "Assistant"
+    "assistant": "Assistant",
+    "add_bos": true,
+    "special_tokens": true,
+    "logit_bias": null,
+    "stopping_word": null
   }
 }

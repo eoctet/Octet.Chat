@@ -60,8 +60,8 @@ public enum ModelType {
     ),
     QWEN(
             "\n",
-            "",
-            "{0}User: {1}\nAssistant: "
+            "<|im_start|>system\n{0}<|im_end|>",
+            "{0}<|im_start|>user\n{1}<|im_end|>\n<|im_start|>assistant"
     ),
     COMMON(
             "\n",
