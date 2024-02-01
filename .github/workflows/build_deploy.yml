@@ -28,7 +28,7 @@ jobs:
         id: build_lib
         run: |
           cd llama-java-core
-          /bin/bash build.sh
+          /bin/bash build.sh linux
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
@@ -48,13 +48,19 @@ jobs:
         id: build_lib
         run: |
           cd llama-java-core
-          /bin/bash build.sh
+          /bin/bash build.sh macos
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
         with:
           name: macos-libllama
           path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
+
+      - name: Upload metal lib
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-metallib
+          path: llama-java-core/llama.cpp/default.metallib
 
   #build windows lib
   build-windows-lib:

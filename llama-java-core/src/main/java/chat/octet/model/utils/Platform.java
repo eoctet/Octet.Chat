@@ -74,31 +74,7 @@ public class Platform {
         return arch;
     }
 
-    public synchronized static void loadLibraryResource() {
-        String libPathEnv = System.getProperty("octet.llama.lib");
-        if (StringUtils.isNotBlank(libPathEnv)) {
-            File libraryFileAbsolutePath = new File(libPathEnv);
-            if (libraryFileAbsolutePath.exists()) {
-                LIB_RESOURCE_PATH = libraryFileAbsolutePath.getAbsolutePath();
-                return;
-            }
-        }
-
-        String libraryName;
-        if (isMac()) {
-            libraryName = "libllamajava.dylib";
-        } else if (isLinux()) {
-            libraryName = "libllamajava.so";
-        } else if (isWindows()) {
-            libraryName = "llamajava.dll";
-        } else {
-            throw new ModelException("Unsupported operating system");
-        }
-        String userDis = System.getProperty("user.home");
-        String libraryPath = getLibraryResourcePrefix(getOSType(), System.getProperty("os.arch"), System.getProperty("os.name"));
-
-        String writeFileAbsolutePath = StringUtils.join(userDis, File.separator, ".llama_java_core", File.separator, libraryName);
-        File libraryFile = new File(writeFileAbsolutePath);
+    private static void writeLibrary(File libraryFile) {
         try {
             if (libraryFile.exists()) {
                 Files.delete(libraryFile.toPath());
@@ -110,7 +86,9 @@ public class Platform {
             throw new ModelException("Delete old library file error: " + libraryFile.toPath(), e);
         }
 
-        String interLibraryPath = libraryPath + "/" + libraryName;
+        String libraryPath = getLibraryResourcePrefix(getOSType(), System.getProperty("os.arch"), System.getProperty("os.name"));
+        String interLibraryPath = libraryPath + "/" + libraryFile.getName();
+
         try (InputStream in = Platform.class.getClassLoader().getResourceAsStream(interLibraryPath);
              BufferedInputStream reader = new BufferedInputStream(Objects.requireNonNull(in, "File not found: " + interLibraryPath));
              FileOutputStream out = new FileOutputStream(libraryFile)
@@ -121,11 +99,44 @@ public class Platform {
                 Arrays.fill(buf, (byte) 0);
             }
         } catch (Exception e) {
-            throw new ModelException("Loading native library error ", e);
+            throw new ModelException("Write native library file error ", e);
+        }
+    }
+
+
+    public synchronized static void loadLibraryResource() {
+        String libPathEnv = System.getProperty("octet.llama.lib");
+        if (StringUtils.isNotBlank(libPathEnv)) {
+            File libraryFileAbsolutePath = new File(libPathEnv);
+            if (libraryFileAbsolutePath.exists()) {
+                LIB_RESOURCE_PATH = libraryFileAbsolutePath.getAbsolutePath();
+                return;
+            }
         }
 
+        String libraryName;
+        String metallibName = "default.metallib";
+        if (isMac()) {
+            libraryName = "libllamajava.dylib";
+        } else if (isLinux()) {
+            libraryName = "libllamajava.so";
+        } else if (isWindows()) {
+            libraryName = "llamajava.dll";
+        } else {
+            throw new ModelException("Unsupported operating system");
+        }
+
+        String writeFileAbsolutePath = StringUtils.join(System.getProperty("user.home"), File.separator, ".llama_java_core", File.separator);
+
+        File libraryFile = new File(writeFileAbsolutePath + libraryName);
+        writeLibrary(libraryFile);
         if (!libraryFile.isFile() || !libraryFile.exists()) {
             throw new ModelException("Loading native library failed. file path: " + libraryFile.getAbsolutePath());
+        }
+
+        if (isMac()) {
+            File metalLibraryFile = new File(writeFileAbsolutePath + metallibName);
+            writeLibrary(metalLibraryFile);
         }
         LIB_RESOURCE_PATH = libraryFile.getAbsolutePath();
     }
