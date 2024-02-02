@@ -88,14 +88,23 @@ public class Generator implements Iterable<Token> {
      * @see CompletionResult
      */
     public CompletionResult result() {
-        StringBuilder builder = new StringBuilder();
-        FinishReason finishReason = FinishReason.UNKNOWN;
-        while (inference.hasNext()) {
-            Token token = inference.next();
-            builder.append(token.getText());
-            finishReason = token.getFinishReason();
+        try {
+            StringBuilder builder = new StringBuilder();
+            FinishReason finishReason = FinishReason.UNKNOWN;
+            for (Token token : this) {
+                builder.append(token.getText());
+                finishReason = token.getFinishReason();
+            }
+            return CompletionResult.builder().content(builder.toString()).finishReason(finishReason).build();
+        } catch (Exception e) {
+            throw new GenerationException("Generate next token error ", e);
+        } finally {
+            if (chatStatus != null) {
+                chatStatus.copyToStatus(inference.getStatus());
+            } else {
+                inference.clearCache();
+            }
         }
-        return CompletionResult.builder().content(builder.toString()).finishReason(finishReason).build();
     }
 
     /**
@@ -184,8 +193,8 @@ public class Generator implements Iterable<Token> {
                 token.updateFinishReason(FinishReason.FINISHED);
                 return true;
             }
-            if (generateParams.getStoppingCriteriaList() != null && !generateParams.getStoppingCriteriaList().isEmpty()) {
-                boolean matched = generateParams.getStoppingCriteriaList().criteria(status.getInputIds(), logits, token);
+            if (!generateParams.getStoppingCriteriaList().isEmpty()) {
+                boolean matched = generateParams.getStoppingCriteriaList().criteria(status.getInputIds(), logits, status.getGenerateTokens());
                 if (matched) {
                     token.updateFinishReason(FinishReason.STOP);
                     return true;
@@ -266,7 +275,7 @@ public class Generator implements Iterable<Token> {
         public Token next() {
             float[] logits = LlamaService.getLogits(status.getLogitsIndex());
             //execute logits processor
-            if (generateParams.getLogitsProcessorList() != null && !generateParams.getLogitsProcessorList().isEmpty()) {
+            if (!generateParams.getLogitsProcessorList().isEmpty()) {
                 logits = generateParams.getLogitsProcessorList().processor(status.getInputIds(), logits);
             }
             //do sampling
