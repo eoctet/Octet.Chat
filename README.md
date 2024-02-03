@@ -7,12 +7,14 @@
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
 ![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
-This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private services, support `Llama2` series models and other open source models.
+This is a LLMs project implemented in Java.
+
+You can use it to deploy your own private services, support `Llama2` series models and other open source models.
 
 #### Provides
 - Simple Java library `llama-java-core`
-- Complete API services `llama-java-app`
-  - `Server deployment` Quickly realize privatized services
+- Complete application `llama-java-app`
+  - `API Services` Quickly realize privatized services
   - `CLI Interaction` Simple local chat interaction
 
 #### Features
@@ -40,12 +42,12 @@ This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private s
 >
 > Support the model files for `llama.cpp`, you can quantify the original model yourself or search for `huggingface` to obtain open-source models.
 
-### 🖥 Server deployment
 
+### 🤖 CLI interaction
 
-#### ① Set up an AI character
+__How to use__
 
-Edit `characters.template.json` to set a custom AI character.
+Edit `characters.template.json` to set a custom AI character. Run command line interaction and specify the set AI character name.
 
 <details>
 
@@ -77,66 +79,7 @@ Edit `characters.template.json` to set a custom AI character.
 }
 ```
 
-> [Character parameter help](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)
-
 </details>
-
-#### ② Launch the app
-
-```bash
-# Default URL: http://YOUR_IP_ADDR:8152/
-
-cd <YOUR_PATH>/llama-java-app
-bash app_server.sh start
-```
-
-#### ③ Get started
-
-> `POST` **/v1/chat/completions**
-
-```shell
-curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
---header 'Content-Type: application/json' \
---data '{
-    "messages": [
-        {
-            "role": "USER",
-            "content": "Who are you?"
-        }
-    ],
-    "stream": true,
-    "character": "octet"
-}'
-```
-
-<details>
-
-<summary>The API will return data in a stream format</summary>
-
-```json
-{
-    "id": "octetchat-98fhd2dvj7",
-    "model": "Llama2-chat",
-    "created": 1695614393810,
-    "choices": [
-        {
-            "index": 0,
-            "delta": {
-                "content": "Hi"
-            },
-            "finish_reason": "NONE"
-        }
-    ]
-}
-```
-
-</details>
-
-### 🤖 CLI interaction
-
-__How to use__
-
-Edit `characters.template.json` to set a custom AI character. Run the command line interaction and specify the set AI character name.
 
 ```bash
 java -jar llama-java-app.jar --character YOUR_CHARACTER
@@ -152,7 +95,7 @@ __How to use__
 
 Download the `Qwen-chat` model, edit [`octet.json`](llama-java-app/characters/octet.json) to set the model file path, and change `agent_mode` to `true` to start the agent mode.
 
-Run the command line interaction to start chatting:
+Run command line interaction to start chatting:
 
 ```bash
 java -jar llama-java-app.jar --character octet
@@ -186,6 +129,67 @@ usage: LLAMA-JAVA-APP
  -q,--questions <arg>    Load the specified user question list, example:
                          /PATH/questions.txt.
 ```
+
+
+### 🖥 API Services
+
+__How to use__
+
+Just like CLI interaction, first edit `characters.template.json` to set a custom AI character.
+
+Launch the app:
+
+```bash
+# Default URL: http://YOUR_IP_ADDR:8152/
+
+cd <YOUR_PATH>/llama-java-app
+bash app_server.sh start
+```
+
+Now it can be integrated into your services, such as `WebUI`, `App`, `Wechat`, etc.
+
+<details>
+
+<summary>How to call API</summary>
+
+> `POST` **/v1/chat/completions**
+
+```shell
+curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "USER",
+            "content": "Who are you?"
+        }
+    ],
+    "stream": true,
+    "character": "octet"
+}'
+```
+
+The API will return data in a stream format:
+
+```json
+{
+    "id": "octetchat-98fhd2dvj7",
+    "model": "Llama2-chat",
+    "created": 1695614393810,
+    "choices": [
+        {
+            "index": 0,
+            "delta": {
+                "content": "Hi"
+            },
+            "finish_reason": "NONE"
+        }
+    ]
+}
+```
+
+</details>
+
 
 ## Documentation
 

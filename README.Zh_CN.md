@@ -7,11 +7,11 @@
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
 ![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
-这个是一个 🦙 `LLaMA` Java项目。你可以用它部署自己的私有服务，支持 `Llama2` 系列模型及其他开源模型。
+这是一个Java实现的LLMs项目。你可以用它部署自己的私有服务，支持 `Llama2` 系列模型及其他开源模型。
 
 #### 提供
 - 简单易用的Java库 `llama-java-core`
-- 完整的API服务 `llama-java-app`
+- 完整的应用服务 `llama-java-app`
   - `服务端部署`，快速实现私有化服务
   - `命令行交互`，简单的本地聊天交互
 
@@ -40,10 +40,10 @@
 >
 > 支持 `llama.cpp` 量化的模型文件，你可以自行量化原始模型或搜索 `huggingface` 获取开源模型。
 
-### 🖥 服务端部署
 
+### 🤖 命令行交互
 
-#### ① 设置一个角色
+__如何使用__
 
 编辑 `characters.template.json` 设置一个自定义的AI角色。
 
@@ -77,66 +77,9 @@
 }
 ```
 
-> [角色参数说明](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)
-
 </details>
 
-#### ② 启动服务
-
-```bash
-# Default URL: http://YOUR_IP_ADDR:8152/
-
-cd <YOUR_PATH>/llama-java-app
-bash app_server.sh start
-```
-
-#### ③ 开始访问
-
-> `POST` **/v1/chat/completions**
-
-```shell
-curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
---header 'Content-Type: application/json' \
---data '{
-    "messages": [
-        {
-            "role": "USER",
-            "content": "Who are you?"
-        }
-    ],
-    "stream": true,
-    "character": "octet"
-}'
-```
-
-<details>
-
-<summary>接口将以流的方式返回数据</summary>
-
-```json
-{
-    "id": "octetchat-98fhd2dvj7",
-    "model": "Llama2-chat",
-    "created": 1695614393810,
-    "choices": [
-        {
-            "index": 0,
-            "delta": {
-                "content": "你好"
-            },
-            "finish_reason": "NONE"
-        }
-    ]
-}
-```
-
-</details>
-
-### 🤖 命令行交互
-
-__如何使用__
-
-编辑 `characters.template.json` 设置一个自定义的AI角色。 运行命令行交互，开始聊天：
+运行命令行交互并指定刚才设置的角色名称，开始聊天：
 
 ```bash
 java -jar llama-java-app.jar --character YOUR_CHARACTER
@@ -186,6 +129,67 @@ usage: LLAMA-JAVA-APP
  -q,--questions <arg>    Load the specified user question list, example:
                          /PATH/questions.txt.
 ```
+
+
+### 🖥 API服务
+
+__如何使用__
+
+和命令行交互一样，首先编辑 `characters.template.json` 设置一个自定义的AI角色。
+
+启动服务：
+
+```bash
+# Default URL: http://YOUR_IP_ADDR:8152/
+
+cd <YOUR_PATH>/llama-java-app
+bash app_server.sh start
+```
+
+现在你可以将API服务集成到你的应用中，例如：`WebUI`、`App`、`Wechat`等。
+
+<details>
+
+<summary>如何调用API</summary>
+
+> `POST` **/v1/chat/completions**
+
+```shell
+curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
+--header 'Content-Type: application/json' \
+--data '{
+    "messages": [
+        {
+            "role": "USER",
+            "content": "Who are you?"
+        }
+    ],
+    "stream": true,
+    "character": "octet"
+}'
+```
+
+接口将以流的方式返回数据：
+
+```json
+{
+    "id": "octetchat-98fhd2dvj7",
+    "model": "Llama2-chat",
+    "created": 1695614393810,
+    "choices": [
+        {
+            "index": 0,
+            "delta": {
+                "content": "你好"
+            },
+            "finish_reason": "NONE"
+        }
+    ]
+}
+```
+
+</details>
+
 
 ## 帮助文档
 
