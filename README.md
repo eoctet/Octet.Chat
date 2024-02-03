@@ -19,7 +19,7 @@ This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private s
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 - 😊 Support `AI Agent` and implements `Function calling` based on `Qwen-chat`
 - 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`
-- 📦 Support for `Llama2` series models and other open source models, such as `Baichuan 7B`,`QWen 7B`
+- 📦 Support for `Llama2` series models and other open source models, such as `Baichuan 7B`,`Qwen 7B`
 
 ----
 
@@ -160,10 +160,10 @@ java -jar llama-java-app.jar --character octet
 
 * Two plugins are currently implemented, and as examples you can continue to enrich them.
 
-| Plugin      | Description                                                                                                                   |
-|-------------|-------------------------------------------------------------------------------------------------------------------------------|
-| Datetime    | A plugin that can query the current system time..                                                                             |
-| API calling | A universal API calling plugin, based on which you can achieve access to services such as weather, text to image, and search. |
+| Plugin   | Description                                                                                                                   |
+|----------|-------------------------------------------------------------------------------------------------------------------------------|
+| Datetime | A plugin that can query the current system time.                                                                              |
+| API      | A universal API calling plugin, based on which you can achieve access to services such as weather, text to image, and search. |
 
 > Plugin configuration file example: [plugins.json](llama-java-app/characters/plugins.json)
 
@@ -178,10 +178,13 @@ java -jar llama-java-app.jar --character octet
 java -jar llama-java-app.jar --help
 
 usage: LLAMA-JAVA-APP
-    --app <arg>                 App launch type: cli | api (default: cli).
- -c,--completions               Use completions mode.
- -h,--help                      Show this help message and exit.
- -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
+    --app <arg>          App launch type: cli | api (default: cli).
+ -c,--completions        Use completions mode.
+ -ch,--character <arg>   Load the specified AI character, default:
+                         llama2-chat.
+ -h,--help               Show this help message and exit.
+ -q,--questions <arg>    Load the specified user question list, example:
+                         /PATH/questions.txt.
 ```
 
 ## Documentation
@@ -201,7 +204,6 @@ __Characters config__
 
 > [!IMPORTANT]
 >
-> - This project is for reference only and is not responsible for any issues.
 > - This project does not provide any models. Please obtain the model files yourself and comply with relevant agreements.
 > - Please do not use this project for illegal purposes, including but not limited to commercial use, profit-making use, or use that violates Chinese laws and regulations.
 > - Any legal liability arising from the use of this project shall be borne by the user, and this project shall not bear any legal liability.

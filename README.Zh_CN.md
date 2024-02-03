@@ -19,7 +19,7 @@
 - 🦙 基于  [`llama.cpp`](https://github.com/ggerganov/llama.cpp) 构建
 - 😊 支持 `AI Agent`，基于 `Qwen-chat` 实现 `Function calling`
 - 🤖 支持 `并行推理`、`连续对话` 和 `文本生成`
-- 📦 支持 `Llama2` 系列模型和其他开源模型，例如：`Baichuan 7B`、`QWen 7B`
+- 📦 支持 `Llama2` 系列模型和其他开源模型，例如：`Baichuan 7B`、`Qwen 7B`
 
 ----
 
@@ -178,10 +178,13 @@ java -jar llama-java-app.jar --character octet
 java -jar llama-java-app.jar --help
 
 usage: LLAMA-JAVA-APP
-    --app <arg>                 App launch type: cli | api (default: cli).
- -c,--completions               Use completions mode.
- -h,--help                      Show this help message and exit.
- -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
+    --app <arg>          App launch type: cli | api (default: cli).
+ -c,--completions        Use completions mode.
+ -ch,--character <arg>   Load the specified AI character, default:
+                         llama2-chat.
+ -h,--help               Show this help message and exit.
+ -q,--questions <arg>    Load the specified user question list, example:
+                         /PATH/questions.txt.
 ```
 
 ## 帮助文档
@@ -201,7 +204,6 @@ __角色配置__
 
 > [!IMPORTANT]
 > 
-> - 本项目仅供参考，不对任何问题负责。
 > - 本项目不提供任何模型，请自行获取模型文件并遵守相关协议。
 > - 请勿将本项目用于非法用途，包括但不限于商业用途、盈利用途、以及违反中国法律法规的用途。
 > - 因使用本项目所产生的任何法律责任，由使用者自行承担，本项目不承担任何法律责任。
