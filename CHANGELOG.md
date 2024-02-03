@@ -1,14 +1,14 @@
 ☕️ __LLaMA-Java-Core__
 
-- Fix multibyte decoding failures.
+- Optimize components.
+- Optimize CMake & Fix metallib failure to load.
+- Update the handling of special tokens.
+- Update chatml prompt template.
+- Optimize generation parameters.
 - Update llama-java libs.
 
 🤖 __LLaMA-Java-App__
 
-- Add custom AI character.
-
-  Support custom AI characters for dialogue.
-
-- Optimize OpenAPI.
-
-  Some unnecessary APIs and parameters have been removed.
+- Add AI agent support.
+- Add plugin modules, such as Api, Datetime.
+- Update characters config.
