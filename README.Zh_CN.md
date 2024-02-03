@@ -134,37 +134,15 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
 
 ### 🤖 命令行交互
 
-#### ① 设置一个角色
+__如何使用__
 
-编辑 `characters.template.json` 设置一个自定义的AI角色。
-
-#### ② 启动服务
-
-运行命令行，指定刚才设置的角色名称。
+编辑 `characters.template.json` 设置一个自定义的AI角色。 运行命令行交互，开始聊天：
 
 ```bash
-java -jar llama-java-app.jar --character octet
+java -jar llama-java-app.jar --character YOUR_CHARACTER
 ```
 
-#### ③ 开始聊天
-
-![cmd.png](docs/cmd.png)
-
-> [!TIP]
->
-> 使用 `help` 查看更多参数，示例如下：
-
-```bash
-java -jar llama-java-app.jar --help
-
-usage: LLAMA-JAVA-APP
-    --app <arg>                 App launch type: cli | api (default: cli).
- -c,--completions               Use completions mode.
- -h,--help                      Show this help message and exit.
- -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
-```
-
-### 🤖 AI Agent
+### 🚀 AI Agent
 
 > [!NOTE]
 >
@@ -172,7 +150,7 @@ usage: LLAMA-JAVA-APP
 
 __如何使用__
 
-下载 `Qwen-chat` 模型，编辑 `octet.json` 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
+下载 `Qwen-chat` 模型，编辑 [`octet.json`](llama-java-app/characters/octet.json) 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
 
 运行命令行交互，开始聊天：
 
@@ -192,164 +170,31 @@ java -jar llama-java-app.jar --character octet
 ![Octet Agent](docs/agent.png)
 
 
-## 开发手册
-
-#### Maven
-
-```xml
-<dependency>
-    <groupId>chat.octet</groupId>
-    <artifactId>llama-java-core</artifactId>
-    <version>LAST_RELEASE_VERSION</version>
-</dependency>
-```
-
-#### Gradle
-```txt
-implementation group: 'chat.octet', name: 'llama-java-core', version: 'LAST_RELEASE_VERSION'
-```
-
-#### Examples
-
-- **Chat Console Example**
-
-这里提供了一个简单的聊天示例。
-
-```java
-public class ConsoleExample {
-    private static final String MODEL_PATH = "/llama-java-app/models/llama2/ggml-model-7b-q6_k.gguf";
-
-    public static void main(String[] args) {
-        ModelParameter modelParams = ModelParameter.builder()
-                .modelPath(MODEL_PATH)
-                .threads(6)
-                .contextSize(4096)
-                .verbose(true)
-                .build();
-
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-             Model model = new Model(modelParams)) {
-
-            GenerateParameter generateParams = GenerateParameter.builder().build();
-            String system = "Answer the questions.";
-
-            while (true) {
-                System.out.print("\nQuestion: ");
-                String input = bufferedReader.readLine();
-                if (StringUtils.trimToEmpty(input).equalsIgnoreCase("exit")) {
-                    break;
-                }
-                model.chat(generateParams, system, input).output();
-                System.out.print("\n");
-                model.metrics();
-            }
-        } catch (Exception e) {
-            System.err.println("Error: " + e);
-            System.exit(1);
-        }
-    }
-}
-```
-
-- **Continuous Chat Example**
-
-```java
-public class ContinuousChatExample {
-
-    private static final String MODEL_PATH = "/llama-java-app/models/llama2/ggml-model-7b-q6_k.gguf";
-
-    public static void main(String[] args) {
-        String system = "You are a helpful assistant. ";
-        String[] questions = new String[]{
-                "List five emojis about food and explain their meanings",
-                "Write a fun story based on the third emoji",
-                "Continue this story and refine it",
-                "Summarize a title for this story, extract five keywords, and the keywords should not exceed five words",
-                "Mark the characters, time, and location of this story",
-                "Great, translate this story into Chinese",
-                "Who are you and why are you here?",
-                "Summarize today's conversation"
-        };
-
-        GenerateParameter generateParams = GenerateParameter.builder()
-                .verbosePrompt(true)
-                .user("William")
-                .build();
-
-        try (Model model = new Model(MODEL_PATH)) {
-            for (String question : questions) {
-                //Example 1: Continuous generation example.
-                //String text = PromptBuilder.toPrompt(system, question);
-                //model.generate(generateParams, text).output();
-
-                //Example 2: Continuous chat example
-                model.chat(generateParams, system, question).output();
-                System.out.println("\n");
-                model.metrics();
-            }
-        }
-    }
-}
-```
-
 > [!TIP]
-> 
-> More examples: `chat.octet.examples.*`
+>
+> 使用 `help` 查看更多参数，示例如下：
 
+```bash
+java -jar llama-java-app.jar --help
 
-#### Components
-  - `LogitsProcessor`
-  - `StoppingCriteria`
-
-可以使用 `LogitsProcessor` 和 `StoppingCriteria` 对模型推理过程进行自定义控制。
-
-> 注：如果需要在Java中进行矩阵计算请使用 [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
-
-**chat.octet.model.components.processor.LogitsProcessor**
-
-自定义一个处理器对词的概率分布进行调整，控制模型推理的生成结果。这里是一个示例：[NoBadWordsLogitsProcessor.java](llama-java-core/src/main/java/chat/octet/model/components/processor/impl/NoBadWordsLogitsProcessor.java)
-
-```java
-    Map<Integer, String> logitBias = Maps.newLinkedHashMap();
-    logitBias.put(5546, "false");
-    logitBias.put(12113, "5.89");
-    LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
-    
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .logitsProcessorList(logitsProcessorList)
-            .build();
+usage: LLAMA-JAVA-APP
+    --app <arg>                 App launch type: cli | api (default: cli).
+ -c,--completions               Use completions mode.
+ -h,--help                      Show this help message and exit.
+ -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
 ```
 
-**chat.octet.model.components.criteria.StoppingCriteria**
+## 帮助文档
 
-自定义一个控制器实现对模型推理的停止规则控制，例如：控制生成最大超时时间，这里是一个示例：[MaxTimeCriteria](llama-java-core/src/main/java/chat/octet/model/components/criteria/impl/MaxTimeCriteria.java)
+__开发文档__
 
-```java
-    long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
-    StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
-    
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .stoppingCriteriaList(stopCriteriaList)
-            .build();
-```
+- __[开发手册](https://github.com/eoctet/llama-java/wiki/开发手册)__
+- __[Development manual](https://github.com/eoctet/llama-java/wiki/Development-manual)__
 
-> 完整的文档请参考 `Java docs`
-
-#### 如何编译
-
-默认已包含各系统版本库，可以直接使用。
-
-> 如果需要更加灵活的编译方式，请参考 `llama.cpp` **Build** 文档。
-
-```ini
-# 加载外部库文件
-
--Doctet.llama.lib=<YOUR_LIB_PATH>
-```
-
-#### 帮助文档
+__角色配置__
 
 - __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
+- __[characters.template.json](llama-java-app/characters/characters.template.json)__
 
 
 ## 免责声明

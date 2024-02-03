@@ -134,37 +134,15 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
 
 ### 🤖 CLI interaction
 
-#### ① Set up an AI character
+__How to use__
 
-Edit `characters.template.json` to set a custom AI character.
-
-#### ② Launch the app
-
-Run the command line interaction and specify the set AI character name.
+Edit `characters.template.json` to set a custom AI character. Run the command line interaction and specify the set AI character name.
 
 ```bash
-java -jar llama-java-app.jar --character octet
+java -jar llama-java-app.jar --character YOUR_CHARACTER
 ```
 
-#### ③ Start chatting
-
-![cmd.png](docs/cmd.png)
-
-> [!TIP]
-> 
-> Use `help` to view more parameters, for example:
-
-```bash
-java -jar llama-java-app.jar --help
-
-usage: LLAMA-JAVA-APP
-    --app <arg>                 App launch type: cli | api (default: cli).
- -c,--completions               Use completions mode.
- -h,--help                      Show this help message and exit.
- -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
-```
-
-### 🤖 AI Agent
+### 🚀 AI Agent
 
 > [!NOTE]
 >
@@ -172,7 +150,7 @@ usage: LLAMA-JAVA-APP
 
 __How to use__
 
-Download the `Qwen-chat` model, edit `octet.json` to set the model file path, and change `agent_mode` to `true` to start the agent mode.
+Download the `Qwen-chat` model, edit [`octet.json`](llama-java-app/characters/octet.json) to set the model file path, and change `agent_mode` to `true` to start the agent mode.
 
 Run the command line interaction to start chatting:
 
@@ -192,164 +170,31 @@ java -jar llama-java-app.jar --character octet
 ![Octet Agent](docs/agent.png)
 
 
-## Development
-
-#### Maven
-
-```xml
-<dependency>
-    <groupId>chat.octet</groupId>
-    <artifactId>llama-java-core</artifactId>
-    <version>LAST_RELEASE_VERSION</version>
-</dependency>
-```
-
-#### Gradle
-```txt
-implementation group: 'chat.octet', name: 'llama-java-core', version: 'LAST_RELEASE_VERSION'
-```
-
-#### Examples
-
-- **Chat Console Example**
-
-Here is a simple chat example.
-
-```java
-public class ConsoleExample {
-    private static final String MODEL_PATH = "/llama-java-app/models/llama2/ggml-model-7b-q6_k.gguf";
-
-    public static void main(String[] args) {
-        ModelParameter modelParams = ModelParameter.builder()
-                .modelPath(MODEL_PATH)
-                .threads(6)
-                .contextSize(4096)
-                .verbose(true)
-                .build();
-
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-             Model model = new Model(modelParams)) {
-
-            GenerateParameter generateParams = GenerateParameter.builder().build();
-            String system = "Answer the questions.";
-
-            while (true) {
-                System.out.print("\nQuestion: ");
-                String input = bufferedReader.readLine();
-                if (StringUtils.trimToEmpty(input).equalsIgnoreCase("exit")) {
-                    break;
-                }
-                model.chat(generateParams, system, input).output();
-                System.out.print("\n");
-                model.metrics();
-            }
-        } catch (Exception e) {
-            System.err.println("Error: " + e);
-            System.exit(1);
-        }
-    }
-}
-```
-
-- **Continuous Chat Example**
-
-```java
-public class ContinuousChatExample {
-
-    private static final String MODEL_PATH = "/llama-java-app/models/llama2/ggml-model-7b-q6_k.gguf";
-
-    public static void main(String[] args) {
-        String system = "You are a helpful assistant. ";
-        String[] questions = new String[]{
-                "List five emojis about food and explain their meanings",
-                "Write a fun story based on the third emoji",
-                "Continue this story and refine it",
-                "Summarize a title for this story, extract five keywords, and the keywords should not exceed five words",
-                "Mark the characters, time, and location of this story",
-                "Great, translate this story into Chinese",
-                "Who are you and why are you here?",
-                "Summarize today's conversation"
-        };
-
-        GenerateParameter generateParams = GenerateParameter.builder()
-                .verbosePrompt(true)
-                .user("William")
-                .build();
-
-        try (Model model = new Model(MODEL_PATH)) {
-            for (String question : questions) {
-                //Example 1: Continuous generation example.
-                //String text = PromptBuilder.toPrompt(system, question);
-                //model.generate(generateParams, text).output();
-
-                //Example 2: Continuous chat example
-                model.chat(generateParams, system, question).output();
-                System.out.println("\n");
-                model.metrics();
-            }
-        }
-    }
-}
-```
-
 > [!TIP]
 >
-> More examples: `chat.octet.examples.*`
+> Use `help` to view more parameters, for example:
 
+```bash
+java -jar llama-java-app.jar --help
 
-#### Components
-  - `LogitsProcessor`
-  - `StoppingCriteria`
-
-You can use `LogitsProcessor` and `StoppingCriteria` to customize and control the model inference process.
-
-> Note: If you need to do matrix calculations in Java, please use [`openblas`](https://github.com/bytedeco/javacpp-presets/tree/master/openblas)
-
-**chat.octet.model.components.processor.LogitsProcessor**
-
-Customize a processor to adjust the probability distribution of words and control the generation of model inference results. Here is an example: [NoBadWordsLogitsProcessor.java](llama-java-core/src/main/java/chat/octet/model/components/processor/impl/NoBadWordsLogitsProcessor.java)
-
-```java
-    Map<Integer, String> logitBias = Maps.newLinkedHashMap();
-    logitBias.put(5546, "false");
-    logitBias.put(12113, "5.89");
-    LogitsProcessorList logitsProcessorList = new LogitsProcessorList(Lists.newArrayList(new CustomBiasLogitsProcessor(logitBias, model.getVocabSize())));
-    
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .logitsProcessorList(logitsProcessorList)
-            .build();
+usage: LLAMA-JAVA-APP
+    --app <arg>                 App launch type: cli | api (default: cli).
+ -c,--completions               Use completions mode.
+ -h,--help                      Show this help message and exit.
+ -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
 ```
 
-**chat.octet.model.components.criteria.StoppingCriteria**
+## Documentation
 
-Customize a controller to implement stop rule control for model inference, such as controlling the maximum timeout time generated. Here is an example: [MaxTimeCriteria](llama-java-core/src/main/java/chat/octet/model/components/criteria/impl/MaxTimeCriteria.java)
+__Development__
 
-```java
-    long maxTime = TimeUnit.MINUTES.toMillis(Optional.ofNullable(params.getTimeout()).orElse(10L));
-    StoppingCriteriaList stopCriteriaList = new StoppingCriteriaList(Lists.newArrayList(new MaxTimeCriteria(maxTime)));
-    
-    GenerateParameter generateParams = GenerateParameter.builder()
-            .stoppingCriteriaList(stopCriteriaList)
-            .build();
-```
+- __[开发手册](https://github.com/eoctet/llama-java/wiki/开发手册)__
+- __[Development manual](https://github.com/eoctet/llama-java/wiki/Development-manual)__
 
-> More information: `Java docs`
-
-#### Build
-
-By default, each system version library is included.
-
-> If you need more flexible compilation methods, please refer to `llama.cpp`
-
-```ini
-# (Optional) Load the external library file
-
--Doctet.llama.lib=<YOUR_LIB_PATH>
-```
-
-#### Wiki
+__Characters config__
 
 - __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
+- __[characters.template.json](llama-java-app/characters/characters.template.json)__
 
 
 ## Disclaimer
