@@ -12,12 +12,12 @@ This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private s
 #### Provides
 - Simple Java library `llama-java-core`
 - Complete API services `llama-java-app`
-  - `Server deployment` to quickly realize privatized services
-  - `CLI Interaction`, simple local chat interaction
+  - `Server deployment` Quickly realize privatized services
+  - `CLI Interaction` Simple local chat interaction
 
 #### Features
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
-- ☕️ Develop using `JNI`, Provides a consistent API with `Llama.cpp`
+- 😊 Support `AI Agent` and implements `Function calling` based on `Qwen-chat`
 - 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`
 - 📦 Support for `Llama2` series models and other open source models, such as `Baichuan 7B`,`QWen 7B`
 
@@ -27,12 +27,10 @@ This is a 🦙 `LLaMA` Java project. You can use it to deploy your own private s
 
 <summary>Last updated</summary>
 
-- [X] 🚀 Provide model quantification API
-- [X] 🚀 Custom model prompt templates (such as Vicuna, Alpaca, etc.)
-- [X] 🚀 Parallel batch decoding (PS: Batch decoding is enabled by default)
-- [X] 🚀 Min-P sampling support
-- [X] 🚀 YaRN RoPE scaling support
-- [X] 🚀 Add custom AI character and optimize OpenAPI
+   ...
+
+- [X] 🚀 Added custom AI character and optimized OpenAPI
+- [X] 🚀 Added AI Agent and implemented Function calling
 
 </details>
 
@@ -55,7 +53,7 @@ Edit `characters.template.json` to set a custom AI character.
 
 ```json
 {
-  "name": "Octet",
+  "agent_mode": false,
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
@@ -154,7 +152,7 @@ java -jar llama-java-app.jar --character octet
 
 > [!TIP]
 > 
-> Use `help` to view more generate parameters, for example:
+> Use `help` to view more parameters, for example:
 
 ```bash
 java -jar llama-java-app.jar --help
@@ -165,6 +163,34 @@ usage: LLAMA-JAVA-APP
  -h,--help                      Show this help message and exit.
  -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
 ```
+
+### 🤖 AI Agent
+
+> [!NOTE]
+>
+> Implementation based on the `Qwen-chat` series model. For more information, please refer to: [Qwen Github](https://github.com/QwenLM/Qwen)
+
+__How to use__
+
+Download the `Qwen-chat` model, edit `octet.json` to set the model file path, and change `agent_mode` to `true` to start the agent mode.
+
+Run the command line interaction to start chatting:
+
+```bash
+java -jar llama-java-app.jar --character octet
+```
+
+* Two plugins are currently implemented, and as examples you can continue to enrich them.
+
+| Plugin      | Description                                                                                                                   |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------|
+| Datetime    | A plugin that can query the current system time..                                                                             |
+| API calling | A universal API calling plugin, based on which you can achieve access to services such as weather, text to image, and search. |
+
+> Plugin configuration file example: [plugins.json](llama-java-app/characters/plugins.json)
+
+![Octet Agent](docs/agent.png)
+
 
 ## Development
 
