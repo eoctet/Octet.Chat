@@ -3,7 +3,9 @@
 The following is a list of all the parameters involved in this project.
 
 > [!NOTE]
-> Other reference documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">Transformers docs</a>.
+> Other reference
+> documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">
+> Transformers docs</a>.
 
 ### Model parameter
 
@@ -25,7 +27,6 @@ The following is a list of all the parameters involved in this project.
 | threads           | 4       | Set the number of threads used for generation (single token).                                                                                                             |
 | threads_batch     | 4       | Set the number of threads used for prompt and batch processing (multiple tokens).                                                                                         |
 | batch_size        | 512     | Set the batch size for prompt processing.                                                                                                                                 |
-| last_tokens_size  | 64      | Maximum number of tokens to keep in the last_n_tokens deque.                                                                                                              |
 | lora_base         | /       | Optional model to use as a base for the layers modified by the LoRA adapter.                                                                                              |
 | lora_path         | /       | Apply a LoRA (Low-Rank Adaptation) adapter to the model (implies --no-mmap).                                                                                              |
 | lora_scale        | 0.0     | apply LoRA adapter with user defined scaling S (implies --no-mmap).                                                                                                       |
@@ -64,7 +65,6 @@ The following is a list of all the parameters involved in this project.
   "threads": 4,
   "threads_batch": 4,
   "batch_size": 512,
-  "last_tokens_size": 64,
   "lora_base": null,
   "lora_path": null,
   "lora_scale": 0.0,
@@ -104,6 +104,7 @@ The following is a list of all the parameters involved in this project.
 | mirostat_tau       | 5.0       | **Mirostat Sampling** Set the Mirostat target entropy, parameter tau.                                                                                      |
 | grammar_rules      | /         | Specify a grammar (defined inline or in a file) to constrain model output to a specific format.                                                            |
 | max_new_token_size | 512       | Maximum new token generation size.                                                                                                                         |
+| last_tokens_size   | 64        | Maximum number of tokens to keep in the last_n_tokens deque.                                                                                               |
 | verbose_prompt     | false     | Print the prompt before generating text.                                                                                                                   |
 | user               | User      | Specify user nickname.                                                                                                                                     |
 | assistant          | Assistant | Specify bot nickname.                                                                                                                                      |
@@ -131,6 +132,7 @@ The following is a list of all the parameters involved in this project.
   "mirostat_tau": 5.0,
   "grammar_rules": null,
   "max_new_token_size": 512,
+  "last_tokens_size": 64,
   "verbose_prompt": false,
   "user": "User",
   "assistant": "Assistant",

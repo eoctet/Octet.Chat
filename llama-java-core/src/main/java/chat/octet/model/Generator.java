@@ -8,6 +8,7 @@ import chat.octet.model.exceptions.DecodeException;
 import chat.octet.model.exceptions.GenerationException;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.ColorConsole;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Model inference generator,
@@ -96,6 +98,25 @@ public class Generator implements Iterable<Token> {
                 finishReason = token.getFinishReason();
             }
             return CompletionResult.builder().content(builder.toString()).finishReason(finishReason).build();
+        } catch (Exception e) {
+            throw new GenerationException("Generate next token error ", e);
+        } finally {
+            if (chatStatus != null) {
+                chatStatus.copyToStatus(inference.getStatus());
+            } else {
+                inference.clearCache();
+            }
+        }
+    }
+
+    /**
+     * Return the generated tokens.
+     *
+     * @return A list of tokens will be returned.
+     */
+    public List<Token> tokens() {
+        try {
+            return Lists.newArrayList(this);
         } catch (Exception e) {
             throw new GenerationException("Generate next token error ", e);
         } finally {

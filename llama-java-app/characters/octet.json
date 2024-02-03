@@ -1,23 +1,28 @@
 {
-  "name": "Octet",
-  "prompt": "Answer the questions.",
+  "agent_mode": true,
+  "prompt": "You are Octet, a professional computer science assistant who aims to help me understand the field of computer science and guide me in learning computer science knowledge.",
   "model_parameter": {
-    "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
-    "model_type": "LLAMA2",
-    "context_size": 4096,
+    "model_path": "/models/qwen-7b-chat.gguf",
+    "model_name": "qwen-chat",
+    "model_type": "QWEN",
+    "context_size": 32768,
     "threads": 6,
     "threads_batch": 6,
-    "mmap": true,
-    "mlock": false,
-    "verbose": true
+    "verbose": false
   },
   "generate_parameter": {
-    "temperature": 0.85,
+    "temperature": 0,
     "repeat_penalty": 1.2,
     "top_k": 40,
     "top_p": 0.9,
-    "verbose_prompt": true,
-    "user": "User",
-    "assistant": "Octet"
+    "verbose_prompt": false,
+    "user": "\uD83D\uDE03 William",
+    "assistant": "\uD83E\uDD16 Octet",
+    "add_bos": false,
+    "stopping_word": [
+      "Observation:",
+      "Observation:\n",
+      "151645"
+    ]
   }
 }

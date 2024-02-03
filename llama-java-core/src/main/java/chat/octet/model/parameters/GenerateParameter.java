@@ -165,11 +165,9 @@ public final class GenerateParameter {
     private String assistant = "Assistant";
 
     /**
-     * NOTE: Reserved parameter, do not use it.
+     * Maximum number of tokens to keep in the last_n_tokens deque.
      */
-    @Setter
     @Builder.Default
-    @JsonIgnore
     private int lastTokensSize = 64;
 
     /**

@@ -17,7 +17,7 @@
 
 #### 主要特点
 - 🦙 基于  [`llama.cpp`](https://github.com/ggerganov/llama.cpp) 构建
-- ☕️ 使用 `JNI` 开发Java库，提供与 `Llama.cpp` 一致的接口
+- 😊 支持 `AI Agent`，基于 `Qwen-chat` 实现 `Function calling`
 - 🤖 支持 `并行推理`、`连续对话` 和 `文本生成`
 - 📦 支持 `Llama2` 系列模型和其他开源模型，例如：`Baichuan 7B`、`QWen 7B`
 
@@ -27,12 +27,10 @@
 
 <summary>最近更新</summary>
 
-- [X] 🚀 提供模型量化接口
-- [X] 🚀 自定义模型的提示词模版（例如：Vicuna、Alpaca等等）
-- [X] 🚀 并行批处理解码（PS：默认已启用批处理解码）
-- [X] 🚀 Min-P 采样支持
-- [X] 🚀 YaRN RoPE 支持
-- [X] 🚀 增加自定义AI角色、优化OpenAPI
+   ...
+
+- [X] 🚀 新增自定义AI角色、优化OpenAPI
+- [X] 🚀 新增AI智能体，可调用插件的能力
 
 </details>
 
@@ -55,7 +53,7 @@
 
 ```json
 {
-  "name": "Octet",
+  "agent_mode": false,
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
@@ -165,6 +163,34 @@ usage: LLAMA-JAVA-APP
  -h,--help                      Show this help message and exit.
  -ch,--character <arg>          Load the specified AI character, default: llama2-chat.
 ```
+
+### 🤖 AI Agent
+
+> [!NOTE]
+>
+> 实现基于 `Qwen-chat` 系列模型，更多信息请参考：[Qwen Github](https://github.com/QwenLM/Qwen)
+
+__如何使用__
+
+下载 `Qwen-chat` 模型，编辑 `octet.json` 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
+
+运行命令行交互，开始聊天：
+
+```bash
+java -jar llama-java-app.jar --character octet
+```
+
+* 目前实现了两个插件，作为示例你可以继续丰富扩展它们。
+
+| 插件   | 描述                                 |
+|------|------------------------------------|
+| 时间查询 | 可以查询当前系统时间的插件。                     |
+| 接口调用 | 通用的接口调用插件，基于此你可以实现天气、文生图、搜索等服务的接入。 |
+
+> 插件配置文件示例：[plugins.json](llama-java-app/characters/plugins.json)
+
+![Octet Agent](docs/agent.png)
+
 
 ## 开发手册
 

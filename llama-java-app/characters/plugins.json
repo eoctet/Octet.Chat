@@ -1,0 +1,42 @@
+[
+  {
+    "plugin_type": "DATETIME",
+    "name_for_human": "时间查询",
+    "name_for_model": "datetime_query",
+    "description_for_model": "时间查询是一个查询当前系统时间的工具，可用于查询现在的时间，时间格式为 yyyy-MM-dd HH:mm:ss.SSS"
+  },
+  {
+    "plugin_type": "API",
+    "name_for_human": "网络搜索",
+    "name_for_model": "searxng",
+    "description_for_model": "网络搜索是一个通用搜索引擎，可用于访问互联网、查询百科知识、了解时事新闻等",
+    "input_parameters": [
+      {
+        "name": "query",
+        "description": "搜索关键词或短语",
+        "required": true,
+        "type": "string"
+      }
+    ],
+    "output_parameters": [
+      {
+        "name": "content",
+        "description": "搜索引擎返回的查询结果",
+        "type": "string"
+      }
+    ],
+    "config": {
+      "url": "http://localhost:8090",
+      "method": "GET",
+      "headers": {},
+      "request": {
+        "q": "${query}",
+        "engines": "bing",
+        "format": "json"
+      },
+      "timeout": 5000,
+      "response_data_format": "JSON",
+      "retry_on_connection_failure": true
+    }
+  }
+]

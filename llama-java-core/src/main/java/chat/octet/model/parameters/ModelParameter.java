@@ -122,12 +122,6 @@ public class ModelParameter {
     private int batchSize = 512;
 
     /**
-     * Maximum number of tokens to keep in the last_n_tokens deque.
-     */
-    @Builder.Default
-    private int lastTokensSize = 64;
-
-    /**
      * Optional model to use as a base for the layers modified by the LoRA adapter.
      */
     @Nullable

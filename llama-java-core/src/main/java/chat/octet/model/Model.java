@@ -36,7 +36,6 @@ public class Model implements AutoCloseable {
     private final String modelName;
     @Getter
     private final String modelType;
-    private final int lastTokensSize;
     private final Map<String, Status> chatStatus = Maps.newConcurrentMap();
 
     public Model(String modelPath) {
@@ -54,7 +53,6 @@ public class Model implements AutoCloseable {
         this.modelName = modelParams.getModelName();
         this.modelType = modelParams.getModelType();
         Preconditions.checkNotNull(modelType, "Model type cannot be null");
-        this.lastTokensSize = modelParams.getLastTokensSize() < 0 ? LlamaService.getContextSize() : modelParams.getLastTokensSize();
         //setting model parameters
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
         LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);
@@ -194,7 +192,6 @@ public class Model implements AutoCloseable {
     public Generator generate(GenerateParameter generateParams, String text) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(text, "Text cannot be null");
-        generateParams.setLastTokensSize(lastTokensSize);
         if (generateParams.getLogitBias() != null && !generateParams.getLogitBias().isEmpty()) {
             generateParams.getLogitsProcessorList().add(new CustomBiasLogitsProcessor(generateParams.getLogitBias(), LlamaService.getVocabSize()));
         }
@@ -288,7 +285,6 @@ public class Model implements AutoCloseable {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(question, "Question cannot be null");
         Preconditions.checkNotNull(generateParams.getUser(), "User id cannot be null");
-        generateParams.setLastTokensSize(lastTokensSize);
         if (generateParams.getLogitBias() != null && !generateParams.getLogitBias().isEmpty()) {
             generateParams.getLogitsProcessorList().add(new CustomBiasLogitsProcessor(generateParams.getLogitBias(), LlamaService.getVocabSize()));
         }

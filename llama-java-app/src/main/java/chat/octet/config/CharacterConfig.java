@@ -13,7 +13,7 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CharacterConfig {
 
-    private String name;
+    private boolean agentMode;
     private String prompt;
     private ModelParameter modelParameter = ModelParameter.builder().build();
     private GenerateParameter generateParameter = GenerateParameter.builder().build();

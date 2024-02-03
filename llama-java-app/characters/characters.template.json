@@ -1,5 +1,5 @@
 {
-  "name": "llama_java",
+  "agent_mode": false,
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
@@ -18,7 +18,6 @@
     "threads": 4,
     "threads_batch": 4,
     "batch_size": 512,
-    "last_tokens_size": 64,
     "lora_base": null,
     "lora_path": null,
     "lora_scale": 0.0,
@@ -53,6 +52,7 @@
     "mirostat_tau": 5.0,
     "grammar_rules": null,
     "max_new_token_size": 512,
+    "last_tokens_size": 64,
     "verbose_prompt": false,
     "user": "User",
     "assistant": "Assistant",
