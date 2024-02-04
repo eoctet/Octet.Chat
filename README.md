@@ -5,11 +5,9 @@
 [![Maven Central](https://img.shields.io/maven-central/v/chat.octet/llama-java-core?color=orange)](https://mvnrepository.com/artifact/chat.octet/llama-java-core)
 [![README Zh_CN](https://img.shields.io/badge/Lang-中文-red)](./README.Zh_CN.md)
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
-![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
 This is a LLMs project implemented in Java.
-
-You can use it to deploy your own private services, support `Llama2` series models and other open source models.
+You can use it to deploy your own private services, supports the `Llama2` and `GPT` models as well as other open-source models.
 
 #### Provides
 - Simple Java library `llama-java-core`
@@ -21,7 +19,7 @@ You can use it to deploy your own private services, support `Llama2` series mode
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 - 😊 Support `AI Agent` and implements `Function calling` based on `Qwen-chat`
 - 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`
-- 📦 Support for `Llama2` series models and other open source models, such as `Baichuan 7B`,`Qwen 7B`
+- 📦 Supports the `Llama2` and `GPT` models as well as other open-source models, such as `Baichuan 7B`,`Qwen 7B`
 
 ----
 
@@ -40,7 +38,7 @@ You can use it to deploy your own private services, support `Llama2` series mode
 
 > [!NOTE]
 >
-> Support the model files for `llama.cpp`, you can quantify the original model yourself or search for `huggingface` to obtain open-source models.
+> You can quantify the original model yourself or search for `huggingface` to obtain open-source models.
 
 
 ### 🤖 CLI interaction

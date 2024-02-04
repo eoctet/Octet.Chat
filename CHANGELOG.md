@@ -11,4 +11,5 @@
 
 - Add AI agent support.
 - Add plugin modules, such as Api, Datetime.
+- Add automated QA testing.
 - Update characters config.

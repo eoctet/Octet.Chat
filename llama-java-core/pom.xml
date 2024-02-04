@@ -6,15 +6,14 @@
     <parent>
         <groupId>chat.octet</groupId>
         <artifactId>llama-java</artifactId>
-        <version>1.3.7-SNAPSHOT</version>
+        <version>1.3.7</version>
     </parent>
 
     <artifactId>llama-java-core</artifactId>
     <packaging>jar</packaging>
 
     <name>llama-java-core</name>
-    <description>A Pure Java Implementation of Llama, support Llama2 series models and other open source models.
-    </description>
+    <description>A Pure Java Implementation of LLMs, supports parallel inference, continuous conversation and text generation.</description>
 
     <dependencies>
         <dependency>

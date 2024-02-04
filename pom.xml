@@ -7,7 +7,7 @@
     <groupId>chat.octet</groupId>
     <artifactId>llama-java</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.7-SNAPSHOT</version>
+    <version>1.3.7</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -19,12 +19,12 @@
         <lombok.version>1.18.26</lombok.version>
         <guava.version>32.1.2-jre</guava.version>
         <spring-boot.version>2.7.16</spring-boot.version>
-        <llama.java.version>1.3.7-SNAPSHOT</llama.java.version>
+        <llama.java.version>1.3.7</llama.java.version>
     </properties>
 
     <name>llama-java</name>
-    <description>This is a LLaMA Java project. Provides a Java library llama-java-core and a complete API service,
-        You can use it to deploy your own private services, support Llama2 series models and other open source models.
+    <description>This is a LLMs project implemented in Java.
+        You can use it to deploy your own private services, supports the Llama2 and GPT models as well as other open-source models.
     </description>
     <url>https://github.com/eoctet/llama-java</url>
 

@@ -5,9 +5,8 @@
 [![Maven Central](https://img.shields.io/maven-central/v/chat.octet/llama-java-core?color=orange)](https://mvnrepository.com/artifact/chat.octet/llama-java-core)
 [![README English](https://img.shields.io/badge/Lang-English-red)](./README.md)
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
-![GitHub all releases](https://img.shields.io/github/downloads/eoctet/llama-java/total?color=blue)
 
-这是一个Java实现的LLMs项目。你可以用它部署自己的私有服务，支持 `Llama2` 系列模型及其他开源模型。
+这是一个Java实现的LLMs项目。你可以用它部署自己的私有服务，支持 `Llama2` 和 `GPT` 模型及其他开源模型。
 
 #### 提供
 - 简单易用的Java库 `llama-java-core`
@@ -19,7 +18,7 @@
 - 🦙 基于  [`llama.cpp`](https://github.com/ggerganov/llama.cpp) 构建
 - 😊 支持 `AI Agent`，基于 `Qwen-chat` 实现 `Function calling`
 - 🤖 支持 `并行推理`、`连续对话` 和 `文本生成`
-- 📦 支持 `Llama2` 系列模型和其他开源模型，例如：`Baichuan 7B`、`Qwen 7B`
+- 📦 支持 `Llama2` 和 `GPT` 模型及其他开源模型，例如：`Baichuan 7B`、`Qwen 7B`
 
 ----
 
@@ -38,7 +37,7 @@
 
 > [!NOTE] 
 >
-> 支持 `llama.cpp` 量化的模型文件，你可以自行量化原始模型或搜索 `huggingface` 获取开源模型。
+> 你可以自行量化原始模型或搜索 `huggingface` 获取开源模型。
 
 
 ### 🤖 命令行交互
