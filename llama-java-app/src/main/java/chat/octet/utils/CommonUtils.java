@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -22,12 +23,14 @@ public class CommonUtils {
         return StringUtils.join(prefixString, "-", randomString);
     }
 
-    public static boolean isEmpty(Collection<?> collection) {
-        return collection == null || collection.isEmpty();
-    }
-
-    public static String readFile(String filePath) {
-        return StringUtils.join(readFileLines(filePath));
+    public static boolean isEmpty(Object value) {
+        if (value instanceof Collection<?>) {
+            return ((Collection<?>) value).isEmpty();
+        } else if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        } else {
+            return value == null;
+        }
     }
 
     public static List<String> readFileLines(String filePath) {

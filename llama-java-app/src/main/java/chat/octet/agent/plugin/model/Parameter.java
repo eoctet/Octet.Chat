@@ -14,6 +14,20 @@ public class Parameter {
     private String description;
     private boolean required;
     private String type;
-    private Object value;
 
+    public Parameter(String name, String description, boolean required, String type) {
+        this.name = name;
+        this.description = description;
+        this.required = required;
+        this.type = type;
+    }
+
+    public Parameter(String name, String description, String type) {
+        this.name = name;
+        this.description = description;
+        this.type = type;
+    }
+
+    public Parameter() {
+    }
 }

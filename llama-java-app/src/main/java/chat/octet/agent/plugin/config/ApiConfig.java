@@ -45,11 +45,6 @@ public class ApiConfig {
     @Builder.Default
     private Map<String, String> request = Maps.newLinkedHashMap();
     /**
-     * Request form parameters.
-     */
-    @Builder.Default
-    private Map<String, String> form = Maps.newLinkedHashMap();
-    /**
      * Request body, supports JSON and XML data format.
      */
     @Nullable
@@ -87,4 +82,12 @@ public class ApiConfig {
      */
     @Builder.Default
     private int proxyServerPort = -1;
+
+    /**
+     * Number of response result list limit,
+     * If the response result list exceeds the limit, it will be truncated.
+     * Default unlimited (-1).
+     */
+    @Builder.Default
+    private int responseResultLimit = -1;
 }

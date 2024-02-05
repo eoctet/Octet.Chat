@@ -20,8 +20,18 @@
     ],
     "output_parameters": [
       {
-        "name": "content",
-        "description": "搜索引擎返回的查询结果",
+        "name": "results.url",
+        "description": "来源网址",
+        "type": "string"
+      },
+      {
+        "name": "results.title",
+        "description": "标题",
+        "type": "string"
+      },
+      {
+        "name": "results.content",
+        "description": "内容",
         "type": "string"
       }
     ],
@@ -34,9 +44,10 @@
         "engines": "bing",
         "format": "json"
       },
-      "timeout": 5000,
+      "timeout": 60000,
+      "retry_on_connection_failure": true,
       "response_data_format": "JSON",
-      "retry_on_connection_failure": true
+      "response_result_limit": 5
     }
   }
 ]

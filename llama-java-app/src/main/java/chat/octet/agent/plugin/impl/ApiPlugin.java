@@ -114,6 +114,7 @@ public class ApiPlugin implements PluginService {
     @Override
     public ExecuteResult execute(QueryParameter params) {
         ExecuteResult result = new ExecuteResult();
+
         try {
             String responseBody = exchange(params);
             if (StringUtils.isBlank(responseBody)) {
@@ -134,7 +135,7 @@ public class ApiPlugin implements PluginService {
             }
             List<Parameter> outputParameter = pluginConfig.getOutputParameters();
             if (!CommonUtils.isEmpty(outputParameter)) {
-                result.findAndAddParameters(outputParameter, responseMaps);
+                result.parse(outputParameter, responseMaps, apiConfig.getResponseResultLimit());
             }
         } catch (Exception e) {
             throw new PluginExecuteException(e.getMessage(), e);
