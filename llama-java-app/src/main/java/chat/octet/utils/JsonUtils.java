@@ -2,7 +2,9 @@ package chat.octet.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,13 +16,20 @@ import java.util.TimeZone;
 @Slf4j
 public class JsonUtils {
 
-    private static final ObjectMapper JACKSON_MAPPER = new ObjectMapper();
+    private static final ObjectMapper JACKSON_MAPPER;
 
     static {
+        JACKSON_MAPPER = JsonMapper.builder()
+                .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                .build();
         JACKSON_MAPPER.setTimeZone(TimeZone.getDefault());
     }
 
     private JsonUtils() {
+    }
+
+    public static ObjectMapper getObjectMapper() {
+        return JACKSON_MAPPER;
     }
 
     public static <T> T parseToObject(String json, @Nullable Class<T> clazz) {

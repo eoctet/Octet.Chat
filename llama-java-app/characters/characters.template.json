@@ -1,4 +1,5 @@
 {
+  "name": "默认角色",
   "agent_mode": false,
   "prompt": "Answer the questions.",
   "model_parameter": {

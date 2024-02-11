@@ -123,16 +123,21 @@ public class Model implements AutoCloseable {
     /**
      * Delete the session state of the specified user.
      *
-     * @param user User name.
+     * @param session User session key.
      */
-    public void removeChatStatus(String user) {
-        boolean exists = chatStatus.containsKey(user);
-        if (exists) {
-            Status status = chatStatus.remove(user);
-            if (status != null) {
-                status.reset();
+    public void removeChatStatus(String session) {
+        String id = "";
+        if (session.contains(":")) {
+            id = session.split(":")[1];
+        }
+        for (String key : chatStatus.keySet()) {
+            if (key.equals(session) || key.endsWith(id)) {
+                Status status = chatStatus.remove(key);
+                if (status != null) {
+                    status.reset();
+                }
+                log.info("Removed chat session, session: {}.", key);
             }
-            log.info("Removed chat session, User: {}.", user);
         }
     }
 
@@ -291,14 +296,15 @@ public class Model implements AutoCloseable {
         if (generateParams.getStoppingWord() != null) {
             generateParams.getStoppingCriteriaList().add(new StoppingWordCriteria(generateParams.getStoppingWord()));
         }
+        String key = StringUtils.isBlank(generateParams.getSession()) ? generateParams.getUser() : (generateParams.getUser() + ":" + generateParams.getSession());
 
-        boolean exists = chatStatus.containsKey(generateParams.getUser());
+        boolean exists = chatStatus.containsKey(key);
         if (!exists) {
             Status userStatus = new Status();
-            chatStatus.put(generateParams.getUser(), userStatus);
-            log.debug("Create new chat session, User: {} id: {}, chat session cache size: {}.", generateParams.getUser(), userStatus.getId(), chatStatus.size());
+            chatStatus.put(key, userStatus);
+            log.debug("Create new chat session, session: {} id: {}, chat session cache size: {}.", key, userStatus.getId(), chatStatus.size());
         }
-        Status userStatus = chatStatus.get(generateParams.getUser());
+        Status userStatus = chatStatus.get(key);
         if (StringUtils.isNotBlank(system) && system.equals(userStatus.getInitialSystemPrompt())) {
             system = null;
         }
@@ -327,6 +333,7 @@ public class Model implements AutoCloseable {
         removeAllChatStatus();
         LlamaService.release();
         LlamaService.llamaBackendFree();
+        log.info("Closed model and context resources.");
     }
 
     @Override

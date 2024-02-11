@@ -74,12 +74,7 @@ public class Generator implements Iterable<Token> {
         } catch (Exception e) {
             throw new GenerationException("Generate next token error ", e);
         } finally {
-            if (chatStatus != null) {
-                //copy last generated status
-                chatStatus.copyToStatus(inference.getStatus());
-            } else {
-                inference.clearCache();
-            }
+            close();
         }
     }
 
@@ -90,23 +85,18 @@ public class Generator implements Iterable<Token> {
      * @see CompletionResult
      */
     public CompletionResult result() {
-        try {
-            StringBuilder builder = new StringBuilder();
-            FinishReason finishReason = FinishReason.UNKNOWN;
-            for (Token token : this) {
-                builder.append(token.getText());
-                finishReason = token.getFinishReason();
-            }
-            return CompletionResult.builder().content(builder.toString()).finishReason(finishReason).build();
-        } catch (Exception e) {
-            throw new GenerationException("Generate next token error ", e);
-        } finally {
-            if (chatStatus != null) {
-                chatStatus.copyToStatus(inference.getStatus());
-            } else {
-                inference.clearCache();
-            }
-        }
+        List<Token> tokens = tokens();
+
+        StringBuilder builder = new StringBuilder();
+        tokens.forEach(t -> builder.append(t.getText()));
+        FinishReason finishReason = tokens.get(tokens.size() - 1).getFinishReason();
+
+        return CompletionResult.builder()
+                .promptTokens(inference.getPromptTokens())
+                .completionTokens(tokens.size())
+                .content(builder.toString())
+                .finishReason(finishReason)
+                .build();
     }
 
     /**
@@ -120,11 +110,18 @@ public class Generator implements Iterable<Token> {
         } catch (Exception e) {
             throw new GenerationException("Generate next token error ", e);
         } finally {
-            if (chatStatus != null) {
-                chatStatus.copyToStatus(inference.getStatus());
-            } else {
-                inference.clearCache();
-            }
+            close();
+        }
+    }
+
+    /**
+     * Close inference generator.
+     */
+    public void close() {
+        if (chatStatus != null) {
+            chatStatus.copyToStatus(inference.getStatus());
+        } else {
+            inference.clearCache();
         }
     }
 
@@ -140,9 +137,14 @@ public class Generator implements Iterable<Token> {
         private boolean finished = false;
         private final int maxNewTokenSize;
         private final int contextSize;
+        private final int promptTokens;
 
         protected Status getStatus() {
             return status;
+        }
+
+        protected int getPromptTokens() {
+            return promptTokens;
         }
 
         /**
@@ -159,6 +161,7 @@ public class Generator implements Iterable<Token> {
             this.status = srcStatus == null ? new Status() : new Status(srcStatus);
 
             int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, generateParams.isAddBos(), generateParams.isSpecialTokens()) : new int[]{LlamaService.getTokenBOS()};
+            this.promptTokens = tokens.length;
             if (tokens.length >= contextSize) {
                 throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
             }

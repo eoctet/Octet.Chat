@@ -7,6 +7,8 @@ SERVER_DIR=$(
   pwd
 )
 mkdir -p "$SERVER_DIR/logs"
+
+AI_CHARACTER=$2
 #-----------------------------------------------------------------------
 # Process Tag to identify
 # Use this tag should identify the process.
@@ -109,8 +111,9 @@ start_proc() {
     echo "${INFO_TAG} ${PROC_TAG} is already running !"
   else
     echo "${INFO_TAG} Starting ${PROC_TAG} ..."
+    echo "AI character: ${AI_CHARACTER}"
     #set_classpath
-    nohup ${JAVA_HOME}/bin/java -Diname=${PROC_TAG} ${JAVA_OPTS} ${PROC_OPTS} -jar ${JAR_FILE} --app api 1>&- 2>${LOG_FILE} &
+    nohup ${JAVA_HOME}/bin/java -Diname=${PROC_TAG} ${JAVA_OPTS} ${PROC_OPTS} -jar ${JAR_FILE} --app api --character "${AI_CHARACTER}" 1>&- 2>${LOG_FILE} &
     sleep 3
     is_proc_run
     if [ $? -eq 0 ]; then

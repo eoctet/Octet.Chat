@@ -156,6 +156,7 @@ public final class GenerateParameter {
      * Specify user nickname, default: User.
      */
     @Builder.Default
+    @Setter
     private String user = "User";
 
     /**
@@ -195,6 +196,13 @@ public final class GenerateParameter {
      */
     @Nullable
     private String[] stoppingWord;
+
+    /**
+     * User session id.
+     */
+    @Builder.Default
+    @Setter
+    private String session = "";
 
     /**
      * Mirostat sampling mode define

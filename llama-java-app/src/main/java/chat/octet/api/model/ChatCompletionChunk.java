@@ -12,6 +12,7 @@ public class ChatCompletionChunk {
     private String id;
     private String model;
     private long created;
+    private ChatCompletionUsage usage;
     private List<ChatCompletionData> choices = Lists.newArrayList();
 
     public ChatCompletionChunk() {
@@ -24,4 +25,11 @@ public class ChatCompletionChunk {
         this.choices = choices;
     }
 
+    public ChatCompletionChunk(String id, String model, ChatCompletionUsage usage, List<ChatCompletionData> choices) {
+        this.id = id;
+        this.model = model;
+        this.created = System.currentTimeMillis();
+        this.usage = usage;
+        this.choices = choices;
+    }
 }

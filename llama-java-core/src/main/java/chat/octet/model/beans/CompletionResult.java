@@ -15,6 +15,8 @@ import lombok.ToString;
 @ToString
 public class CompletionResult {
     private String content;
+    private int promptTokens;
+    private int completionTokens;
     private FinishReason finishReason;
 
 }
