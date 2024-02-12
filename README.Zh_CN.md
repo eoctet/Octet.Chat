@@ -1,4 +1,4 @@
-# 🦙 LLaMA Java ☕️
+# 🚀 Octet.Chat
 
 
 [![CI](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml)
@@ -52,6 +52,7 @@ __如何使用__
 
 ```json
 {
+  "name": "Assistant Octet",
   "agent_mode": false,
   "prompt": "Answer the questions.",
   "model_parameter": {
@@ -97,7 +98,7 @@ __如何使用__
 运行命令行交互，开始聊天：
 
 ```bash
-java -jar llama-java-app.jar --character octet
+java -jar llama-java-app.jar --character "Assistant Octet"
 ```
 
 * 目前实现了两个插件，作为示例你可以继续丰富扩展它们。
@@ -142,10 +143,12 @@ __如何使用__
 # Default URL: http://YOUR_IP_ADDR:8152/
 
 cd <YOUR_PATH>/llama-java-app
-bash app_server.sh start
+bash app_server.sh start YOUR_CHARACTER
 ```
 
 现在你可以将API服务集成到你的应用中，例如：`WebUI`、`App`、`Wechat`等。
+
+![webui.png](docs/webui.png)
 
 <details>
 
@@ -163,8 +166,8 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
             "content": "Who are you?"
         }
     ],
-    "stream": true,
-    "character": "octet"
+    "user": "User",
+    "stream": true
 }'
 ```
 

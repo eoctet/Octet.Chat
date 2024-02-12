@@ -1,4 +1,4 @@
-# 🦙 LLaMA Java ☕️
+# 🚀 Octet.Chat
 
 
 [![CI](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml)
@@ -53,6 +53,7 @@ Edit `characters.template.json` to set a custom AI character. Run command line i
 
 ```json
 {
+  "name": "Assistant Octet",
   "agent_mode": false,
   "prompt": "Answer the questions.",
   "model_parameter": {
@@ -96,7 +97,7 @@ Download the `Qwen-chat` model, edit [`octet.json`](llama-java-app/characters/oc
 Run command line interaction to start chatting:
 
 ```bash
-java -jar llama-java-app.jar --character octet
+java -jar llama-java-app.jar --character "Assistant Octet"
 ```
 
 * Two plugins are currently implemented, and as examples you can continue to enrich them.
@@ -141,10 +142,12 @@ Launch the app:
 # Default URL: http://YOUR_IP_ADDR:8152/
 
 cd <YOUR_PATH>/llama-java-app
-bash app_server.sh start
+bash app_server.sh start YOUR_CHARACTER
 ```
 
 Now it can be integrated into your services, such as `WebUI`, `App`, `Wechat`, etc.
+
+![webui.png](docs/webui.png)
 
 <details>
 
@@ -162,8 +165,8 @@ curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
             "content": "Who are you?"
         }
     ],
-    "stream": true,
-    "character": "octet"
+    "user": "User",
+    "stream": true
 }'
 ```
 
