@@ -236,7 +236,7 @@ public class ChatCompletionService {
 
         GenerateParameter generateParams = config.getGenerateParameter();
         generateParams.setUser(requestParams.getUser());
-        generateParams.setSession(requestParams.getSession());
+        generateParams.setSession(Optional.ofNullable(requestParams.getSession()).orElse(""));
         String system = config.getPrompt();
 
         if (!requestParams.isStream()) {
