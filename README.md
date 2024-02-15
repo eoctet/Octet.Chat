@@ -1,7 +1,7 @@
 # 🚀 Octet.Chat
 
 
-[![CI](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/llama-java/actions/workflows/maven_build_deploy.yml)
+[![CI](https://github.com/eoctet/octet.chat/actions/workflows/maven_build_deploy.yml/badge.svg)](https://github.com/eoctet/octet.chat/actions/workflows/maven_build_deploy.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/chat.octet/llama-java-core?color=orange)](https://mvnrepository.com/artifact/chat.octet/llama-java-core)
 [![README Zh_CN](https://img.shields.io/badge/Lang-中文-red)](./README.Zh_CN.md)
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
@@ -196,12 +196,12 @@ The API will return data in a stream format:
 
 __Development__
 
-- __[开发手册](https://github.com/eoctet/llama-java/wiki/开发手册)__
-- __[Development manual](https://github.com/eoctet/llama-java/wiki/Development-manual)__
+- __[开发手册](https://github.com/eoctet/octet.chat/wiki/开发手册)__
+- __[Development manual](https://github.com/eoctet/octet.chat/wiki/Development-manual)__
 
 __Characters config__
 
-- __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
+- __[Llama Java Parameter](https://github.com/eoctet/octet.chat/wiki/Llama-Java-parameters)__
 - __[characters.template.json](octet-chat-app/characters/characters.template.json)__
 
 
