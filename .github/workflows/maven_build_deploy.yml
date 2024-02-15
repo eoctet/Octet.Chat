@@ -182,14 +182,14 @@ jobs:
         env:
           TAG_NAME: ${{ github.ref_name }}
         run: |
-          mkdir -p vendor/llama-java-app/characters
-          cp llama-java-app/characters/*.json vendor/llama-java-app/characters
-          cp llama-java-app/app_server.sh vendor/llama-java-app
+          mkdir -p vendor/octet-chat-app/characters
+          cp octet-chat-app/characters/*.json vendor/octet-chat-app/characters
+          cp octet-chat-app/app_server.sh vendor/octet-chat-app
           
-          mv llama-java-app/target/*.jar vendor/llama-java-app/llama-java-app.jar
+          mv octet-chat-app/target/*.jar vendor/octet-chat-app/octet-chat-app.jar
           
           cd vendor
-          zip -r llama-java-app-$TAG_NAME.zip llama-java-app
+          zip -r octet-chat-app-$TAG_NAME.zip octet-chat-app
           ls -l *
 
       - name: Create Release
@@ -199,4 +199,4 @@ jobs:
           body_path: CHANGELOG.md
           token: ${{ secrets.DEV_TOKEN }}
           files: |
-            vendor/llama-java-app-${{ github.ref_name }}.zip
+            vendor/octet-chat-app-${{ github.ref_name }}.zip

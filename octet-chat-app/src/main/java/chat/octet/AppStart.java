@@ -31,7 +31,7 @@ public class AppStart {
 
         if (cmd.hasOption("h") || cmd.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("LLAMA-JAVA-APP", OPTIONS);
+            formatter.printHelp("Octet.Chat", OPTIONS);
             System.exit(0);
         }
         String mode = cmd.getOptionValue("app", "cli");

@@ -10,7 +10,7 @@
 
 #### 提供
 - 简单易用的Java库 `llama-java-core`
-- 完整的应用服务 `llama-java-app`
+- 完整的应用服务 `octet-chat-app`
   - `服务端部署`，快速实现私有化服务
   - `命令行交互`，简单的本地聊天交互
 
@@ -82,7 +82,7 @@ __如何使用__
 运行命令行交互并指定刚才设置的角色名称，开始聊天：
 
 ```bash
-java -jar llama-java-app.jar --character YOUR_CHARACTER
+java -jar octet-chat-app.jar --character YOUR_CHARACTER
 ```
 
 ### 🚀 AI Agent
@@ -93,12 +93,12 @@ java -jar llama-java-app.jar --character YOUR_CHARACTER
 
 __如何使用__
 
-下载 `Qwen-chat` 模型，编辑 [`octet.json`](llama-java-app/characters/octet.json) 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
+下载 `Qwen-chat` 模型，编辑 [`octet.json`](octet-chat-app/characters/octet.json) 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
 
 运行命令行交互，开始聊天：
 
 ```bash
-java -jar llama-java-app.jar --character "Assistant Octet"
+java -jar octet-chat-app.jar --character "Assistant Octet"
 ```
 
 * 目前实现了两个插件，作为示例你可以继续丰富扩展它们。
@@ -108,7 +108,7 @@ java -jar llama-java-app.jar --character "Assistant Octet"
 | 时间查询 | 可以查询当前系统时间的插件。                     |
 | 接口调用 | 通用的接口调用插件，基于此你可以实现天气、文生图、搜索等服务的接入。 |
 
-> 插件配置文件示例：[plugins.json](llama-java-app/characters/plugins.json)
+> 插件配置文件示例：[plugins.json](octet-chat-app/characters/plugins.json)
 
 ![Octet Agent](docs/agent.png)
 
@@ -118,9 +118,9 @@ java -jar llama-java-app.jar --character "Assistant Octet"
 > 使用 `help` 查看更多参数，示例如下：
 
 ```bash
-java -jar llama-java-app.jar --help
+java -jar octet-chat-app.jar --help
 
-usage: LLAMA-JAVA-APP
+usage: Octet.Chat
     --app <arg>          App launch type: cli | api (default: cli).
  -c,--completions        Use completions mode.
  -ch,--character <arg>   Load the specified AI character, default:
@@ -142,7 +142,7 @@ __如何使用__
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
 
-cd <YOUR_PATH>/llama-java-app
+cd <YOUR_PATH>/octet-chat-app
 bash app_server.sh start YOUR_CHARACTER
 ```
 
@@ -203,7 +203,7 @@ __开发文档__
 __角色配置__
 
 - __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
-- __[characters.template.json](llama-java-app/characters/characters.template.json)__
+- __[characters.template.json](octet-chat-app/characters/characters.template.json)__
 
 
 ## 免责声明

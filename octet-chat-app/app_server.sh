@@ -13,7 +13,7 @@ AI_CHARACTER=$2
 # Process Tag to identify
 # Use this tag should identify the process.
 # The command is :  ps -ef | grep -w $PROC_TAG
-PROC_TAG="llama-java-app"
+PROC_TAG="octet-chat-app"
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
@@ -56,7 +56,7 @@ LOG_FILE="$SERVER_DIR/logs/$PROC_TAG.out"
 
 #-----------------------------------------------------------------------
 # Process Entrance class
-JAR_FILE="llama-java-app.jar"
+JAR_FILE="octet-chat-app.jar"
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------

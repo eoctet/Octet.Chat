@@ -7,11 +7,11 @@
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
 
 This is a LLMs project implemented in Java.
-You can use it to deploy your own private services, supports the `Llama2` and `GPT` models as well as other open-source models.
+You can use it to deploy your own private services, supports the `Llama2` and `GPT` models and other open-source models.
 
 #### Provides
 - Simple Java library `llama-java-core`
-- Complete application `llama-java-app`
+- Complete application `octet-chat-app`
   - `API Services` Quickly realize privatized services
   - `CLI Interaction` Simple local chat interaction
 
@@ -19,7 +19,7 @@ You can use it to deploy your own private services, supports the `Llama2` and `G
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 - 😊 Support `AI Agent` and implements `Function calling` based on `Qwen-chat`
 - 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`
-- 📦 Supports the `Llama2` and `GPT` models as well as other open-source models, such as `Baichuan 7B`,`Qwen 7B`
+- 📦 Supports the `Llama2` and `GPT` models, such as `Baichuan 7B`,`Qwen 7B`
 
 ----
 
@@ -81,7 +81,7 @@ Edit `characters.template.json` to set a custom AI character. Run command line i
 </details>
 
 ```bash
-java -jar llama-java-app.jar --character YOUR_CHARACTER
+java -jar octet-chat-app.jar --character YOUR_CHARACTER
 ```
 
 ### 🚀 AI Agent
@@ -92,12 +92,12 @@ java -jar llama-java-app.jar --character YOUR_CHARACTER
 
 __How to use__
 
-Download the `Qwen-chat` model, edit [`octet.json`](llama-java-app/characters/octet.json) to set the model file path, and change `agent_mode` to `true` to start the agent mode.
+Download the `Qwen-chat` model, edit [`octet.json`](octet-chat-app/characters/octet.json) to set the model file path, and change `agent_mode` to `true` to start the agent mode.
 
 Run command line interaction to start chatting:
 
 ```bash
-java -jar llama-java-app.jar --character "Assistant Octet"
+java -jar octet-chat-app.jar --character "Assistant Octet"
 ```
 
 * Two plugins are currently implemented, and as examples you can continue to enrich them.
@@ -107,7 +107,7 @@ java -jar llama-java-app.jar --character "Assistant Octet"
 | Datetime | A plugin that can query the current system time.                                                                              |
 | API      | A universal API calling plugin, based on which you can achieve access to services such as weather, text to image, and search. |
 
-> Plugin configuration file example: [plugins.json](llama-java-app/characters/plugins.json)
+> Plugin configuration file example: [plugins.json](octet-chat-app/characters/plugins.json)
 
 ![Octet Agent](docs/agent.png)
 
@@ -117,9 +117,9 @@ java -jar llama-java-app.jar --character "Assistant Octet"
 > Use `help` to view more parameters, for example:
 
 ```bash
-java -jar llama-java-app.jar --help
+java -jar octet-chat-app.jar --help
 
-usage: LLAMA-JAVA-APP
+usage: Octet.Chat
     --app <arg>          App launch type: cli | api (default: cli).
  -c,--completions        Use completions mode.
  -ch,--character <arg>   Load the specified AI character, default:
@@ -141,7 +141,7 @@ Launch the app:
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
 
-cd <YOUR_PATH>/llama-java-app
+cd <YOUR_PATH>/octet-chat-app
 bash app_server.sh start YOUR_CHARACTER
 ```
 
@@ -202,7 +202,7 @@ __Development__
 __Characters config__
 
 - __[Llama Java Parameter](https://github.com/eoctet/llama-java/wiki/Llama-Java-parameters)__
-- __[characters.template.json](llama-java-app/characters/characters.template.json)__
+- __[characters.template.json](octet-chat-app/characters/characters.template.json)__
 
 
 ## Disclaimer
