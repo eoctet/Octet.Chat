@@ -169,6 +169,18 @@ jobs:
         run: |
           ls -l llama-java-core/src/main/resources/*
 
+      - name: Build WebUI
+        id: build_webui
+        run: |
+          git clone https://github.com/eoctet/Lite-Next-Web.git
+          if [ ! -d "Lite-Next-Web" ]; then
+            echo "Git clone Lite-Next-Web failed."
+            exit 1
+          fi
+          cd Lite-Next-Web
+          yarn install & yarn export
+          mv out ../octet-chat-app/src/main/resources/static
+
       - name: Build with Maven
         run: |
           mvn clean package deploy
