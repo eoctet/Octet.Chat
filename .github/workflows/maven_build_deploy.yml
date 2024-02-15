@@ -183,8 +183,11 @@ jobs:
             exit 1
           fi
           cd Lite-Next-Web
-          yarn install & yarn export
+          yarn install
+          yarn export
+          ls -l
           mv out ../octet-chat-app/src/main/resources/static
+          ls -l ../octet-chat-app/src/main/resources/*
 
       - name: Build with Maven
         run: |
