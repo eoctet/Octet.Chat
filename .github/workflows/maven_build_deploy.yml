@@ -123,6 +123,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v4
         with:
