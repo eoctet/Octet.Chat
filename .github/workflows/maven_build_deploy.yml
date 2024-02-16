@@ -95,7 +95,8 @@ jobs:
           Copy-Item -Path llamajava/* -Destination llama.cpp/llamajava -Force
           Copy-Item -Path llamajava/win/* -Destination llama.cpp/llamajava -Force
           cd llama.cpp
-          $LATEST_TAG=(git.exe describe --tags)
+          $TAG_ID=(git.exe rev-list --tags --max-count=1)
+          $LATEST_TAG=(git.exe describe --tags $TAG_ID)
           echo "=> Llama.cpp latest tag: $LATEST_TAG"
           git.exe checkout $LATEST_TAG
           Add-Content CMakeLists.txt "add_subdirectory(llamajava)"
