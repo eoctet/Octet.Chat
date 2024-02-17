@@ -7,7 +7,7 @@ import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.PromptBuilder;
 
 public class ModelExample {
-    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+    private static final String MODEL_PATH = "/octet-chat/models/llama2/ggml-model-7b-q6_k.gguf";
 
     public static void main(String[] args) {
         GenerateParameter generateParams = GenerateParameter.builder().verbosePrompt(true).build();

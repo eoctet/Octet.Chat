@@ -5,7 +5,7 @@ import chat.octet.model.parameters.GenerateParameter;
 
 public class ContinuousChatExample {
 
-    private static final String MODEL_PATH = "/llama.cpp/models/llama2/ggml-model-7b-q6_k.gguf";
+    private static final String MODEL_PATH = "/octet-chat/models/llama2/ggml-model-7b-q6_k.gguf";
 
     public static void main(String[] args) {
         String system = "You are a helpful assistant. ";
