@@ -4,7 +4,6 @@ import chat.octet.agent.OctetAgent;
 import chat.octet.api.CharacterModelBuilder;
 import chat.octet.config.CharacterConfig;
 import chat.octet.model.Model;
-import chat.octet.model.enums.ModelType;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.ColorConsole;
 import chat.octet.model.utils.PromptBuilder;
@@ -34,25 +33,14 @@ public class CmdInteraction {
         this.completions = cmd.hasOption("completions");
     }
 
-    private OctetAgent getOctetAgent(Model model, CharacterConfig config) {
-        if (config.isAgentMode()) {
-            if (ModelType.QWEN != ModelType.valueOf(model.getModelType())) {
-                throw new IllegalArgumentException("AI Agent only supports Qwen series model");
-            }
-            return new OctetAgent(model, config);
-        }
-        return null;
-    }
-
     private void execute(Model model, CharacterConfig config, String system, String input) {
         if (!completions) {
             String botInputPrefix = ColorConsole.cyan(config.getGenerateParameter().getAssistant() + ": ");
             System.out.print(botInputPrefix);
 
-            OctetAgent agent = getOctetAgent(model, config);
-            if (agent != null) {
+            if (config.isAgentMode()) {
                 System.out.println(ColorConsole.grey("[ I'm thinking, please wait a moment.. ]"));
-                agent.chat(input, true);
+                OctetAgent.getInstance().output(model, config.getGenerateParameter(), system, input);
             } else {
                 model.chat(config.getGenerateParameter(), system, input).output();
             }

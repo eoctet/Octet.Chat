@@ -1,8 +1,11 @@
 package chat.octet.api;
 
+import chat.octet.agent.OctetAgent;
+import chat.octet.agent.plugin.PluginManager;
 import chat.octet.config.CharacterConfig;
 import chat.octet.exceptions.ServerException;
 import chat.octet.model.Model;
+import chat.octet.model.enums.ModelType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +63,14 @@ public final class CharacterModelBuilder implements AutoCloseable {
                     }
                     defaultCharacterConfig = CHARACTER_CONFIGS.get(characterName);
                     model = new Model(defaultCharacterConfig.getModelParameter());
+
+                    if (defaultCharacterConfig.isAgentMode()) {
+                        if (ModelType.QWEN != ModelType.valueOf(model.getModelType())) {
+                            throw new IllegalArgumentException("AI Agent only supports Qwen series model");
+                        }
+                        PluginManager.getInstance().loadPlugins();
+                        OctetAgent.getInstance().reset();
+                    }
                 }
             }
         }

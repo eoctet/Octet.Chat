@@ -37,7 +37,6 @@ public class PluginManager {
     static {
         PLUGIN_MAPPING.put(PluginType.DATETIME.name(), DateTimePlugin.class.getName());
         PLUGIN_MAPPING.put(PluginType.API.name(), ApiPlugin.class.getName());
-
     }
 
     private PluginManager() {
@@ -54,28 +53,29 @@ public class PluginManager {
         return register;
     }
 
-    public synchronized void loadPlugins() {
-        if (pluginConfigs != null) {
-            PLUGIN_INSTANCE.clear();
-        }
-        pluginConfigs = loadPluginConfig();
-        pluginConfigs.forEach(plugin -> {
-            Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getPluginType()), "Plugin type cannot be empty.");
-            Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getNameForHuman()), "Name of human cannot be empty.");
-            Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getNameForModel()), "Name of model cannot be empty.");
-            Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getDescriptionForModel()), "Plugin description cannot be empty.");
+    public void loadPlugins() {
+        if (pluginConfigs == null) {
+            synchronized (PluginManager.class) {
+                pluginConfigs = loadPluginConfig();
+                pluginConfigs.forEach(plugin -> {
+                    Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getPluginType()), "Plugin type cannot be empty.");
+                    Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getNameForHuman()), "Name of human cannot be empty.");
+                    Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getNameForModel()), "Name of model cannot be empty.");
+                    Preconditions.checkArgument(StringUtils.isNotBlank(plugin.getDescriptionForModel()), "Plugin description cannot be empty.");
 
-            String className = PLUGIN_MAPPING.get(plugin.getPluginType().toUpperCase());
-            if (className == null) {
-                throw new ServerException("Plugin type " + plugin.getPluginType() + " is not supported.");
+                    String className = PLUGIN_MAPPING.get(plugin.getPluginType().toUpperCase());
+                    if (className == null) {
+                        throw new ServerException("Plugin type " + plugin.getPluginType() + " is not supported.");
+                    }
+                    try {
+                        Class<?> clazz = Class.forName(className);
+                        PLUGIN_INSTANCE.put(plugin.getNameForModel().toUpperCase(), (PluginService) clazz.getConstructor(PluginConfig.class).newInstance(plugin));
+                    } catch (Exception e) {
+                        throw new ServerException(e.getMessage(), e);
+                    }
+                });
             }
-            try {
-                Class<?> clazz = Class.forName(className);
-                PLUGIN_INSTANCE.put(plugin.getNameForModel().toUpperCase(), (PluginService) clazz.getConstructor(PluginConfig.class).newInstance(plugin));
-            } catch (Exception e) {
-                throw new ServerException(e.getMessage(), e);
-            }
-        });
+        }
     }
 
     private List<PluginConfig> loadPluginConfig() {
