@@ -325,6 +325,8 @@ public class Generator implements Iterable<Token> {
                     generateParams.getTsf(),
                     generateParams.getTypical(),
                     generateParams.getMinP(),
+                    generateParams.getDynatempRange(),
+                    generateParams.getDynatempExponent(),
                     status.getId(),
                     status.getPastTokenSize()
             );

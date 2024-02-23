@@ -117,6 +117,7 @@ public class Model implements AutoCloseable {
         llamaContextParams.logitsAll = modelParams.isLogitsAll();
         llamaContextParams.embedding = modelParams.isEmbedding();
         llamaContextParams.offloadKqv = modelParams.isOffloadKqv();
+        llamaContextParams.doPooling = modelParams.isDoPooling();
         return llamaContextParams;
     }
 

@@ -1,6 +1,5 @@
 package chat.octet.model.utils;
 
-import chat.octet.model.beans.ChatMessage;
 import chat.octet.model.enums.ModelType;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
@@ -60,41 +59,6 @@ public class PromptBuilder {
             }
         }
         return MessageFormat.format(modelType.getPromptTemplate(), formatSystem, question);
-    }
-
-    /**
-     * Format chat messages as prompt text.
-     *
-     * @param modelType Model type.
-     * @param messages  Chat messages.
-     * @return String
-     */
-    public static String format(ModelType modelType, ChatMessage... messages) {
-        Preconditions.checkNotNull(messages, "Chat messages cannot be null");
-        if (messages.length == 1 && ChatMessage.ChatRole.USER != messages[0].getRole()) {
-            throw new IllegalArgumentException("Chat message is missing the user part, please check your messages.");
-        }
-
-        StringBuilder prompt = new StringBuilder();
-        String system = null;
-        for (int i = 0; i < messages.length; i++) {
-            ChatMessage m = messages[i];
-            ChatMessage.ChatRole role = m.getRole();
-            if (ChatMessage.ChatRole.SYSTEM == role) {
-                system = m.getContent();
-            } else if (ChatMessage.ChatRole.USER == role) {
-                prompt.append(format(modelType, system, m.getContent()));
-                system = null;
-            } else if (ChatMessage.ChatRole.ASSISTANT == role) {
-                int preIndex = Math.max(0, i - 1);
-                ChatMessage preMessage = messages[preIndex];
-                if (ChatMessage.ChatRole.USER != preMessage.getRole()) {
-                    throw new IllegalArgumentException("Invalid order of chat messages, please check your messages.");
-                }
-                prompt.append(m.getContent()).append(modelType.getSeparator());
-            }
-        }
-        return prompt.toString();
     }
 
 }

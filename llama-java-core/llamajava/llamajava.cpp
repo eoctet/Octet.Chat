@@ -45,6 +45,7 @@ jfieldID FIELD_DATA_TYPE_V;
 jfieldID FIELD_LOGITS_ALL;
 jfieldID FIELD_EMBEDDING;
 jfieldID FIELD_OFFLOAD_KQV;
+jfieldID FIELD_DO_POOLING;
 
 //Class LlamaModelParams:
 jclass LLAMA_MODEL_PARAMS_CLASS;
@@ -149,6 +150,7 @@ static struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jl
             /*.logits_all                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_LOGITS_ALL)),
             /*.embedding                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_EMBEDDING)),
             /*.offload_kqv                 =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_OFFLOAD_KQV)),
+            /*.do_pooling                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_DO_POOLING)),
     };
     return params;
 }
@@ -202,6 +204,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_LOGITS_ALL = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "logitsAll", "Z");
     FIELD_EMBEDDING = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "embedding", "Z");
     FIELD_OFFLOAD_KQV = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "offloadKqv", "Z");
+    FIELD_DO_POOLING = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "doPooling", "Z");
 
     //Class LlamaContextParams
     LLAMA_MODEL_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelParams");
@@ -292,6 +295,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
     env->SetBooleanField(llama_context_params, FIELD_LOGITS_ALL, ToJBoolean(defaults.logits_all));
     env->SetBooleanField(llama_context_params, FIELD_EMBEDDING, ToJBoolean(defaults.embedding));
     env->SetBooleanField(llama_context_params, FIELD_OFFLOAD_KQV, ToJBoolean(defaults.offload_kqv));
+    env->SetBooleanField(llama_context_params, FIELD_DO_POOLING, ToJBoolean(defaults.do_pooling));
     env->DeleteLocalRef(llama_context_params_class);
     return llama_context_params;
 }
@@ -323,8 +327,8 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuanti
  * Method:    llamaBackendInit
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendInit
-        (JNIEnv *env, jclass thisClass, jboolean numa) {
-    llama_backend_init(ToCBool(numa));
+        (JNIEnv *env, jclass thisClass) {
+    llama_backend_init();
 }
 
 /*
@@ -391,7 +395,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMmapSupported
         (JNIEnv *env, jclass thisClass) {
-    return ToJBoolean(llama_mmap_supported());
+    return ToJBoolean(llama_supports_mmap());
 }
 
 /*
@@ -400,7 +404,16 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMmapSupported
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
         (JNIEnv *env, jclass thisClass) {
-    return ToJBoolean(llama_mlock_supported());
+    return ToJBoolean(llama_supports_mlock());
+}
+
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    isGpuOffloadSupported
+ */
+JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isGpuOffloadSupported
+        (JNIEnv *env, jclass thisClass) {
+    return ToJBoolean(llama_supports_gpu_offload());
 }
 
 /*
@@ -580,6 +593,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
          jfloat tsf,
          jfloat typical,
          jfloat min_p,
+         jfloat dynatemp_range,
+         jfloat dynatemp_exponent,
          jint sequence_id,
          jint past_token_size) {
 
@@ -640,7 +655,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
             llama_sample_typical(llama_ctx, &candidates_p, typical, 1);
             llama_sample_top_p(llama_ctx, &candidates_p, top_p, 1);
             llama_sample_min_p(llama_ctx, &candidates_p, min_p, 1);
-            llama_sample_temp(llama_ctx, &candidates_p, temperature);
+            if (dynatemp_range > 0) {
+                float dynatemp_min = std::max(0.0f, temperature - dynatemp_range);
+                float dynatemp_max = std::max(0.0f, temperature + dynatemp_range);
+                llama_sample_entropy(llama_ctx, &candidates_p, dynatemp_min, dynatemp_max, dynatemp_exponent);
+            } else {
+                llama_sample_temp(llama_ctx, &candidates_p, temperature);
+            }
             token = llama_sample_token(llama_ctx, &candidates_p);
         }
     }

@@ -233,4 +233,11 @@ public class ModelParameter {
     @Builder.Default
     private int splitMode = 1;
 
+    /**
+     * whether to pool (sum) embedding results by sequence id (ignored if no pooling layer).
+     */
+    @Builder.Default
+    private boolean doPooling = true;
+
+
 }

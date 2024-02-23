@@ -88,5 +88,9 @@ public class LlamaContextParams {
      * whether to offload the KQV ops (including the KV cache) to GPU.
      */
     public boolean offloadKqv;
+    /**
+     * whether to pool (sum) embedding results by sequence id (ignored if no pooling layer).
+     */
+    public boolean doPooling;
 
 }

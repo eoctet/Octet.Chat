@@ -24,14 +24,14 @@ import java.text.MessageFormat;
  * <p>C++ source: llamajava.h, llamajava.cpp</p>
  *
  * @author <a href="https://github.com/eoctet">William</a>
- * @since b1993
+ * @since b2249
  */
 public class LlamaService {
 
     static {
         System.load(Platform.LIB_RESOURCE_PATH);
         initNative();
-        llamaBackendInit(true);
+        llamaBackendInit();
     }
 
     /**
@@ -62,11 +62,8 @@ public class LlamaService {
 
     /**
      * Initialize the llama + ggml backend
-     * If numa is true, use NUMA optimizations Call once at the start of the program.
-     *
-     * @param numa Use NUMA optimizations.
      */
-    public static native void llamaBackendInit(boolean numa);
+    public static native void llamaBackendInit();
 
     /**
      * Call once at the end of the program.
@@ -97,18 +94,25 @@ public class LlamaService {
     public static native void release();
 
     /**
-     * Check whether MMAP is supported.
+     * Check whether mmap is supported.
      *
      * @return boolean
      */
     public static native boolean isMmapSupported();
 
     /**
-     * Check whether MLOCK is supported.
+     * Check whether mlock is supported.
      *
      * @return boolean
      */
     public static native boolean isMlockSupported();
+
+    /**
+     * Check whether gpu_offload is supported.
+     *
+     * @return boolean
+     */
+    public static native boolean isGpuOffloadSupported();
 
     /**
      * Get model vocab size.
@@ -220,28 +224,49 @@ public class LlamaService {
     /**
      * Inference sampling the next token.
      *
-     * @param logits         User-defined logits, Adjustments can be made via LogitsProcessor.
-     * @param lastTokens     Last token array.
-     * @param lastTokensSize Last token array size.
-     * @param penalty        Control the repetition of token sequences in the generated text.
-     * @param alphaFrequency Repeat alpha frequency penalty.
-     * @param alphaPresence  Repeat alpha presence penalty.
-     * @param penalizeNL     Disable penalization for newline tokens when applying the repeat penalty.
-     * @param mirostatMode   <b>Mirostat Sampling</b> Use Mirostat sampling, controlling perplexity during text generation.
-     * @param mirostatTAU    <b>Mirostat Sampling</b> Set the Mirostat target entropy.
-     * @param mirostatETA    <b>Mirostat Sampling</b> Set the Mirostat learning rate.
-     * @param temperature    Adjust the randomness of the generated text.
-     * @param topK           <b>TOP-K Sampling</b> Limit the next token selection to the K most probable tokens.
-     * @param topP           <b>TOP-P Sampling</b> Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.
-     * @param tsf            <b>Tail Free Sampling (TFS)</b> Enable tail free sampling with parameter z.
-     * @param typical        <b>Typical Sampling</b> Enable typical sampling sampling with parameter p.
-     * @param minP           <b>MIN-P Sampling</b> Sets a minimum base probability threshold for token selection.
-     * @param sequenceId     Generation sequence id.
-     * @param pastTokenSize  Past token size.
+     * @param logits           User-defined logits, Adjustments can be made via LogitsProcessor.
+     * @param lastTokens       Last token array.
+     * @param lastTokensSize   Last token array size.
+     * @param penalty          Control the repetition of token sequences in the generated text.
+     * @param alphaFrequency   Repeat alpha frequency penalty.
+     * @param alphaPresence    Repeat alpha presence penalty.
+     * @param penalizeNL       Disable penalization for newline tokens when applying the repeat penalty.
+     * @param mirostatMode     <b>Mirostat Sampling</b> Use Mirostat sampling, controlling perplexity during text generation.
+     * @param mirostatTAU      <b>Mirostat Sampling</b> Set the Mirostat target entropy.
+     * @param mirostatETA      <b>Mirostat Sampling</b> Set the Mirostat learning rate.
+     * @param temperature      Adjust the randomness of the generated text.
+     * @param topK             <b>TOP-K Sampling</b> Limit the next token selection to the K most probable tokens.
+     * @param topP             <b>TOP-P Sampling</b> Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.
+     * @param tsf              <b>Tail Free Sampling (TFS)</b> Enable tail free sampling with parameter z.
+     * @param typical          <b>Typical Sampling</b> Enable typical sampling sampling with parameter p.
+     * @param minP             <b>MIN-P Sampling</b> Sets a minimum base probability threshold for token selection.
+     * @param dynatempRange    <b>Dynamic Temperature Sampling</b> Dynamic temperature range.
+     * @param dynatempExponent <b>Dynamic Temperature Sampling</b> Dynamic temperature exponent.
+     * @param sequenceId       Generation sequence id.
+     * @param pastTokenSize    Past token size.
      * @return int, Returns the sampled token id.
      * @see GenerateParameter
      */
-    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, float minP, int sequenceId, int pastTokenSize) throws DecodeException;
+    public static native int sampling(float[] logits,
+                                      int[] lastTokens,
+                                      int lastTokensSize,
+                                      float penalty,
+                                      float alphaFrequency,
+                                      float alphaPresence,
+                                      boolean penalizeNL,
+                                      int mirostatMode,
+                                      float mirostatTAU,
+                                      float mirostatETA,
+                                      float temperature,
+                                      int topK,
+                                      float topP,
+                                      float tsf,
+                                      float typical,
+                                      float minP,
+                                      float dynatempRange,
+                                      float dynatempExponent,
+                                      int sequenceId,
+                                      int pastTokenSize) throws DecodeException;
 
     /**
      * Load llama grammar by rules.

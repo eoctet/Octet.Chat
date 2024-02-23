@@ -120,6 +120,22 @@ public final class GenerateParameter {
     private float mirostatTAU = 5.0f;
 
     /**
+     * <b>Dynamic Temperature Sampling</b><br/>
+     * Dynamic temperature range.
+     * The final temperature will be in the range of (temperature - dynatemp_range) and (temperature + dynatemp_range)
+     * (default: 0.0, 0.0 = disabled).
+     */
+    @Builder.Default
+    private float dynatempRange = 0f;
+
+    /**
+     * <b>Dynamic Temperature Sampling</b><br/>
+     * Dynamic temperature exponent (default: 1.0).
+     */
+    @Builder.Default
+    private float dynatempExponent = 1.0f;
+
+    /**
      * Specify a grammar (defined inline or in a file) to constrain model output to a specific format.
      * For example, you could force the model to output JSON or to speak only in emojis
      */
