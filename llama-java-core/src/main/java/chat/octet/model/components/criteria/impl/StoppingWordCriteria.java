@@ -9,8 +9,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
 
 public class StoppingWordCriteria implements StoppingCriteria {
@@ -42,9 +42,8 @@ public class StoppingWordCriteria implements StoppingCriteria {
                 if (length > generateTokens.size()) {
                     continue;
                 }
-                List<Token> lastTokens = generateTokens.subList(generateTokens.size() - length, generateTokens.size());
-                int matched = (int) IntStream.range(0, length).filter(i -> tokens[i] == lastTokens.get(i).getId()).count();
-                if (matched == length) {
+                int[] lastTokens = generateTokens.subList(generateTokens.size() - length, generateTokens.size()).stream().mapToInt(Token::getId).toArray();
+                if (Arrays.equals(tokens, lastTokens)) {
                     return true;
                 }
             }

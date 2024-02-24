@@ -247,26 +247,43 @@ public class LlamaService {
      * @return int, Returns the sampled token id.
      * @see GenerateParameter
      */
-    public static native int sampling(float[] logits,
-                                      int[] lastTokens,
-                                      int lastTokensSize,
-                                      float penalty,
-                                      float alphaFrequency,
-                                      float alphaPresence,
-                                      boolean penalizeNL,
-                                      int mirostatMode,
-                                      float mirostatTAU,
-                                      float mirostatETA,
-                                      float temperature,
-                                      int topK,
-                                      float topP,
-                                      float tsf,
-                                      float typical,
-                                      float minP,
-                                      float dynatempRange,
-                                      float dynatempExponent,
-                                      int sequenceId,
-                                      int pastTokenSize) throws DecodeException;
+    public static native int sampling(float[] logits, int[] lastTokens, int lastTokensSize, float penalty, float alphaFrequency, float alphaPresence, boolean penalizeNL, int mirostatMode, float mirostatTAU, float mirostatETA, float temperature, int topK, float topP, float tsf, float typical, float minP, float dynatempRange, float dynatempExponent, int sequenceId, int pastTokenSize) throws DecodeException;
+
+    /**
+     * Inference sampling the next token.
+     *
+     * @param generateParams generation parameter.
+     * @param logits         User-defined logits, Adjustments can be made via LogitsProcessor.
+     * @param lastTokens     Last token array.
+     * @param sequenceId     Generation sequence id.
+     * @param pastTokenSize  Past token size.
+     * @return int, Returns the sampled token id.
+     * @see GenerateParameter
+     */
+    public static int sampling(GenerateParameter generateParams, float[] logits, int[] lastTokens, int sequenceId, int pastTokenSize) throws DecodeException {
+        return sampling(
+                logits,
+                lastTokens,
+                generateParams.getLastTokensSize(),
+                generateParams.getRepeatPenalty(),
+                generateParams.getFrequencyPenalty(),
+                generateParams.getPresencePenalty(),
+                generateParams.isPenalizeNl(),
+                generateParams.getMirostatMode().ordinal(),
+                generateParams.getMirostatTAU(),
+                generateParams.getMirostatETA(),
+                generateParams.getTemperature(),
+                generateParams.getTopK(),
+                generateParams.getTopP(),
+                generateParams.getTsf(),
+                generateParams.getTypical(),
+                generateParams.getMinP(),
+                generateParams.getDynatempRange(),
+                generateParams.getDynatempExponent(),
+                sequenceId,
+                pastTokenSize
+        );
+    }
 
     /**
      * Load llama grammar by rules.

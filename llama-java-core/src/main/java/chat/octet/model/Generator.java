@@ -308,28 +308,7 @@ public class Generator implements Iterable<Token> {
                 int startIndex = Math.max(0, status.getInputLength() - generateParams.getLastTokensSize());
                 lastTokens = status.subInputIds(startIndex);
             }
-            int tokenId = LlamaService.sampling(
-                    logits,
-                    lastTokens,
-                    generateParams.getLastTokensSize(),
-                    generateParams.getRepeatPenalty(),
-                    generateParams.getFrequencyPenalty(),
-                    generateParams.getPresencePenalty(),
-                    generateParams.isPenalizeNl(),
-                    generateParams.getMirostatMode().ordinal(),
-                    generateParams.getMirostatTAU(),
-                    generateParams.getMirostatETA(),
-                    generateParams.getTemperature(),
-                    generateParams.getTopK(),
-                    generateParams.getTopP(),
-                    generateParams.getTsf(),
-                    generateParams.getTypical(),
-                    generateParams.getMinP(),
-                    generateParams.getDynatempRange(),
-                    generateParams.getDynatempExponent(),
-                    status.getId(),
-                    status.getPastTokenSize()
-            );
+            int tokenId = LlamaService.sampling(generateParams, logits, lastTokens, status.getId(), status.getPastTokenSize());
             Token token = new Token(tokenId, LlamaService.getLlamaTokenType(tokenId), tokenToText(tokenId));
             //update generate status
             status.appendNextToken(token);
