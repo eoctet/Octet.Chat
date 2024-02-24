@@ -30,6 +30,8 @@
 
 - [X] 🚀 新增自定义AI角色、优化OpenAPI
 - [X] 🚀 新增AI智能体，可调用插件的能力
+- [X] 🚀 支持动态温度采样
+- [X] 🚀 Octet-chat-app 增加了 WebUI
 
 </details>
 
@@ -85,34 +87,6 @@ __如何使用__
 java -jar octet-chat-app.jar --character YOUR_CHARACTER
 ```
 
-### 🚀 AI Agent
-
-> [!NOTE]
->
-> 实现基于 `Qwen-chat` 系列模型，更多信息请参考：[Qwen Github](https://github.com/QwenLM/Qwen)
-
-__如何使用__
-
-下载 `Qwen-chat` 模型，编辑 [`octet.json`](octet-chat-app/characters/octet.json) 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
-
-运行命令行交互，开始聊天：
-
-```bash
-java -jar octet-chat-app.jar --character "Assistant Octet"
-```
-
-* 目前实现了两个插件，作为示例你可以继续丰富扩展它们。
-
-| 插件   | 描述                                 |
-|------|------------------------------------|
-| 时间查询 | 可以查询当前系统时间的插件。                     |
-| 接口调用 | 通用的接口调用插件，基于此你可以实现天气、文生图、搜索等服务的接入。 |
-
-> 插件配置文件示例：[plugins.json](octet-chat-app/characters/plugins.json)
-
-![Octet Agent](docs/agent.png)
-
-
 > [!TIP]
 >
 > 使用 `help` 查看更多参数，示例如下：
@@ -131,13 +105,36 @@ usage: Octet.Chat
 ```
 
 
-### 🖥 API服务
+### 🚀 AI Agent
+
+> [!NOTE]
+>
+> 实现基于 `Qwen-chat` 系列模型，更多信息请参考：[Qwen Github](https://github.com/QwenLM/Qwen)
 
 __如何使用__
 
-和命令行交互一样，首先编辑 `characters.template.json` 设置一个自定义的AI角色。
+下载 `Qwen-chat` 模型，编辑 [`octet.json`](octet-chat-app/characters/octet.json) 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
 
-启动服务：
+
+* 目前实现了两个插件，作为示例你可以继续丰富扩展它们。
+
+| 插件   | 描述                                 |
+|------|------------------------------------|
+| 时间查询 | 可以查询当前系统时间的插件。                     |
+| 接口调用 | 通用的接口调用插件，基于此你可以实现天气、文生图、搜索等服务的接入。 |
+
+> 插件配置文件示例：[plugins.json](octet-chat-app/characters/plugins.json)
+
+![Octet Agent](docs/agent.png)
+
+
+### 🖥 Web UI
+
+__如何使用__
+
+和命令行交互一样，首先设置一个自定义的AI角色。
+
+启动服务，打开浏览器开始聊天，默认地址：`http://YOUR_IP_ADDR:8152/`
 
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
@@ -146,15 +143,18 @@ cd <YOUR_PATH>/octet-chat-app
 bash app_server.sh start YOUR_CHARACTER
 ```
 
-现在你可以将API服务集成到你的应用中，例如：`WebUI`、`App`、`Wechat`等。
-
 ![webui.png](docs/webui.png)
+
+
+> [!TIP]
+>
+> 你也可以将API服务集成到你的应用中，例如：`VsCode`、`App`、`Wechat`等。
 
 <details>
 
 <summary>如何调用API</summary>
 
-> `POST` **/v1/chat/completions**
+> Api docs: http://127.0.0.1:8152/swagger-ui.html
 
 ```shell
 curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
@@ -211,7 +211,7 @@ __角色配置__
 > [!IMPORTANT]
 > 
 > - 本项目不提供任何模型，请自行获取模型文件并遵守相关协议。
-> - 请勿将本项目用于非法用途，包括但不限于商业用途、盈利用途、以及违反中国法律法规的用途。
+> - 请勿将本项目用于非法用途，包括但不限于商业用途、盈利用途、以及违反法律法规的用途。
 > - 因使用本项目所产生的任何法律责任，由使用者自行承担，本项目不承担任何法律责任。
 
 ## 问题反馈

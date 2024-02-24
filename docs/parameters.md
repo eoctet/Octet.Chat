@@ -4,7 +4,8 @@ The following is a list of all the parameters involved in this project.
 
 > [!NOTE]
 > Other reference
-> documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">
+>
+documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">
 > Transformers docs</a>.
 
 ### Model parameter
@@ -44,6 +45,7 @@ The following is a list of all the parameters involved in this project.
 | yarn_beta_slow    | 1.0     | YaRN high correction dim.                                                                                                                                                 |
 | yarn_orig_ctx     | 0       | YaRN original context size.                                                                                                                                               |
 | offload_kqv       | true    | whether to offload the KQV ops (including the KV cache) to GPU.                                                                                                           |
+| do_pooling        | true    | whether to pool (sum) embedding results by sequence id (ignored if no pooling layer).                                                                                     
 
 **JSON template**
 
@@ -81,37 +83,40 @@ The following is a list of all the parameters involved in this project.
   "yarn_beta_fast": 32.0,
   "yarn_beta_slow": 1.0,
   "yarn_orig_ctx": 0,
-  "offload_kqv": true
+  "offload_kqv": true,
+  "do_pooling": true
 }
 ```
 
 ### Generate parameter
 
-| Parameter          | Default   | Description                                                                                                                                                |
-|--------------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| temperature        | 0.8       | Adjust the randomness of the generated text.                                                                                                               |
-| repeat_penalty     | 1.1       | Control the repetition of token sequences in the generated text.                                                                                           |
-| penalize_nl        | true      | Disable penalization for newline tokens when applying the repeat penalty.                                                                                  |
-| frequency_penalty  | 0.0       | Repeat alpha frequency penalty.                                                                                                                            |
-| presence_penalty   | 0.0       | Repeat alpha presence penalty.                                                                                                                             |
-| top_k              | 40        | **TOP-K Sampling** Limit the next token selection to the K most probable tokens.                                                                           |
-| top_p              | 0.9       | **TOP-P Sampling** Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.                                 |
-| tsf                | 1.0       | **Tail Free Sampling (TFS)** Enable tail free sampling with parameter z.                                                                                   |
-| typical            | 1.0       | **Typical Sampling** Enable typical sampling sampling with parameter p.                                                                                    |
-| min_p              | 0.05      | **Min P Sampling** Sets a minimum base probability threshold for token selection.                                                                          |
-| mirostat_mode      | DISABLED  | **Mirostat Sampling** Enable Mirostat sampling, controlling perplexity during text generation. `DISABLED = disabled`, `V1 = Mirostat`, `V2 = Mirostat 2.0` |
-| mirostat_eta       | 0.1       | **Mirostat Sampling** Set the Mirostat learning rate, parameter eta.                                                                                       |
-| mirostat_tau       | 5.0       | **Mirostat Sampling** Set the Mirostat target entropy, parameter tau.                                                                                      |
-| grammar_rules      | /         | Specify a grammar (defined inline or in a file) to constrain model output to a specific format.                                                            |
-| max_new_token_size | 512       | Maximum new token generation size.                                                                                                                         |
-| last_tokens_size   | 64        | Maximum number of tokens to keep in the last_n_tokens deque.                                                                                               |
-| verbose_prompt     | false     | Print the prompt before generating text.                                                                                                                   |
-| user               | User      | Specify user nickname.                                                                                                                                     |
-| assistant          | Assistant | Specify bot nickname.                                                                                                                                      |
-| add_bos            | true      | Add BOS token.                                                                                                                                             |
-| special_tokens     | true      | Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext.                                                   |
-| logit_bias         | Assistant | Adjust the probability distribution of words.                                                                                                              |
-| stopping_word      | Assistant | Control the stop word list for generating stops, with values that can be text or token IDs.                                                                |
+| Parameter          | Default   | Description                                                                                                                                                                  |
+|--------------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| temperature        | 0.8       | Adjust the randomness of the generated text.                                                                                                                                 |
+| repeat_penalty     | 1.1       | Control the repetition of token sequences in the generated text.                                                                                                             |
+| penalize_nl        | true      | Disable penalization for newline tokens when applying the repeat penalty.                                                                                                    |
+| frequency_penalty  | 0.0       | Repeat alpha frequency penalty.                                                                                                                                              |
+| presence_penalty   | 0.0       | Repeat alpha presence penalty.                                                                                                                                               |
+| top_k              | 40        | **TOP-K Sampling** Limit the next token selection to the K most probable tokens.                                                                                             |
+| top_p              | 0.9       | **TOP-P Sampling** Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.                                                   |
+| tsf                | 1.0       | **Tail Free Sampling (TFS)** Enable tail free sampling with parameter z.                                                                                                     |
+| typical            | 1.0       | **Typical Sampling** Enable typical sampling sampling with parameter p.                                                                                                      |
+| min_p              | 0.05      | **Min P Sampling** Sets a minimum base probability threshold for token selection.                                                                                            |
+| mirostat_mode      | DISABLED  | **Mirostat Sampling** Enable Mirostat sampling, controlling perplexity during text generation. `DISABLED = disabled`, `V1 = Mirostat`, `V2 = Mirostat 2.0`                   |
+| mirostat_eta       | 0.1       | **Mirostat Sampling** Set the Mirostat learning rate, parameter eta.                                                                                                         |
+| mirostat_tau       | 5.0       | **Mirostat Sampling** Set the Mirostat target entropy, parameter tau.                                                                                                        |
+| dynatemp_range     | 0.0       | **Dynamic Temperature Sampling** Dynamic temperature range. The final temperature will be in the range of (temperature - dynatemp_range) and (temperature + dynatemp_range). |
+| dynatemp_exponent  | 1.0       | **Dynamic Temperature Sampling** Dynamic temperature exponent.                                                                                                               |
+| grammar_rules      | /         | Specify a grammar (defined inline or in a file) to constrain model output to a specific format.                                                                              |
+| max_new_token_size | 512       | Maximum new token generation size.                                                                                                                                           |
+| last_tokens_size   | 64        | Maximum number of tokens to keep in the last_n_tokens deque.                                                                                                                 |
+| verbose_prompt     | false     | Print the prompt before generating text.                                                                                                                                     |
+| user               | User      | Specify user nickname.                                                                                                                                                       |
+| assistant          | Assistant | Specify bot nickname.                                                                                                                                                        |
+| add_bos            | true      | Add BOS token.                                                                                                                                                               |
+| special_tokens     | true      | Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext.                                                                     |
+| logit_bias         | Assistant | Adjust the probability distribution of words.                                                                                                                                |
+| stopping_word      | Assistant | Control the stop word list for generating stops, with values that can be text or token IDs.                                                                                  |
 
 **JSON template**
 
@@ -130,6 +135,8 @@ The following is a list of all the parameters involved in this project.
   "mirostat_mode": "DISABLED",
   "mirostat_eta": 0.1,
   "mirostat_tau": 5.0,
+  "dynatemp_range": 0.0,
+  "dynatemp_exponent": 1.0,
   "grammar_rules": null,
   "max_new_token_size": 512,
   "last_tokens_size": 64,

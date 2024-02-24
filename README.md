@@ -31,6 +31,8 @@ You can use it to deploy your own private services, supports the `Llama2` and `G
 
 - [X] 🚀 Added custom AI character and optimized OpenAPI
 - [X] 🚀 Added AI Agent and implemented Function calling
+- [X] 🚀 Supported dynamic temperature sampling.
+- [X] 🚀 Added WebUI to octet-chat-app.
 
 </details>
 
@@ -84,34 +86,6 @@ Edit `characters.template.json` to set a custom AI character. Run command line i
 java -jar octet-chat-app.jar --character YOUR_CHARACTER
 ```
 
-### 🚀 AI Agent
-
-> [!NOTE]
->
-> Implementation based on the `Qwen-chat` series model. For more information, please refer to: [Qwen Github](https://github.com/QwenLM/Qwen)
-
-__How to use__
-
-Download the `Qwen-chat` model, edit [`octet.json`](octet-chat-app/characters/octet.json) to set the model file path, and change `agent_mode` to `true` to start the agent mode.
-
-Run command line interaction to start chatting:
-
-```bash
-java -jar octet-chat-app.jar --character "Assistant Octet"
-```
-
-* Two plugins are currently implemented, and as examples you can continue to enrich them.
-
-| Plugin   | Description                                                                                                                   |
-|----------|-------------------------------------------------------------------------------------------------------------------------------|
-| Datetime | A plugin that can query the current system time.                                                                              |
-| API      | A universal API calling plugin, based on which you can achieve access to services such as weather, text to image, and search. |
-
-> Plugin configuration file example: [plugins.json](octet-chat-app/characters/plugins.json)
-
-![Octet Agent](docs/agent.png)
-
-
 > [!TIP]
 >
 > Use `help` to view more parameters, for example:
@@ -130,13 +104,36 @@ usage: Octet.Chat
 ```
 
 
-### 🖥 API Services
+### 🚀 AI Agent
+
+> [!NOTE]
+>
+> Implementation based on the `Qwen-chat` series model. For more information, please refer to: [Qwen Github](https://github.com/QwenLM/Qwen)
 
 __How to use__
 
-Just like CLI interaction, first edit `characters.template.json` to set a custom AI character.
+Download the `Qwen-chat` model, edit [`octet.json`](octet-chat-app/characters/octet.json) to set the model file path, and change `agent_mode` to `true` to start the agent mode.
 
-Launch the app:
+
+* Two plugins are currently implemented, and as examples you can continue to enrich them.
+
+| Plugin   | Description                                                                                                                   |
+|----------|-------------------------------------------------------------------------------------------------------------------------------|
+| Datetime | A plugin that can query the current system time.                                                                              |
+| API      | A universal API calling plugin, based on which you can achieve access to services such as weather, text to image, and search. |
+
+> Plugin configuration file example: [plugins.json](octet-chat-app/characters/plugins.json)
+
+![Octet Agent](docs/agent.png)
+
+
+### 🖥 Web UI
+
+__How to use__
+
+Just like CLI interaction, set a custom AI character and Launch the app.
+
+open browser enjoy it now `http://YOUR_IP_ADDR:8152/`
 
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
@@ -145,15 +142,18 @@ cd <YOUR_PATH>/octet-chat-app
 bash app_server.sh start YOUR_CHARACTER
 ```
 
-Now it can be integrated into your services, such as `WebUI`, `App`, `Wechat`, etc.
-
 ![webui.png](docs/webui.png)
+
+
+> [!TIP]
+>
+> It can be integrated into your services, such as `VsCode`, `App`, `Wechat`, etc.
 
 <details>
 
 <summary>How to call API</summary>
 
-> `POST` **/v1/chat/completions**
+> Api docs: http://127.0.0.1:8152/swagger-ui.html
 
 ```shell
 curl --location 'http://127.0.0.1:8152/v1/chat/completions' \
@@ -210,7 +210,7 @@ __Characters config__
 > [!IMPORTANT]
 >
 > - This project does not provide any models. Please obtain the model files yourself and comply with relevant agreements.
-> - Please do not use this project for illegal purposes, including but not limited to commercial use, profit-making use, or use that violates Chinese laws and regulations.
+> - Please do not use this project for illegal purposes, including but not limited to commercial use, profit-making use, or use that violates laws and regulations.
 > - Any legal liability arising from the use of this project shall be borne by the user, and this project shall not bear any legal liability.
 
 ## Feedback

@@ -1,10 +1,9 @@
 ☕️ __LLaMA-Java-Core__
 
+- Support dynamic temperature sampling.
 - Update llama-java libs.
 
 🤖 __Octet-Chat-App__
 
-- Add WebUI support.
-- Rename project name.
-- Optimize open api.
-- Fix API response result parsing issue.
+- Optimize auto agent.
+- Add openapi docs.
