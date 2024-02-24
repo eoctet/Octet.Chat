@@ -2,8 +2,9 @@
 server:
   port: 8152
   shutdown: graceful
-swagger:
-  enabled: true
+springdoc:
+  api-docs:
+    enabled: true
 spring:
   lifecycle:
     timeout-per-shutdown-phase: 30s

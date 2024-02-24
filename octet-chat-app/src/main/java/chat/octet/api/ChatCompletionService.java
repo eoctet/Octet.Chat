@@ -16,8 +16,19 @@ import chat.octet.utils.CommonUtils;
 import chat.octet.utils.JsonUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springdoc.core.annotations.RouterOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -26,6 +37,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Flux;
@@ -39,8 +51,13 @@ import java.util.concurrent.Semaphore;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 
+@OpenAPIDefinition(
+        info = @Info(title = "Octet.Chat", description = "Build your own private auto agent."),
+        externalDocs = @ExternalDocumentation(description = "Github", url = "https://github.com/eoctet/Octet.Chat")
+)
 @Slf4j
 @Configuration
+@Tag(name = "ChatCompletionService", description = "Chat completion service")
 public class ChatCompletionService {
 
     private final Semaphore semaphore = new Semaphore(1);
@@ -64,6 +81,18 @@ public class ChatCompletionService {
 
 
     @Bean
+    @RouterOperation(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_EVENT_STREAM_VALUE},
+            operation = @Operation(
+                    requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RequestParameter.class))),
+                    description = "Chat with local agent.",
+                    operationId = "chat",
+                    tags = "Chat & Completions",
+                    responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatCompletionChunk.class)))
+            )
+    )
     public RouterFunction<ServerResponse> chatCompletionsFunction() {
         return handler(
                 POST("/v1/chat/completions"),
@@ -82,6 +111,18 @@ public class ChatCompletionService {
     }
 
     @Bean
+    @RouterOperation(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_EVENT_STREAM_VALUE},
+            operation = @Operation(
+                    requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RequestParameter.class))),
+                    description = "Completions with local agent.",
+                    operationId = "completions",
+                    tags = "Chat & Completions",
+                    responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatCompletionChunk.class)))
+            )
+    )
     public RouterFunction<ServerResponse> completionsFunction() {
         return handler(
                 POST("/v1/completions"),
@@ -96,6 +137,18 @@ public class ChatCompletionService {
     }
 
     @Bean
+    @RouterOperation(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            operation = @Operation(
+                    requestBody = @RequestBody(content = @Content(examples = @ExampleObject(value = "{\"content\":\"Your text\"}"), schema = @Schema(implementation = Object.class))),
+                    description = "Tokenize text to tokens.",
+                    operationId = "tokenize",
+                    tags = "Tokenize",
+                    responses = @ApiResponse(responseCode = "200", content = @Content(examples = @ExampleObject(value = "{\"tokens\":[]}")))
+            )
+    )
     public RouterFunction<ServerResponse> tokenizeFunction() {
         return handler(
                 POST("/v1/tokenize"),
@@ -114,6 +167,18 @@ public class ChatCompletionService {
     }
 
     @Bean
+    @RouterOperation(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            operation = @Operation(
+                    requestBody = @RequestBody(content = @Content(examples = @ExampleObject(value = "{\"tokens\":[]}"), schema = @Schema(implementation = Object.class))),
+                    description = "Detokenize tokens to text.",
+                    operationId = "detokenize",
+                    tags = "Tokenize",
+                    responses = @ApiResponse(responseCode = "200", content = @Content(examples = @ExampleObject(value = "{\"content\":\"string\"}")))
+            )
+    )
     public RouterFunction<ServerResponse> detokenizeFunction() {
         return handler(
                 POST("/v1/detokenize"),
@@ -133,6 +198,18 @@ public class ChatCompletionService {
 
 
     @Bean
+    @RouterOperation(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.ALL_VALUE,
+            operation = @Operation(
+                    requestBody = @RequestBody(content = @Content(examples = @ExampleObject(value = "{\"user\":\"string\",\"session\":\"string\"}"), schema = @Schema(implementation = Object.class))),
+                    description = "Reset chat session.",
+                    operationId = "reset",
+                    tags = "Characters",
+                    responses = @ApiResponse(responseCode = "200", content = @Content(examples = @ExampleObject(value = "success")))
+            )
+    )
     public RouterFunction<ServerResponse> resetSessionFunction() {
         return handler(
                 POST("/v1/session/reset"),
@@ -159,6 +236,18 @@ public class ChatCompletionService {
     }
 
     @Bean
+    @RouterOperation(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            operation = @Operation(
+                    requestBody = @RequestBody(content = @Content(examples = @ExampleObject(value = "{}"), schema = @Schema(implementation = Object.class))),
+                    description = "Show all AI characters list.",
+                    operationId = "characters",
+                    tags = "Characters",
+                    responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CharacterModel.class)))
+            )
+    )
     public RouterFunction<ServerResponse> getCharactersFunction() {
         return RouterFunctions.route(
                 RequestPredicates.POST("/v1/characters").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
@@ -179,6 +268,18 @@ public class ChatCompletionService {
     }
 
     @Bean
+    @RouterOperation(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.ALL_VALUE,
+            operation = @Operation(
+                    requestBody = @RequestBody(content = @Content(examples = @ExampleObject(value = "{\"character\": \"string\"}"), schema = @Schema(implementation = Object.class))),
+                    description = "Reload AI characters.",
+                    operationId = "reload",
+                    tags = "Characters",
+                    responses = @ApiResponse(responseCode = "200", content = @Content(examples = @ExampleObject(value = "success")))
+            )
+    )
     public RouterFunction<ServerResponse> reloadCharactersFunction() {
         return handler(
                 POST("/v1/characters/reload"),
