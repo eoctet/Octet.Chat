@@ -35,8 +35,6 @@ public enum LlamaRoPEScalingType {
 //     */
 //    LLAMA_ROPE_SCALING_MAX_VALUE(2);
 
-    private final int type;
-
     private static final Map<Integer, LlamaRoPEScalingType> TYPES;
 
     static {
@@ -49,6 +47,8 @@ public enum LlamaRoPEScalingType {
         }
         TYPES = Collections.unmodifiableMap(map);
     }
+
+    private final int type;
 
     LlamaRoPEScalingType(int type) {
         this.type = type;

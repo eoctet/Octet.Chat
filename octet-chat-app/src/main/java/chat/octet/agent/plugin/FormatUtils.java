@@ -10,9 +10,6 @@ import java.util.Map;
 
 public class FormatUtils {
 
-    private FormatUtils() {
-    }
-
     public static final String PROMPT_TEMPLATE = "Answer the following questions as best you can. You have access to the following tools:\n\n" +
             "${tool_descs}" +
             "Use the following format:\n\n" +
@@ -26,14 +23,14 @@ public class FormatUtils {
             "Final Answer: the final answer to the original input question\n\n" +
             "Begin!\n\n" +
             "Question: ${question}";
-
     public static final String PLUGINS_DESC_TEMPLATE = "${name_for_model}: Call this tool to interact with the ${name_for_human} API. What is the ${name_for_human} API useful for? ${description_for_model} Parameters: ${parameters} Format the arguments as a JSON object.";
-
     public static final String THOUGHT = "Thought:";
     public static final String ACTION = "Action:";
     public static final String ACTION_INPUT = "Action Input:";
     public static final String OBSERVATION = "Observation:";
     public static final String FINAL_ANSWER = "Final Answer:";
+    private FormatUtils() {
+    }
 
     public static String formatUserQuestion(String question) {
         Map<String, Object> params = Maps.newLinkedHashMap();

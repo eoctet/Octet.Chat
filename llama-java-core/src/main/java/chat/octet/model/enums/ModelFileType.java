@@ -45,8 +45,6 @@ public enum ModelFileType {
      */
     LLAMA_FTYPE_GUESSED(1024);
 
-    private final int type;
-
     private static final Map<Integer, ModelFileType> TYPES;
 
     static {
@@ -59,6 +57,8 @@ public enum ModelFileType {
         }
         TYPES = Collections.unmodifiableMap(map);
     }
+
+    private final int type;
 
     ModelFileType(int type) {
         this.type = type;

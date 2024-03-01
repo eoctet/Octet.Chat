@@ -132,20 +132,12 @@ public class Generator implements Iterable<Token> {
         private final GenerateParameter generateParams;
         private final Status status;
         private final byte[] multiByteTokenBuffer;
-        private int multiByteTokenLength;
-        private int multiByteTokenIndex;
-        private boolean finished = false;
         private final int maxNewTokenSize;
         private final int contextSize;
         private final int promptTokens;
-
-        protected Status getStatus() {
-            return status;
-        }
-
-        protected int getPromptTokens() {
-            return promptTokens;
-        }
+        private int multiByteTokenLength;
+        private int multiByteTokenIndex;
+        private boolean finished = false;
 
         /**
          * Create inference iterator.
@@ -189,6 +181,14 @@ public class Generator implements Iterable<Token> {
          */
         protected Inference(GenerateParameter generateParams, String text) {
             this(generateParams, text, null);
+        }
+
+        protected Status getStatus() {
+            return status;
+        }
+
+        protected int getPromptTokens() {
+            return promptTokens;
         }
 
         /**

@@ -65,17 +65,17 @@ public enum DataType {
 
     private final Class<? extends Serializable> clazz;
 
-    public Class<? extends Serializable> getClassType() {
-        return clazz;
+    <T extends Serializable> DataType(T defaultValue) {
+        this.defaultValue = defaultValue;
+        this.clazz = defaultValue.getClass();
     }
 
     public static DataType valueOfType(String key) {
         return TYPES.get(key.trim().toUpperCase());
     }
 
-    <T extends Serializable> DataType(T defaultValue) {
-        this.defaultValue = defaultValue;
-        this.clazz = defaultValue.getClass();
+    public Class<? extends Serializable> getClassType() {
+        return clazz;
     }
 
 }

@@ -28,6 +28,18 @@ public class ChatMessage {
         this.content = content;
     }
 
+    public static ChatMessage toSystem(String content) {
+        return new ChatMessage(ChatRole.SYSTEM, content);
+    }
+
+    public static ChatMessage toUser(String content) {
+        return new ChatMessage(ChatRole.USER, content);
+    }
+
+    public static ChatMessage toAssistant(String content) {
+        return new ChatMessage(ChatRole.ASSISTANT, content);
+    }
+
     /**
      * Chat role define
      *
@@ -46,17 +58,5 @@ public class ChatMessage {
          * Assistant role
          */
         ASSISTANT
-    }
-
-    public static ChatMessage toSystem(String content) {
-        return new ChatMessage(ChatRole.SYSTEM, content);
-    }
-
-    public static ChatMessage toUser(String content) {
-        return new ChatMessage(ChatRole.USER, content);
-    }
-
-    public static ChatMessage toAssistant(String content) {
-        return new ChatMessage(ChatRole.ASSISTANT, content);
     }
 }
