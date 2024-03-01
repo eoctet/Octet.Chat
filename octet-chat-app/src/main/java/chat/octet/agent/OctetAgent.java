@@ -67,10 +67,6 @@ public class OctetAgent {
                         text = StringUtils.strip(text);
                     }
                     System.out.print(ColorConsole.cyan(text));
-                    try {
-                        Thread.sleep(12);
-                    } catch (Exception ignored) {
-                    }
                 }
             }
         }
