@@ -14,9 +14,9 @@ public enum ModelType {
             "[INST] {0}{1} [/INST] "
     ),
     LLAMA3(
-            "",
-            "<<SYS>>\n{0}\n<</SYS>>",
-            "[INST] {0}{1} [/INST] "
+            "\n",
+            "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{0}<|eot_id|>\n",
+            "{0}<|start_header_id|>user<|end_header_id|>\n{1}<|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>\n"
     ),
     ALPACA(
             "\n\n",
@@ -64,6 +64,11 @@ public enum ModelType {
             "{0}User: {1}\nAssistant: "
     ),
     QWEN(
+            "\n",
+            "<|im_start|>system\n{0}<|im_end|>",
+            "{0}<|im_start|>user\n{1}<|im_end|>\n<|im_start|>assistant"
+    ),
+    QWEN2(
             "\n",
             "<|im_start|>system\n{0}<|im_end|>",
             "{0}<|im_start|>user: \n{1}<|im_end|>\n<|im_start|>assistant: "
