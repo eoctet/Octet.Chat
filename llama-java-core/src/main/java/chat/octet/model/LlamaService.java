@@ -31,7 +31,6 @@ public class LlamaService {
     static {
         System.load(Platform.LIB_RESOURCE_PATH);
         initNative();
-        llamaBackendInit();
     }
 
     /**
@@ -61,9 +60,14 @@ public class LlamaService {
     public static native LlamaModelQuantizeParams getLlamaModelQuantizeDefaultParams();
 
     /**
-     * Initialize the llama + ggml backend
+     * Initialize the llama + ggml backend.
      */
     public static native void llamaBackendInit();
+
+    /**
+     * Initialize NUMA optimizations.
+     */
+    public static native void llamaNumaInit(int numaStrategy);
 
     /**
      * Call once at the end of the program.

@@ -45,6 +45,13 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendInit
 
 /*
  * Class:     chat_octet_model_LlamaService
+ * Method:    llamaNumaInit
+ */
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaNumaInit
+        (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     chat_octet_model_LlamaService
  * Method:    llamaBackendFree
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree

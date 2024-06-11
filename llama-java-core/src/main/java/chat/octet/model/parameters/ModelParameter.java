@@ -2,9 +2,7 @@ package chat.octet.model.parameters;
 
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
-import chat.octet.model.enums.LlamaPoolingType;
-import chat.octet.model.enums.LlamaRoPEScalingType;
-import chat.octet.model.enums.ModelType;
+import chat.octet.model.enums.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -158,18 +156,6 @@ public class ModelParameter {
     private float ropeFreqScale = 0;
 
     /**
-     * Grouped-query attention. Must be 8 for llama-2 70b.
-     */
-    @Nullable
-    private Integer gqa;
-
-    /**
-     * default is 1e-5, 5e-6 is a good value for llama-2 models.
-     */
-    @Nullable
-    private Float rmsNormEps;
-
-    /**
      * Print verbose output to stderr.
      */
     @Builder.Default
@@ -220,13 +206,11 @@ public class ModelParameter {
 
     /**
      * how to split the model across multiple GPUs (default: 1).
-     * <p></p>
-     * LLAMA_SPLIT_NONE    = 0 (single GPU)
-     * LLAMA_SPLIT_LAYER   = 1 (split layers and KV across GPUs)
-     * LLAMA_SPLIT_ROW     = 2 (split rows across GPUs)
+     *
+     * @see LlamaSplitMode
      */
     @Builder.Default
-    private int splitMode = 1;
+    private int splitMode = LlamaSplitMode.LLAMA_SPLIT_MODE_LAYER.getType();
 
     /**
      * Physical maximum batch size (default: 512).
@@ -242,6 +226,8 @@ public class ModelParameter {
 
     /**
      * Pooling type for embeddings, use model default if unspecified. Options are none(0), mean(1), cls(2).
+     *
+     * @see LlamaPoolingType
      */
     @Builder.Default
     private int poolingType = LlamaPoolingType.LLAMA_POOLING_TYPE_UNSPECIFIED.getType();
@@ -263,5 +249,13 @@ public class ModelParameter {
      */
     @Builder.Default
     private boolean checkTensors = false;
+
+    /**
+     * Attempt one of the below optimization strategies that may help on some NUMA systems (default: disabled).
+     *
+     * @see LlamaNumaStrategy
+     */
+    @Builder.Default
+    private int numaStrategy = LlamaNumaStrategy.NUMA_STRATEGY_DISABLED.getType();
 
 }

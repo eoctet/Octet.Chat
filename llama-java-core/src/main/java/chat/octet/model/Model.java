@@ -53,6 +53,10 @@ public class Model implements AutoCloseable {
         this.modelName = modelParams.getModelName();
         this.modelType = modelParams.getModelType();
         Preconditions.checkNotNull(modelType, "Model type cannot be null");
+        //init llama backend
+        LlamaService.llamaBackendInit();
+        //use NUMA optimizations
+        LlamaService.llamaNumaInit(modelParams.getNumaStrategy());
         //setting model parameters
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
         LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);

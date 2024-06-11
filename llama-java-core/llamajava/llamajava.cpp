@@ -365,6 +365,15 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendInit
 
 /*
  * Class:     chat_octet_model_LlamaService
+ * Method:    llamaNumaInit
+ */
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaNumaInit
+        (JNIEnv *env, jclass thisClass, jint numa_strategy) {
+    llama_numa_init(static_cast<enum ggml_numa_strategy>(numa_strategy));
+}
+
+/*
+ * Class:     chat_octet_model_LlamaService
  * Method:    llamaBackendFree
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree
