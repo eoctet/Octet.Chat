@@ -38,7 +38,7 @@ jobs:
 
   #build macos lib
   build-macos-lib:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - name: Checkout project
         id: checkout_project
@@ -60,6 +60,32 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-metallib
+          path: llama-java-core/llama.cpp/default.metallib
+
+  #build macos arm lib
+  build-macos-arm-lib:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout project
+        id: checkout_project
+        uses: actions/checkout@v4
+
+      - name: Build lib
+        id: build_lib
+        run: |
+          cd llama-java-core
+          /bin/bash build.sh macos
+
+      - name: Upload lib
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm-libllama
+          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
+
+      - name: Upload metal lib
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm-metallib
           path: llama-java-core/llama.cpp/default.metallib
 
   #build windows lib
