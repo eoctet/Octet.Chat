@@ -147,6 +147,7 @@ jobs:
       - build-linux-lib
       - build-macos-lib
       - build-windows-lib
+      - build-macos-arm-lib
 
     steps:
       - uses: actions/checkout@v4
