@@ -81,6 +81,7 @@ public class Model implements AutoCloseable {
         llamaModelParams.gpuLayers = modelParams.getGpuLayers();
         llamaModelParams.splitMode = modelParams.getSplitMode();
         llamaModelParams.vocabOnly = modelParams.isVocabOnly();
+        llamaModelParams.checkTensors = modelParams.isCheckTensors();
         boolean mmap = (StringUtils.isBlank(modelParams.getLoraPath()) && modelParams.isMmap());
         if (mmap && LlamaService.isMmapSupported()) {
             llamaModelParams.mmap = true;
@@ -103,21 +104,24 @@ public class Model implements AutoCloseable {
         llamaContextParams.seed = modelParams.getSeed();
         llamaContextParams.ctx = modelParams.getContextSize();
         llamaContextParams.batch = modelParams.getBatchSize();
+        llamaContextParams.ubatch = modelParams.getUbatch();
+        llamaContextParams.seqMax = modelParams.getSeqMax();
         llamaContextParams.threads = modelParams.getThreads();
         llamaContextParams.threadsBatch = modelParams.getThreadsBatch() == -1 ? modelParams.getThreads() : modelParams.getThreadsBatch();
         llamaContextParams.ropeScalingType = modelParams.getRopeScalingType();
+        llamaContextParams.poolingType = modelParams.getPoolingType();
         llamaContextParams.yarnExtFactor = modelParams.getYarnExtFactor();
         llamaContextParams.yarnAttnFactor = modelParams.getYarnAttnFactor();
         llamaContextParams.yarnBetaFast = modelParams.getYarnBetaFast();
         llamaContextParams.yarnBetaSlow = modelParams.getYarnBetaSlow();
         llamaContextParams.yarnOrigCtx = modelParams.getYarnOrigCtx();
+        llamaContextParams.defragThold = modelParams.getDefragThold();
         llamaContextParams.ropeFreqBase = modelParams.getRopeFreqBase();
         llamaContextParams.ropeFreqScale = modelParams.getRopeFreqScale();
-        llamaContextParams.mulMatQ = modelParams.isMulMatQ();
         llamaContextParams.logitsAll = modelParams.isLogitsAll();
         llamaContextParams.embedding = modelParams.isEmbedding();
         llamaContextParams.offloadKqv = modelParams.isOffloadKqv();
-        llamaContextParams.doPooling = modelParams.isDoPooling();
+        llamaContextParams.flashAttn = modelParams.isFlashAttn();
         return llamaContextParams;
     }
 

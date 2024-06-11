@@ -10,7 +10,7 @@ import chat.octet.model.Model;
 import chat.octet.model.TokenDecoder;
 import chat.octet.model.beans.CompletionResult;
 import chat.octet.model.beans.Token;
-import chat.octet.model.enums.LlamaTokenType;
+import chat.octet.model.enums.LlamaTokenAttr;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.utils.CommonUtils;
 import chat.octet.utils.JsonUtils;
@@ -376,8 +376,8 @@ public class ChatCompletionService {
 
         return ServerResponse.ok().contentType(MediaType.TEXT_EVENT_STREAM)
                 .body(Flux.fromIterable(generator)
-                        .concatWithValues(new Token(-1, LlamaTokenType.LLAMA_TOKEN_TYPE_USER_DEFINED, "[DONE]")).map(token -> {
-                            if (token.getId() == -1 && token.getTokenType() == LlamaTokenType.LLAMA_TOKEN_TYPE_USER_DEFINED) {
+                        .concatWithValues(new Token(-1, LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED, "[DONE]")).map(token -> {
+                            if (token.getId() == -1 && token.getTokenAttr() == LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED) {
                                 return token.getText();
                             } else {
                                 ChatCompletionData data = chat ? new ChatCompletionData("content", token.getText(), token.getFinishReason().name())

@@ -7,7 +7,7 @@ import chat.octet.agent.plugin.model.ThoughtProcess;
 import chat.octet.model.Model;
 import chat.octet.model.TokenDecoder;
 import chat.octet.model.beans.Token;
-import chat.octet.model.enums.LlamaTokenType;
+import chat.octet.model.enums.LlamaTokenAttr;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.ColorConsole;
 import chat.octet.utils.JsonUtils;
@@ -134,7 +134,7 @@ public class OctetAgent {
                 if (StringUtils.isNotBlank(thought.getFinalAnswer())) {
                     tokens = TokenDecoder.subTokensBetween(tokens, FINAL_ANSWER);
                     if (apiEnabled) {
-                        tokens.add(new Token(-1, LlamaTokenType.LLAMA_TOKEN_TYPE_USER_DEFINED, "[DONE]"));
+                        tokens.add(new Token(-1, LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED, "[DONE]"));
                     }
                     finished = true;
                     return tokens;
@@ -155,7 +155,7 @@ public class OctetAgent {
                     if (StringUtils.isNotBlank(thought.getThought())) {
                         tokens = TokenDecoder.subTokensBetween(tokens, THOUGHT);
                         if (apiEnabled) {
-                            tokens.add(new Token(-1, LlamaTokenType.LLAMA_TOKEN_TYPE_USER_DEFINED, "[DONE]"));
+                            tokens.add(new Token(-1, LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED, "[DONE]"));
                         }
                     }
                     finished = true;

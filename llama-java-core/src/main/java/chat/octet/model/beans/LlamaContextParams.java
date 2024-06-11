@@ -1,5 +1,6 @@
 package chat.octet.model.beans;
 
+import chat.octet.model.enums.LlamaPoolingType;
 import chat.octet.model.enums.LlamaRoPEScalingType;
 import lombok.ToString;
 
@@ -23,6 +24,14 @@ public class LlamaContextParams {
      */
     public int batch;
     /**
+     * physical maximum batch size.
+     */
+    public int ubatch;
+    /**
+     * max number of sequences (i.e. distinct states for recurrent models).
+     */
+    public int seqMax;
+    /**
      * number of threads used for generation.
      */
     public int threads;
@@ -36,6 +45,12 @@ public class LlamaContextParams {
      * @see LlamaRoPEScalingType
      */
     public int ropeScalingType;
+    /**
+     * whether to pool (sum) embedding results by sequence id,(ignored if no pooling layer).
+     *
+     * @see LlamaPoolingType
+     */
+    public int poolingType;
     /**
      * YaRN extrapolation mix factor, NaN = from model.
      */
@@ -57,6 +72,10 @@ public class LlamaContextParams {
      */
     public int yarnOrigCtx;
     /**
+     * defragment the KV cache if holes/size > thold, < 0 disabled (default).
+     */
+    public float defragThold;
+    /**
      * RoPE base frequency.
      */
     public float ropeFreqBase;
@@ -73,10 +92,6 @@ public class LlamaContextParams {
      */
     public int dataTypeV;
     /**
-     * if true, use experimental mul_mat_q kernels.
-     */
-    public boolean mulMatQ;
-    /**
      * the llama_eval() call computes all logits, not just the last one.
      */
     public boolean logitsAll;
@@ -89,8 +104,8 @@ public class LlamaContextParams {
      */
     public boolean offloadKqv;
     /**
-     * whether to pool (sum) embedding results by sequence id (ignored if no pooling layer).
+     * whether to use flash attention [EXPERIMENTAL].
      */
-    public boolean doPooling;
+    public boolean flashAttn;
 
 }

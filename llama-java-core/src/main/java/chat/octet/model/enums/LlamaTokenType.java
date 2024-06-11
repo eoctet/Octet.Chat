@@ -13,6 +13,7 @@ import java.util.Map;
  * @author <a href="https://github.com/eoctet">William</a>
  */
 @Getter
+@Deprecated
 public enum LlamaTokenType {
     /**
      * Undefined type.

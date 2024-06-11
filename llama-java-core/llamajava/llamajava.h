@@ -129,9 +129,9 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbedding
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getTokenType
+ * Method:    getTokenAttr
  */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenAttr
         (JNIEnv *, jclass, jint);
 
 /*
@@ -160,7 +160,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
  * Method:    tokenToPiece
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenToPiece
-        (JNIEnv *, jclass, jint, jbyteArray, jint);
+        (JNIEnv *, jclass, jint, jbyteArray, jint, jboolean);
 
 /*
  * Class:     chat_octet_model_LlamaService

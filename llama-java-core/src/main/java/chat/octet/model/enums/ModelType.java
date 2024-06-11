@@ -13,6 +13,11 @@ public enum ModelType {
             "<<SYS>>\n{0}\n<</SYS>>",
             "[INST] {0}{1} [/INST] "
     ),
+    LLAMA3(
+            "",
+            "<<SYS>>\n{0}\n<</SYS>>",
+            "[INST] {0}{1} [/INST] "
+    ),
     ALPACA(
             "\n\n",
             "",

@@ -41,6 +41,10 @@ public class LlamaModelParams {
      * force system to keep model in RAM.
      */
     public boolean mlock;
+    /**
+     * validate model tensor data.
+     */
+    public boolean checkTensors;
 
 
 }

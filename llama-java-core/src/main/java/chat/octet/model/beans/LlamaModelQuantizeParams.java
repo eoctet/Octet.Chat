@@ -18,6 +18,14 @@ public class LlamaModelQuantizeParams {
      */
     public int modelFileType;
     /**
+     * output tensor type.
+     */
+    public int outputTensorType;
+    /**
+     * token embeddings tensor type.
+     */
+    public int tokenEmbeddingType;
+    /**
      * allow quantizing non-f32/f16 tensors
      */
     public boolean allowRequantize;
@@ -33,5 +41,9 @@ public class LlamaModelQuantizeParams {
      * disable k-quant mixtures and quantize all tensors to the same type
      */
     public boolean pure;
+    /**
+     * quantize to the same number of shards.
+     */
+    public boolean keepSplit;
 
 }

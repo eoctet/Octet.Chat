@@ -2,6 +2,7 @@ package chat.octet.model.parameters;
 
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
+import chat.octet.model.enums.LlamaPoolingType;
 import chat.octet.model.enums.LlamaRoPEScalingType;
 import chat.octet.model.enums.ModelType;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,10 +43,10 @@ public class ModelParameter {
     private String modelName;
 
     /**
-     * Llama model type (default model type: Llama2).
+     * Llama model type (default model type: Llama3).
      */
     @Builder.Default
-    private String modelType = ModelType.LLAMA2.name();
+    private String modelType = ModelType.LLAMA3.name();
 
     /**
      * option allows you to set the size of the prompt context used by the LLaMA models during text generation.
@@ -169,12 +170,6 @@ public class ModelParameter {
     private Float rmsNormEps;
 
     /**
-     * If true, use experimental mul_mat_q kernels.
-     */
-    @Builder.Default
-    private boolean mulMatQ = true;
-
-    /**
      * Print verbose output to stderr.
      */
     @Builder.Default
@@ -234,10 +229,39 @@ public class ModelParameter {
     private int splitMode = 1;
 
     /**
-     * whether to pool (sum) embedding results by sequence id (ignored if no pooling layer).
+     * Physical maximum batch size (default: 512).
      */
     @Builder.Default
-    private boolean doPooling = true;
+    private int ubatch = 512;
 
+    /**
+     * Max number of sequences (default: 1).
+     */
+    @Builder.Default
+    private int seqMax = 1;
+
+    /**
+     * Pooling type for embeddings, use model default if unspecified. Options are none(0), mean(1), cls(2).
+     */
+    @Builder.Default
+    private int poolingType = LlamaPoolingType.LLAMA_POOLING_TYPE_UNSPECIFIED.getType();
+
+    /**
+     * KV cache defragmentation threshold (default: -1.0, < 0 = disabled).
+     */
+    @Builder.Default
+    private float defragThold = -1.0f;
+
+    /**
+     * Enable flash attention (default: disabled).
+     */
+    @Builder.Default
+    private boolean flashAttn = false;
+
+    /**
+     * Validate model tensor data (default: disabled).
+     */
+    @Builder.Default
+    private boolean checkTensors = false;
 
 }

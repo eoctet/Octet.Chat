@@ -1,7 +1,7 @@
 package chat.octet.model.beans;
 
 import chat.octet.model.enums.FinishReason;
-import chat.octet.model.enums.LlamaTokenType;
+import chat.octet.model.enums.LlamaTokenAttr;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -19,13 +19,13 @@ import java.util.Objects;
 public final class Token implements Serializable {
     private final int id;
     private final String text;
-    private final LlamaTokenType tokenType;
+    private final LlamaTokenAttr tokenAttr;
     private FinishReason finishReason;
 
-    public Token(int id, LlamaTokenType tokenType, String text) {
+    public Token(int id, LlamaTokenAttr tokenAttr, String text) {
         this.id = id;
         this.text = text;
-        this.tokenType = tokenType;
+        this.tokenAttr = tokenAttr;
         this.finishReason = FinishReason.NONE;
     }
 

@@ -265,7 +265,7 @@ public class Generator implements Iterable<Token> {
          */
         private String tokenToText(int token) {
             byte[] buffer = new byte[64];
-            int length = LlamaService.tokenToPiece(token, buffer, buffer.length);
+            int length = LlamaService.tokenToPiece(token, buffer, buffer.length, false);
             if (length == 0) {
                 return StringUtils.EMPTY;
             }
@@ -309,7 +309,7 @@ public class Generator implements Iterable<Token> {
                 lastTokens = status.subInputIds(startIndex);
             }
             int tokenId = LlamaService.sampling(generateParams, logits, lastTokens, status.getId(), status.getPastTokenSize());
-            Token token = new Token(tokenId, LlamaService.getLlamaTokenType(tokenId), tokenToText(tokenId));
+            Token token = new Token(tokenId, LlamaService.getLlamaTokenAttr(tokenId), tokenToText(tokenId));
             //update generate status
             status.appendNextToken(token);
             finished = breakOrContinue(token, logits);

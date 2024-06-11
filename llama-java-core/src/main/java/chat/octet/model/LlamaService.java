@@ -5,7 +5,7 @@ import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.beans.LlamaModelQuantizeParams;
 import chat.octet.model.beans.Metrics;
-import chat.octet.model.enums.LlamaTokenType;
+import chat.octet.model.enums.LlamaTokenAttr;
 import chat.octet.model.enums.ModelFileType;
 import chat.octet.model.exceptions.DecodeException;
 import chat.octet.model.exceptions.ModelException;
@@ -24,7 +24,7 @@ import java.text.MessageFormat;
  * <p>C++ source: llamajava.h, llamajava.cpp</p>
  *
  * @author <a href="https://github.com/eoctet">William</a>
- * @since b2249
+ * @since b3091 20240611
  */
 public class LlamaService {
 
@@ -164,7 +164,7 @@ public class LlamaService {
      * @param token Token id.
      * @return int
      */
-    public static native int getTokenType(int token);
+    public static native int getTokenAttr(int token);
 
     /**
      * Get special BOS token.
@@ -201,9 +201,10 @@ public class LlamaService {
      * @param token        Token id.
      * @param buf          Input byte buffer.
      * @param bufferLength Input byte buffer length.
+     * @param special      If true, special tokens are rendered in the output.
      * @return int, Returns byte buffer length of the piece.
      */
-    public static native int tokenToPiece(int token, byte[] buf, int bufferLength);
+    public static native int tokenToPiece(int token, byte[] buf, int bufferLength, boolean special);
 
     /**
      * Get sampling metrics
@@ -373,11 +374,11 @@ public class LlamaService {
      * Get token type define.
      *
      * @param token Token id.
-     * @return LlamaTokenType
-     * @see LlamaTokenType
+     * @return LlamaTokenAttr
+     * @see LlamaTokenAttr
      */
-    public static LlamaTokenType getLlamaTokenType(int token) {
-        return LlamaTokenType.valueOfType(getTokenType(token));
+    public static LlamaTokenAttr getLlamaTokenAttr(int token) {
+        return LlamaTokenAttr.valueOfType(getTokenAttr(token));
     }
 
 }

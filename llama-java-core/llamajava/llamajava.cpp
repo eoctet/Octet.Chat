@@ -29,23 +29,28 @@ jclass LLAMA_CONTEXT_PARAMS_CLASS;
 jfieldID FIELD_SEED;
 jfieldID FIELD_CTX;
 jfieldID FIELD_BATCH;
+jfieldID FIELD_UBATCH;
+jfieldID FIELD_SEQ_MAX;
 jfieldID FIELD_THREADS;
 jfieldID FIELD_THREADS_BATCH;
 jfieldID FIELD_ROPE_SCALING_TYPE;
+jfieldID FIELD_POOLING_TYPE;
 jfieldID FIELD_YARN_EXT_FACTOR;
 jfieldID FIELD_YARN_ATTN_FACTOR;
 jfieldID FIELD_YARN_BETA_FAST;
 jfieldID FIELD_YARN_BETA_SLOW;
 jfieldID FIELD_YARN_ORIG_CTX;
+jfieldID FIELD_DEFRAG_THOLD;
 jfieldID FIELD_ROPE_FREQ_BASE;
 jfieldID FIELD_ROPE_FREQ_SCALE;
-jfieldID FIELD_MUL_MAT_Q;
 jfieldID FIELD_DATA_TYPE_K;
 jfieldID FIELD_DATA_TYPE_V;
 jfieldID FIELD_LOGITS_ALL;
 jfieldID FIELD_EMBEDDING;
 jfieldID FIELD_OFFLOAD_KQV;
-jfieldID FIELD_DO_POOLING;
+jfieldID FIELD_FLASH_ATTN;
+jfieldID FIELD_ABORT_CALLBACK;
+jfieldID FIELD_ABORT_CALLBACK_DATA;
 
 //Class LlamaModelParams:
 jclass LLAMA_MODEL_PARAMS_CLASS;
@@ -56,15 +61,21 @@ jfieldID FIELD_TENSOR_SPLIT;
 jfieldID FIELD_VOCAB_ONLY;
 jfieldID FIELD_USE_MMAP;
 jfieldID FIELD_USE_MLOCK;
+jfieldID FIELD_CHECK_TENSORS;
 
 //Class LlamaModelQuantizeParams:
 jclass LLAMA_MODEL_QUANTIZE_PARAMS_CLASS;
 jfieldID FIELD_THREAD;
 jfieldID FIELD_MODEL_FILE_TYPE;
+jfieldID FIELD_OUTPUT_TENSOR_TYPE;
+jfieldID FIELD_TOKEN_EMBEDDING_TYPE;
 jfieldID FIELD_ALLOW_REQUANTIZE;
 jfieldID FIELD_QUANTIZE_OUTPUT_TENSOR;
 jfieldID FIELD_ONLY_COPY;
 jfieldID FIELD_PURE;
+jfieldID FIELD_KEEP_SPLIT;
+jfieldID FIELD_IMATRIX;
+jfieldID FIELD_KV_OVERRIDES;
 
 //Class Metrics
 jclass METRICS_CLASS;
@@ -114,12 +125,14 @@ static struct llama_model_params GetLlamaModelParams(JNIEnv *env, jobject jllama
             /*.split_mode                  =*/ static_cast<enum llama_split_mode>(env->GetIntField(jllama_model_params, FIELD_SPLIT_MODE)),
             /*.main_gpu                    =*/ env->GetIntField(jllama_model_params, FIELD_MAIN_GPU),
             /*.tensor_split                =*/ tensor_split,
+            /*.rpc_servers                 =*/ nullptr,
             /*.progress_callback           =*/ nullptr,
             /*.progress_callback_user_data =*/ nullptr,
             /*.kv_overrides                =*/ nullptr,
             /*.vocab_only                  =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_VOCAB_ONLY)),
             /*.use_mmap                    =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_USE_MMAP)),
             /*.use_mlock                   =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_USE_MLOCK)),
+            /*.check_tensors               =*/ ToCBool(env->GetBooleanField(jllama_model_params, FIELD_CHECK_TENSORS)),
     };
     if (arrays_data != nullptr) {
         env->ReleaseFloatArrayElements(arrays_data, tensor_split, 0);
@@ -132,9 +145,12 @@ static struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jl
             /*.seed                        =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_SEED),
             /*.n_ctx                       =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_CTX),
             /*.n_batch                     =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_BATCH),
+            /*.n_ubatch                    =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_UBATCH),
+            /*.n_seq_max                   =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_SEQ_MAX),
             /*.n_threads                   =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_THREADS),
             /*.n_threads_batch             =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_THREADS_BATCH),
-            /*.rope_scaling_type           =*/ (int8_t) env->GetIntField(jllama_context_params, FIELD_ROPE_SCALING_TYPE),
+            /*.rope_scaling_type           =*/ static_cast<enum llama_rope_scaling_type>(env->GetIntField(jllama_context_params, FIELD_ROPE_SCALING_TYPE)),
+            /*.pooling_type                =*/ static_cast<enum llama_pooling_type>(env->GetIntField(jllama_context_params, FIELD_POOLING_TYPE)),
             /*.rope_freq_base              =*/ env->GetFloatField(jllama_context_params, FIELD_ROPE_FREQ_BASE),
             /*.rope_freq_scale             =*/ env->GetFloatField(jllama_context_params, FIELD_ROPE_FREQ_SCALE),
             /*.yarn_ext_factor             =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_EXT_FACTOR),
@@ -142,15 +158,17 @@ static struct llama_context_params GetLlamaContextParams(JNIEnv *env, jobject jl
             /*.yarn_beta_fast              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_FAST),
             /*.yarn_beta_slow              =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_BETA_SLOW),
             /*.yarn_orig_ctx               =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_YARN_ORIG_CTX),
+            /*.defrag_thold                =*/ env->GetFloatField(jllama_context_params, FIELD_DEFRAG_THOLD),
             /*.cb_eval                     =*/ nullptr,
             /*.cb_eval_user_data           =*/ nullptr,
             /*.type_k                      =*/ static_cast<enum ggml_type>(env->GetIntField(jllama_context_params, FIELD_DATA_TYPE_K)),
             /*.type_v                      =*/ static_cast<enum ggml_type>(env->GetIntField(jllama_context_params, FIELD_DATA_TYPE_V)),
-            /*.mul_mat_q                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_MUL_MAT_Q)),
             /*.logits_all                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_LOGITS_ALL)),
-            /*.embedding                   =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_EMBEDDING)),
+            /*.embeddings                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_EMBEDDING)),
             /*.offload_kqv                 =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_OFFLOAD_KQV)),
-            /*.do_pooling                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_DO_POOLING)),
+            /*.flash_attn                  =*/ ToCBool(env->GetBooleanField(jllama_context_params, FIELD_FLASH_ATTN)),
+            /*.abort_callback              =*/ nullptr,
+            /*.abort_callback_data         =*/ nullptr,
     };
     return params;
 }
@@ -188,23 +206,26 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_SEED = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "seed", "I");
     FIELD_CTX = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ctx", "I");
     FIELD_BATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "batch", "I");
+    FIELD_UBATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ubatch", "I");
+    FIELD_SEQ_MAX = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "seqMax", "I");
     FIELD_THREADS = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "threads", "I");
     FIELD_THREADS_BATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "threadsBatch", "I");
     FIELD_ROPE_SCALING_TYPE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeScalingType", "I");
+    FIELD_POOLING_TYPE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "poolingType", "I");
     FIELD_YARN_EXT_FACTOR = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnExtFactor", "F");
     FIELD_YARN_ATTN_FACTOR = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnAttnFactor", "F");
     FIELD_YARN_BETA_FAST = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnBetaFast", "F");
     FIELD_YARN_BETA_SLOW = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnBetaSlow", "F");
     FIELD_YARN_ORIG_CTX = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnOrigCtx", "I");
+    FIELD_DEFRAG_THOLD = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "defragThold", "F");
     FIELD_ROPE_FREQ_BASE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqBase", "F");
     FIELD_ROPE_FREQ_SCALE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeFreqScale", "F");
     FIELD_DATA_TYPE_K = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "dataTypeK", "I");
     FIELD_DATA_TYPE_V = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "dataTypeV", "I");
-    FIELD_MUL_MAT_Q = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "mulMatQ", "Z");
     FIELD_LOGITS_ALL = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "logitsAll", "Z");
     FIELD_EMBEDDING = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "embedding", "Z");
     FIELD_OFFLOAD_KQV = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "offloadKqv", "Z");
-    FIELD_DO_POOLING = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "doPooling", "Z");
+    FIELD_FLASH_ATTN = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "flashAttn", "Z");
 
     //Class LlamaContextParams
     LLAMA_MODEL_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelParams");
@@ -215,15 +236,19 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
     FIELD_VOCAB_ONLY = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "vocabOnly", "Z");
     FIELD_USE_MMAP = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mmap", "Z");
     FIELD_USE_MLOCK = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "mlock", "Z");
+    FIELD_CHECK_TENSORS = env->GetFieldID(LLAMA_MODEL_PARAMS_CLASS, "checkTensors", "Z");
 
     //Class LlamaModelQuantizeParams
     LLAMA_MODEL_QUANTIZE_PARAMS_CLASS = env->FindClass("chat/octet/model/beans/LlamaModelQuantizeParams");
     FIELD_THREAD = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "thread", "I");
     FIELD_MODEL_FILE_TYPE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "modelFileType", "I");
+    FIELD_OUTPUT_TENSOR_TYPE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "outputTensorType", "I");
+    FIELD_TOKEN_EMBEDDING_TYPE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "tokenEmbeddingType", "I");
     FIELD_ALLOW_REQUANTIZE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "allowRequantize", "Z");
     FIELD_QUANTIZE_OUTPUT_TENSOR = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "quantizeOutputTensor", "Z");
     FIELD_ONLY_COPY = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "onlyCopy", "Z");
     FIELD_PURE = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "pure", "Z");
+    FIELD_KEEP_SPLIT = env->GetFieldID(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, "keepSplit", "Z");
 
     //Class Metrics
     METRICS_CLASS = env->FindClass("chat/octet/model/beans/Metrics");
@@ -258,6 +283,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelDefaul
     env->SetBooleanField(llama_model_params, FIELD_VOCAB_ONLY, ToJBoolean(defaults.vocab_only));
     env->SetBooleanField(llama_model_params, FIELD_USE_MMAP, ToJBoolean(defaults.use_mmap));
     env->SetBooleanField(llama_model_params, FIELD_USE_MLOCK, ToJBoolean(defaults.use_mlock));
+    env->SetBooleanField(llama_model_params, FIELD_CHECK_TENSORS, ToJBoolean(defaults.check_tensors));
     env->DeleteLocalRef(llama_model_params_class);
     return llama_model_params;
 }
@@ -279,23 +305,26 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
     env->SetIntField(llama_context_params, FIELD_SEED, defaults.seed);
     env->SetIntField(llama_context_params, FIELD_CTX, defaults.n_ctx);
     env->SetIntField(llama_context_params, FIELD_BATCH, defaults.n_batch);
+    env->SetIntField(llama_context_params, FIELD_UBATCH, defaults.n_ubatch);
+    env->SetIntField(llama_context_params, FIELD_SEQ_MAX, defaults.n_seq_max);
     env->SetIntField(llama_context_params, FIELD_THREADS, defaults.n_threads);
     env->SetIntField(llama_context_params, FIELD_THREADS_BATCH, defaults.n_threads_batch);
     env->SetIntField(llama_context_params, FIELD_ROPE_SCALING_TYPE, defaults.rope_scaling_type);
+    env->SetIntField(llama_context_params, FIELD_POOLING_TYPE, defaults.pooling_type);
     env->SetFloatField(llama_context_params, FIELD_YARN_EXT_FACTOR, defaults.yarn_ext_factor);
     env->SetFloatField(llama_context_params, FIELD_YARN_ATTN_FACTOR, defaults.yarn_attn_factor);
     env->SetFloatField(llama_context_params, FIELD_YARN_BETA_FAST, defaults.yarn_beta_fast);
     env->SetFloatField(llama_context_params, FIELD_YARN_BETA_SLOW, defaults.yarn_beta_slow);
     env->SetIntField(llama_context_params, FIELD_YARN_ORIG_CTX, defaults.yarn_orig_ctx);
+    env->SetFloatField(llama_context_params, FIELD_DEFRAG_THOLD, defaults.defrag_thold);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_BASE, defaults.rope_freq_base);
     env->SetFloatField(llama_context_params, FIELD_ROPE_FREQ_SCALE, defaults.rope_freq_scale);
     env->SetIntField(llama_context_params, FIELD_DATA_TYPE_K, defaults.type_k);
     env->SetIntField(llama_context_params, FIELD_DATA_TYPE_V, defaults.type_v);
-    env->SetBooleanField(llama_context_params, FIELD_MUL_MAT_Q, ToJBoolean(defaults.mul_mat_q));
     env->SetBooleanField(llama_context_params, FIELD_LOGITS_ALL, ToJBoolean(defaults.logits_all));
-    env->SetBooleanField(llama_context_params, FIELD_EMBEDDING, ToJBoolean(defaults.embedding));
+    env->SetBooleanField(llama_context_params, FIELD_EMBEDDING, ToJBoolean(defaults.embeddings));
     env->SetBooleanField(llama_context_params, FIELD_OFFLOAD_KQV, ToJBoolean(defaults.offload_kqv));
-    env->SetBooleanField(llama_context_params, FIELD_DO_POOLING, ToJBoolean(defaults.do_pooling));
+    env->SetBooleanField(llama_context_params, FIELD_FLASH_ATTN, ToJBoolean(defaults.flash_attn));
     env->DeleteLocalRef(llama_context_params_class);
     return llama_context_params;
 }
@@ -314,10 +343,13 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuanti
 
     env->SetIntField(llama_model_quantize_params, FIELD_THREAD, defaults.nthread);
     env->SetIntField(llama_model_quantize_params, FIELD_MODEL_FILE_TYPE, defaults.ftype);
+    env->SetIntField(llama_model_quantize_params, FIELD_OUTPUT_TENSOR_TYPE, defaults.output_tensor_type);
+    env->SetIntField(llama_model_quantize_params, FIELD_TOKEN_EMBEDDING_TYPE, defaults.token_embedding_type);
     env->SetBooleanField(llama_model_quantize_params, FIELD_ALLOW_REQUANTIZE, ToJBoolean(defaults.allow_requantize));
     env->SetBooleanField(llama_model_quantize_params, FIELD_QUANTIZE_OUTPUT_TENSOR, ToJBoolean(defaults.quantize_output_tensor));
     env->SetBooleanField(llama_model_quantize_params, FIELD_ONLY_COPY, ToJBoolean(defaults.only_copy));
     env->SetBooleanField(llama_model_quantize_params, FIELD_PURE, ToJBoolean(defaults.pure));
+    env->SetBooleanField(llama_model_quantize_params, FIELD_KEEP_SPLIT, ToJBoolean(defaults.keep_split));
     env->DeleteLocalRef(llama_model_quantize_params_class);
     return llama_model_quantize_params;
 }
@@ -489,11 +521,11 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbedding
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getTokenType
+ * Method:    getTokenAttr
  */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenType
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenAttr
         (JNIEnv *env, jclass thisClass, jint token) {
-    return llama_token_get_type(model, token);
+    return llama_token_get_attr(model, token);
 }
 
 /*
@@ -539,9 +571,9 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
  * Method:    tokenToPiece
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenToPiece
-        (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint buffer_length) {
+        (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint buffer_length, jboolean special) {
     jbyte *buffer = new jbyte[buffer_length];
-    int size = llama_token_to_piece(model, token, (char *) buffer, buffer_length);
+    int size = llama_token_to_piece(model, token, (char *) buffer, buffer_length, ToCBool(special));
     env->ReleaseByteArrayElements(buf, buffer, 0);
     return size;
 }
@@ -795,17 +827,19 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
         (JNIEnv *env, jclass thisClass, jstring source_model_file_path, jstring output_model_file_path, jobject quantize_params) {
-    int model_ftype = env->GetIntField(quantize_params, FIELD_MODEL_FILE_TYPE);
-    llama_ftype ftype = static_cast<enum llama_ftype>(model_ftype);
 
     struct llama_model_quantize_params params = {
         /*.nthread                     =*/ env->GetIntField(quantize_params, FIELD_THREAD),
-        /*.ftype                       =*/ ftype,
+        /*.ftype                       =*/ static_cast<enum llama_ftype>(env->GetIntField(quantize_params, FIELD_MODEL_FILE_TYPE)),
+        /*.output_tensor_type          =*/ static_cast<enum ggml_type>(env->GetIntField(quantize_params, FIELD_OUTPUT_TENSOR_TYPE)),
+        /*.token_embedding_type        =*/ static_cast<enum ggml_type>(env->GetIntField(quantize_params, FIELD_TOKEN_EMBEDDING_TYPE)),
         /*.allow_requantize            =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_ALLOW_REQUANTIZE)),
         /*.quantize_output_tensor      =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_QUANTIZE_OUTPUT_TENSOR)),
         /*.only_copy                   =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_ONLY_COPY)),
         /*.pure                        =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_PURE)),
-        /*.imatrix                     =*/ nullptr
+        /*.keep_split                  =*/ ToCBool(env->GetBooleanField(quantize_params, FIELD_KEEP_SPLIT)),
+        /*.imatrix                     =*/ nullptr,
+        /*.kv_overrides                =*/ nullptr,
     };
 
    return llama_model_quantize(ToCString(env, source_model_file_path), ToCString(env, output_model_file_path), &params);
