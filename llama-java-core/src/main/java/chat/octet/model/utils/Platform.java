@@ -25,9 +25,49 @@ public class Platform {
     public static final int GNU = 9;
     public static final int KFREEBSD = 10;
     public static final int NETBSD = 11;
-    public static String LIB_RESOURCE_PATH;
-    private static final int osType;
     public static final String ARCH;
+    private static final int osType;
+    public static String LIB_RESOURCE_PATH;
+
+    static {
+        String osName = System.getProperty("os.name");
+        if (osName.startsWith("Linux")) {
+            if ("dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"))) {
+                osType = 8;
+            } else {
+                osType = 1;
+            }
+        } else if (osName.startsWith("AIX")) {
+            osType = 7;
+        } else if (!osName.startsWith("Mac") && !osName.startsWith("Darwin")) {
+            if (osName.startsWith("Windows CE")) {
+                osType = 6;
+            } else if (osName.startsWith("Windows")) {
+                osType = 2;
+            } else if (!osName.startsWith("Solaris") && !osName.startsWith("SunOS")) {
+                if (osName.startsWith("FreeBSD")) {
+                    osType = 4;
+                } else if (osName.startsWith("OpenBSD")) {
+                    osType = 5;
+                } else if (osName.equalsIgnoreCase("gnu")) {
+                    osType = 9;
+                } else if (osName.equalsIgnoreCase("gnu/kfreebsd")) {
+                    osType = 10;
+                } else if (osName.equalsIgnoreCase("netbsd")) {
+                    osType = 11;
+                } else {
+                    osType = -1;
+                }
+            } else {
+                osType = 3;
+            }
+        } else {
+            osType = 0;
+        }
+
+        ARCH = getCanonicalArchitecture(System.getProperty("os.arch"), osType);
+        loadLibraryResource();
+    }
 
     private Platform() {
     }
@@ -102,7 +142,6 @@ public class Platform {
             throw new ModelException("Write native library file error ", e);
         }
     }
-
 
     public synchronized static void loadLibraryResource() {
         String libPathEnv = System.getProperty("octet.llama.lib");
@@ -191,45 +230,5 @@ public class Platform {
                 break;
         }
         return osPrefix;
-    }
-
-    static {
-        String osName = System.getProperty("os.name");
-        if (osName.startsWith("Linux")) {
-            if ("dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"))) {
-                osType = 8;
-            } else {
-                osType = 1;
-            }
-        } else if (osName.startsWith("AIX")) {
-            osType = 7;
-        } else if (!osName.startsWith("Mac") && !osName.startsWith("Darwin")) {
-            if (osName.startsWith("Windows CE")) {
-                osType = 6;
-            } else if (osName.startsWith("Windows")) {
-                osType = 2;
-            } else if (!osName.startsWith("Solaris") && !osName.startsWith("SunOS")) {
-                if (osName.startsWith("FreeBSD")) {
-                    osType = 4;
-                } else if (osName.startsWith("OpenBSD")) {
-                    osType = 5;
-                } else if (osName.equalsIgnoreCase("gnu")) {
-                    osType = 9;
-                } else if (osName.equalsIgnoreCase("gnu/kfreebsd")) {
-                    osType = 10;
-                } else if (osName.equalsIgnoreCase("netbsd")) {
-                    osType = 11;
-                } else {
-                    osType = -1;
-                }
-            } else {
-                osType = 3;
-            }
-        } else {
-            osType = 0;
-        }
-
-        ARCH = getCanonicalArchitecture(System.getProperty("os.arch"), osType);
-        loadLibraryResource();
     }
 }

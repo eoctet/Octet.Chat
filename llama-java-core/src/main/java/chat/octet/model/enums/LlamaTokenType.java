@@ -44,8 +44,6 @@ public enum LlamaTokenType {
      */
     LLAMA_TOKEN_TYPE_BYTE(6);
 
-    private final int type;
-
     private static final Map<Integer, LlamaTokenType> TYPES;
 
     static {
@@ -58,6 +56,8 @@ public enum LlamaTokenType {
         }
         TYPES = Collections.unmodifiableMap(map);
     }
+
+    private final int type;
 
     LlamaTokenType(int type) {
         this.type = type;

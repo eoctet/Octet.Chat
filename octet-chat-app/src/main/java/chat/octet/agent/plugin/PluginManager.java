@@ -29,15 +29,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PluginManager {
 
-    private static volatile PluginManager register;
     private final static Map<String, String> PLUGIN_MAPPING = Maps.newLinkedHashMap();
     private final static Map<String, PluginService> PLUGIN_INSTANCE = Maps.newLinkedHashMap();
-    private List<PluginConfig> pluginConfigs;
+    private static volatile PluginManager register;
 
     static {
         PLUGIN_MAPPING.put(PluginType.DATETIME.name(), DateTimePlugin.class.getName());
         PLUGIN_MAPPING.put(PluginType.API.name(), ApiPlugin.class.getName());
     }
+
+    private List<PluginConfig> pluginConfigs;
 
     private PluginManager() {
     }

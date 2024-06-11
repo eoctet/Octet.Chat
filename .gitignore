@@ -46,3 +46,4 @@ build/
 ### Mac OS ###
 .DS_Store
 /llama-java-core/src/main/resources/**
+/octet-chat-app/src/main/resources/static

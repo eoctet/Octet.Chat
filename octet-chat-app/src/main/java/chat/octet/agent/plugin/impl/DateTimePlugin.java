@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter;
 
 public class DateTimePlugin implements PluginService {
 
-    private final PluginConfig pluginConfig;
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private final PluginConfig pluginConfig;
 
     public DateTimePlugin(PluginConfig pluginConfig) {
         this.pluginConfig = pluginConfig;

@@ -402,10 +402,6 @@ public class ChatCompletionService {
                 .body(Flux.fromIterable(generator).flatMap(tokenList -> Flux.fromIterable(tokenList)
                         .map(token -> new ChatCompletionData("content", token.getText(), token.getFinishReason().name()))
                         .map(data -> {
-                            try {
-                                Thread.sleep(12);
-                            } catch (Exception ignored) {
-                            }
                             if ("[DONE]".equals(data.getDelta().getValue())) {
                                 return data.getDelta().getValue();
                             } else {
