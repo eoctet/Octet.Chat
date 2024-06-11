@@ -6,7 +6,7 @@
 [![README English](https://img.shields.io/badge/Lang-English-red)](./README.md)
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
 
-这是一个Java实现的LLMs项目。你可以用它部署自己的私有服务，支持 `Llama2` 和 `GPT` 模型及其他开源模型。
+这是一个Java实现的LLMs项目。你可以用它部署自己的私有服务，支持 `Llama3` 和 `GPT` 模型及其他开源模型。
 
 #### 提供
 - 简单易用的Java库 `llama-java-core`
@@ -18,7 +18,7 @@
 - 🦙 基于  [`llama.cpp`](https://github.com/ggerganov/llama.cpp) 构建
 - 😊 支持 `AI Agent`，基于 `Qwen-chat` 实现 `Function calling`
 - 🤖 支持 `并行推理`、`连续对话` 和 `文本生成`
-- 📦 支持 `Llama2` 和 `GPT` 模型及其他开源模型，例如：`Baichuan 7B`、`Qwen 7B`
+- 📦 支持 `Llama3` 和 `GPT` 模型及其他开源模型，例如：`Baichuan 7B`、`Qwen 7B`
 
 ----
 
@@ -32,6 +32,7 @@
 - [X] 🚀 新增AI智能体，可调用插件的能力
 - [X] 🚀 支持动态温度采样
 - [X] 🚀 Octet-chat-app 增加了 WebUI
+- [X] 🚀 更新API参数
 
 </details>
 
@@ -59,7 +60,7 @@ __如何使用__
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
-    "model_type": "LLAMA2",
+    "model_type": "LLAMA3",
     "context_size": 4096,
     "threads": 6,
     "threads_batch": 6,

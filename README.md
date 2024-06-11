@@ -7,7 +7,7 @@
 [![GitHub](https://img.shields.io/github/license/eoctet/llama-java?color=green)](https://opensource.org/licenses/MIT)
 
 This is a LLMs project implemented in Java.
-You can use it to deploy your own private services, supports the `Llama2` and `GPT` models and other open-source models.
+You can use it to deploy your own private services, supports the `Llama3` and `GPT` models and other open-source models.
 
 #### Provides
 - Simple Java library `llama-java-core`
@@ -19,7 +19,7 @@ You can use it to deploy your own private services, supports the `Llama2` and `G
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
 - 😊 Support `AI Agent` and implements `Function calling` based on `Qwen-chat`
 - 🤖 Supports `parallel inference`, `continuous conversation` and `text generation`
-- 📦 Supports the `Llama2` and `GPT` models, such as `Baichuan 7B`,`Qwen 7B`
+- 📦 Supports the `Llama3` and `GPT` models, such as `Baichuan 7B`,`Qwen 7B`
 
 ----
 
@@ -33,6 +33,7 @@ You can use it to deploy your own private services, supports the `Llama2` and `G
 - [X] 🚀 Added AI Agent and implemented Function calling
 - [X] 🚀 Supported dynamic temperature sampling.
 - [X] 🚀 Added WebUI to octet-chat-app.
+- [X] 🚀 Updated API parameters.
 
 </details>
 
@@ -60,7 +61,7 @@ Edit `characters.template.json` to set a custom AI character. Run command line i
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
-    "model_type": "LLAMA2",
+    "model_type": "LLAMA3",
     "context_size": 4096,
     "threads": 6,
     "threads_batch": 6,

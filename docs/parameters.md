@@ -10,54 +10,57 @@ documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_g
 
 ### Model parameter
 
-| Parameter         | Default | Description                                                                                                                                                               |
-|-------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| model_path        | /       | Llama model path.                                                                                                                                                         |
-| model_name        | /       | Llama model name.                                                                                                                                                         |
-| model_type        | LLAMA2  | Llama model type `chat.octet.model.enums.ModelType`.                                                                                                                      |
-| context_size      | 512     | option allows you to set the size of the prompt context used by the LLaMA models during text generation.                                                                  |
-| main_gpu          | /       | When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of  splitting the computation across all GPUs is not worthwhile. |
-| gpu_layers        | 0       | Number of layers to offload to GPU (-ngl). If -1, all layers are offloaded.                                                                                               |
-| split_mode        | 1       | How to split the model across multiple GPUs. `0 = single GPU`, `1 = split layers and KV across GPUs`, `2 = split rows across GPUs`                                        |
-| seed              | -1      | Set the random number generator seed.                                                                                                                                     |
-| logits_all        | false   | Return logits for all tokens, not just the last token.                                                                                                                    |
-| vocab_only        | false   | Only load the vocabulary no weights.                                                                                                                                      |
-| mmap              | true    | use mmap if possible (slower load but may reduce pageouts if not using mlock).                                                                                            |
-| mlock             | false   | Lock the model in memory, preventing it from being swapped out when memory-mapped.                                                                                        |
-| embedding         | false   | Embedding mode only.                                                                                                                                                      |
-| threads           | 4       | Set the number of threads used for generation (single token).                                                                                                             |
-| threads_batch     | 4       | Set the number of threads used for prompt and batch processing (multiple tokens).                                                                                         |
-| batch_size        | 512     | Set the batch size for prompt processing.                                                                                                                                 |
-| lora_base         | /       | Optional model to use as a base for the layers modified by the LoRA adapter.                                                                                              |
-| lora_path         | /       | Apply a LoRA (Low-Rank Adaptation) adapter to the model (implies --no-mmap).                                                                                              |
-| lora_scale        | 0.0     | apply LoRA adapter with user defined scaling S (implies --no-mmap).                                                                                                       |
-| tensor_split      | /       | When using multiple GPUs this option controls how large tensors should be split across all GPUs.                                                                          |
-| rope_freq_base    | 0.0     | Base frequency for RoPE sampling.                                                                                                                                         |
-| rope_freq_scale   | 0.0     | Scale factor for RoPE sampling.                                                                                                                                           |
-| gqa               | /       | Grouped-query attention. Must be 8 for llama-2 70b.                                                                                                                       |
-| rms_norm_eps      | /       | default is 1e-5, 5e-6 is a good value for llama-2 models.                                                                                                                 |
-| mul_mat_q         | true    | If true, use experimental mul_mat_q kernels.                                                                                                                              |
-| verbose           | false   | Print verbose output to stderr.                                                                                                                                           |
-| rope_scaling_type | -1      | RoPE scaling type, from `enum llama_rope_scaling_type`                                                                                                                    |
-| yarn_ext_factor   | -1.0    | YaRN extrapolation mix factor, NaN = from model.                                                                                                                          |
-| yarn_attn_factor  | 1.0     | YaRN magnitude scaling factor.                                                                                                                                            |
-| yarn_beta_fast    | 32.0    | YaRN low correction dim.                                                                                                                                                  |
-| yarn_beta_slow    | 1.0     | YaRN high correction dim.                                                                                                                                                 |
-| yarn_orig_ctx     | 0       | YaRN original context size.                                                                                                                                               |
-| offload_kqv       | true    | whether to offload the KQV ops (including the KV cache) to GPU.                                                                                                           |
-| do_pooling        | true    | whether to pool (sum) embedding results by sequence id (ignored if no pooling layer).                                                                                     
+| Parameter         | Default | Description                                                                                                                                                              |
+|-------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| model_path        | /       | Llama model path.                                                                                                                                                        |
+| model_name        | /       | Llama model name.                                                                                                                                                        |
+| model_type        | LLAMA3  | Llama model type `chat.octet.model.enums.ModelType`.                                                                                                                     |
+| context_size      | 512     | option allows you to set the size of the prompt context used by the LLaMA models during text generation.                                                                 |
+| main_gpu          | /       | When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of splitting the computation across all GPUs is not worthwhile. |
+| gpu_layers        | 0       | Number of layers to offload to GPU (-ngl). If -1, all layers are offloaded.                                                                                              |
+| split_mode        | 1       | How to split the model across multiple GPUs. `0 = single GPU`, `1 = split layers and KV across GPUs`, `2 = split rows across GPUs`                                       |
+| seed              | -1      | Set the random number generator seed.                                                                                                                                    |
+| logits_all        | false   | Return logits for all tokens, not just the last token.                                                                                                                   |
+| vocab_only        | false   | Only load the vocabulary no weights.                                                                                                                                     |
+| mmap              | true    | use mmap if possible (slower load but may reduce pageouts if not using mlock).                                                                                           |
+| mlock             | false   | Lock the model in memory, preventing it from being swapped out when memory-mapped.                                                                                       |
+| embedding         | false   | Embedding mode only.                                                                                                                                                     |
+| threads           | 4       | Set the number of threads used for generation (single token).                                                                                                            |
+| threads_batch     | 4       | Set the number of threads used for prompt and batch processing (multiple tokens).                                                                                        |
+| batch_size        | 512     | Set the batch size for prompt processing.                                                                                                                                |
+| lora_base         | /       | Optional model to use as a base for the layers modified by the LoRA adapter.                                                                                             |
+| lora_path         | /       | Apply a LoRA (Low-Rank Adaptation) adapter to the model (implies --no-mmap).                                                                                             |
+| lora_scale        | 0.0     | apply LoRA adapter with user defined scaling S (implies --no-mmap).                                                                                                      |
+| tensor_split      | /       | When using multiple GPUs this option controls how large tensors should be split across all GPUs.                                                                         |
+| rope_freq_base    | 0.0     | Base frequency for RoPE sampling.                                                                                                                                        |
+| rope_freq_scale   | 0.0     | Scale factor for RoPE sampling.                                                                                                                                          |
+| gqa               | /       | Grouped-query attention. Must be 8 for llama-2 70b.                                                                                                                      |
+| rms_norm_eps      | /       | default is 1e-5, 5e-6 is a good value for llama-2 models.                                                                                                                |
+| verbose           | false   | Print verbose output to stderr.                                                                                                                                          |
+| rope_scaling_type | -1      | RoPE scaling type, from `enum llama_rope_scaling_type`                                                                                                                   |
+| yarn_ext_factor   | -1.0    | YaRN extrapolation mix factor, NaN = from model.                                                                                                                         |
+| yarn_attn_factor  | 1.0     | YaRN magnitude scaling factor.                                                                                                                                           |
+| yarn_beta_fast    | 32.0    | YaRN low correction dim.                                                                                                                                                 |
+| yarn_beta_slow    | 1.0     | YaRN high correction dim.                                                                                                                                                |
+| yarn_orig_ctx     | 0       | YaRN original context size.                                                                                                                                              |
+| offload_kqv       | true    | whether to offload the KQV ops (including the KV cache) to GPU.                                                                                                          |
+| ubatch            | 512     | Physical maximum batch size (default: 512).                                                                                                                              
+| seq_max           | 1       | Max number of sequences (default: 1).                                                                                                                                    
+| pooling_type      | -1      | Pooling type for embeddings, use model default if unspecified. Options are none(0), mean(1), cls(2).                                                                     
+| defrag_thold      | -1.0    | KV cache defragmentation threshold (default: -1.0, < 0 = disabled).                                                                                                      
+| flash_attn        | false   | Enable flash attention (default: disabled).                                                                                                                              
+| check_tensors     | false   | Validate model tensor data (default: disabled).                                                                                                                          
 
 **JSON template**
 
 ```json
 {
-  "model_path": null,
-  "model_name": null,
-  "model_type": "LLAMA2",
+  "model_path": "",
+  "model_name": "",
+  "model_type": "LLAMA3",
   "context_size": 512,
   "main_gpu": null,
   "gpu_layers": 0,
-  "split_mode": 1,
   "seed": -1,
   "logits_all": false,
   "vocab_only": false,
@@ -67,15 +70,14 @@ documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_g
   "threads": 4,
   "threads_batch": 4,
   "batch_size": 512,
-  "lora_base": null,
-  "lora_path": null,
+  "lora_base": "",
+  "lora_path": "",
   "lora_scale": 0.0,
   "tensor_split": null,
   "rope_freq_base": 0.0,
   "rope_freq_scale": 0.0,
   "gqa": null,
   "rms_norm_eps": null,
-  "mul_mat_q": true,
   "verbose": false,
   "rope_scaling_type": -1,
   "yarn_ext_factor": -1.0,
@@ -84,7 +86,13 @@ documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_g
   "yarn_beta_slow": 1.0,
   "yarn_orig_ctx": 0,
   "offload_kqv": true,
-  "do_pooling": true
+  "split_mode": 1,
+  "ubatch": 512,
+  "seq_max": 1,
+  "pooling_type": -1,
+  "defrag_thold": -1.0,
+  "flash_attn": false,
+  "check_tensors": false
 }
 ```
 
@@ -139,13 +147,13 @@ documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_g
   "dynatemp_exponent": 1.0,
   "grammar_rules": null,
   "max_new_token_size": 512,
-  "last_tokens_size": 64,
   "verbose_prompt": false,
   "user": "User",
   "assistant": "Assistant",
+  "last_tokens_size": 64,
   "add_bos": true,
   "special_tokens": true,
-  "logit_bias": null,
-  "stopping_word": null
+  "logit_bias": "",
+  "stopping_word": ""
 }
 ```
