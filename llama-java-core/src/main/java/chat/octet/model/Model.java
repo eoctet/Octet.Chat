@@ -84,8 +84,11 @@ public class Model implements AutoCloseable {
         LlamaModelParams llamaModelParams = LlamaService.getLlamaModelDefaultParams();
         llamaModelParams.gpuLayers = modelParams.getGpuLayers();
         llamaModelParams.splitMode = modelParams.getSplitMode();
+        llamaModelParams.mainGpu = modelParams.getMainGpu();
+        if (modelParams.getTensorSplit() != null) {
+            llamaModelParams.tensorSplit = modelParams.getTensorSplit();
+        }
         llamaModelParams.vocabOnly = modelParams.isVocabOnly();
-        llamaModelParams.checkTensors = modelParams.isCheckTensors();
         boolean mmap = (StringUtils.isBlank(modelParams.getLoraPath()) && modelParams.isMmap());
         if (mmap && LlamaService.isMmapSupported()) {
             llamaModelParams.mmap = true;
@@ -94,12 +97,7 @@ public class Model implements AutoCloseable {
         if (mlock && LlamaService.isMlockSupported()) {
             llamaModelParams.mlock = true;
         }
-        if (modelParams.getMainGpu() != null) {
-            llamaModelParams.mainGpu = modelParams.getMainGpu();
-        }
-        if (modelParams.getTensorSplit() != null) {
-            llamaModelParams.tensorSplit = modelParams.getTensorSplit();
-        }
+        llamaModelParams.checkTensors = modelParams.isCheckTensors();
         return llamaModelParams;
     }
 

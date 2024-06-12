@@ -30,6 +30,8 @@ import javax.annotation.Nullable;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ModelParameter {
 
+    //Basic parameters
+
     /**
      * Llama model path
      */
@@ -42,83 +44,11 @@ public class ModelParameter {
 
     /**
      * Llama model type (default model type: Llama3).
+     *
+     * @see ModelType
      */
     @Builder.Default
     private String modelType = ModelType.LLAMA3.name();
-
-    /**
-     * option allows you to set the size of the prompt context used by the LLaMA models during text generation.
-     * (default: 512)
-     */
-    @Builder.Default
-    private int contextSize = 512;
-
-    /**
-     * When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of
-     * splitting the computation across all GPUs is not worthwhile.
-     */
-    @Nullable
-    private Integer mainGpu;
-
-    /**
-     * Number of layers to offload to GPU (-ngl). If -1, all layers are offloaded.
-     */
-    @Builder.Default
-    private int gpuLayers = 0;
-
-    /**
-     * Set the random number generator (RNG) seed (default: -1, -1 = random seed).
-     */
-    @Builder.Default
-    private int seed = -1;
-
-    /**
-     * Return logits for all tokens, not just the last token.
-     */
-    @Builder.Default
-    private boolean logitsAll = false;
-
-    /**
-     * Only load the vocabulary no weights.
-     */
-    @Builder.Default
-    private boolean vocabOnly = false;
-
-    /**
-     * use mmap if possible (slower load but may reduce pageouts if not using mlock).
-     */
-    @Builder.Default
-    private boolean mmap = true;
-
-    /**
-     * Lock the model in memory, preventing it from being swapped out when memory-mapped.
-     */
-    @Builder.Default
-    private boolean mlock = false;
-
-    /**
-     * Embedding mode only.
-     */
-    @Builder.Default
-    private boolean embedding = false;
-
-    /**
-     * Set the number of threads used for generation (single token).
-     */
-    @Builder.Default
-    private int threads = 4;
-
-    /**
-     * Set the number of threads used for prompt and batch processing (multiple tokens).
-     */
-    @Builder.Default
-    private int threadsBatch = 4;
-
-    /**
-     * Set the batch size for prompt processing (default: 512).
-     */
-    @Builder.Default
-    private int batchSize = 512;
 
     /**
      * Optional model to use as a base for the layers modified by the LoRA adapter.
@@ -138,10 +68,79 @@ public class ModelParameter {
     private float loraScale;
 
     /**
-     * When using multiple GPUs this option controls how large tensors should be split across all GPUs.
+     * Print verbose output to stderr.
      */
-    @Nullable
-    private float[] tensorSplit;
+    @Builder.Default
+    private boolean verbose = false;
+
+    /**
+     * Attempt one of the below optimization strategies that may help on some NUMA systems (default: disabled).
+     *
+     * @see LlamaNumaStrategy
+     */
+    @Builder.Default
+    private int numaStrategy = LlamaNumaStrategy.NUMA_STRATEGY_DISABLED.getType();
+
+    //Context parameters
+
+    /**
+     * Set the random number generator (RNG) seed (default: -1, -1 = random seed).
+     */
+    @Builder.Default
+    private int seed = -1;
+
+    /**
+     * option allows you to set the size of the prompt context used by the LLaMA models during text generation.
+     * (default: 512)
+     */
+    @Builder.Default
+    private int contextSize = 512;
+
+    /**
+     * Set the batch size for prompt processing (default: 2048).
+     */
+    @Builder.Default
+    private int batchSize = 2048;
+
+    /**
+     * Physical maximum batch size (default: 512).
+     */
+    @Builder.Default
+    private int ubatch = 512;
+
+    /**
+     * Max number of sequences (default: 1).
+     */
+    @Builder.Default
+    private int seqMax = 1;
+
+    /**
+     * Set the number of threads used for generation (single token).
+     */
+    @Builder.Default
+    private int threads = 4;
+
+    /**
+     * Set the number of threads used for prompt and batch processing (multiple tokens).
+     */
+    @Builder.Default
+    private int threadsBatch = 4;
+
+    /**
+     * RoPE scaling type.
+     *
+     * @see LlamaRoPEScalingType
+     */
+    @Builder.Default
+    private int ropeScalingType = LlamaRoPEScalingType.LLAMA_ROPE_SCALING_UNSPECIFIED.getType();
+
+    /**
+     * Pooling type for embeddings, use model default if unspecified. Options are none(0), mean(1), cls(2).
+     *
+     * @see LlamaPoolingType
+     */
+    @Builder.Default
+    private int poolingType = LlamaPoolingType.LLAMA_POOLING_TYPE_UNSPECIFIED.getType();
 
     /**
      * Base frequency for RoPE sampling.
@@ -154,20 +153,6 @@ public class ModelParameter {
      */
     @Builder.Default
     private float ropeFreqScale = 0;
-
-    /**
-     * Print verbose output to stderr.
-     */
-    @Builder.Default
-    private boolean verbose = false;
-
-    /**
-     * RoPE scaling type, from `enum llama_rope_scaling_type`.
-     *
-     * @see LlamaRoPEScalingType
-     */
-    @Builder.Default
-    private int ropeScalingType = LlamaRoPEScalingType.LLAMA_ROPE_SCALING_UNSPECIFIED.getType();
 
     /**
      * YaRN extrapolation mix factor, NaN = from model.
@@ -199,10 +184,42 @@ public class ModelParameter {
     private int yarnOrigCtx;
 
     /**
+     * KV cache defragmentation threshold (default: -1.0, < 0 = disabled).
+     */
+    @Builder.Default
+    private float defragThold = -1.0f;
+
+    /**
+     * Return logits for all tokens, not just the last token.
+     */
+    @Builder.Default
+    private boolean logitsAll = false;
+
+    /**
+     * Embedding mode only.
+     */
+    @Builder.Default
+    private boolean embedding = false;
+
+    /**
      * whether to offload the KQV ops (including the KV cache) to GPU.
      */
     @Builder.Default
     private boolean offloadKqv = true;
+
+    /**
+     * Enable flash attention (default: disabled).
+     */
+    @Builder.Default
+    private boolean flashAttn = false;
+
+    //Model parameters
+
+    /**
+     * Number of layers to offload to GPU (-ngl). If -1, all layers are offloaded.
+     */
+    @Builder.Default
+    private int gpuLayers = 0;
 
     /**
      * how to split the model across multiple GPUs (default: 1).
@@ -213,49 +230,40 @@ public class ModelParameter {
     private int splitMode = LlamaSplitMode.LLAMA_SPLIT_MODE_LAYER.getType();
 
     /**
-     * Physical maximum batch size (default: 512).
+     * When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of
+     * splitting the computation across all GPUs is not worthwhile.
      */
     @Builder.Default
-    private int ubatch = 512;
+    private int mainGpu = 0;
 
     /**
-     * Max number of sequences (default: 1).
+     * When using multiple GPUs this option controls how large tensors should be split across all GPUs.
      */
-    @Builder.Default
-    private int seqMax = 1;
+    @Nullable
+    private float[] tensorSplit;
 
     /**
-     * Pooling type for embeddings, use model default if unspecified. Options are none(0), mean(1), cls(2).
-     *
-     * @see LlamaPoolingType
+     * Only load the vocabulary no weights.
      */
     @Builder.Default
-    private int poolingType = LlamaPoolingType.LLAMA_POOLING_TYPE_UNSPECIFIED.getType();
+    private boolean vocabOnly = false;
 
     /**
-     * KV cache defragmentation threshold (default: -1.0, < 0 = disabled).
+     * use mmap if possible (slower load but may reduce pageouts if not using mlock).
      */
     @Builder.Default
-    private float defragThold = -1.0f;
+    private boolean mmap = true;
 
     /**
-     * Enable flash attention (default: disabled).
+     * Lock the model in memory, preventing it from being swapped out when memory-mapped.
      */
     @Builder.Default
-    private boolean flashAttn = false;
+    private boolean mlock = false;
 
     /**
      * Validate model tensor data (default: disabled).
      */
     @Builder.Default
     private boolean checkTensors = false;
-
-    /**
-     * Attempt one of the below optimization strategies that may help on some NUMA systems (default: disabled).
-     *
-     * @see LlamaNumaStrategy
-     */
-    @Builder.Default
-    private int numaStrategy = LlamaNumaStrategy.NUMA_STRATEGY_DISABLED.getType();
 
 }
