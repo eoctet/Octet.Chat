@@ -3,9 +3,10 @@ package chat.octet.utils;
 import chat.octet.exceptions.ServerException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.List;
@@ -34,12 +35,12 @@ public class CommonUtils {
     }
 
     public static List<String> readFileLines(String filePath) {
-        File file = new File(filePath);
-        if (!file.isFile() || !file.exists()) {
+        Path path = Paths.get(filePath);
+        if (!Files.isRegularFile(path) || !Files.exists(path)) {
             throw new ServerException("Can not read file, please make sure it is valid: " + filePath);
         }
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            return bufferedReader.lines().collect(Collectors.toList());
+        try {
+            return Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new ServerException("Read file error", e);
         }

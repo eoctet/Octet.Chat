@@ -55,7 +55,7 @@ public class ColorConsole {
     }
 
     public static String format(String text, ColorStyle colorStyle, FontStyle fontStyle) {
-        if (text == null || colorStyle == null) {
+        if (text == null || colorStyle == null || Platform.isWindows()) {
             return text;
         }
         String template = "\033[38;5;%d%s%s\033[0m";
