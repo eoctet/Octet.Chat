@@ -73,7 +73,8 @@ public final class CharacterModelBuilder implements AutoCloseable {
                     model = new Model(defaultCharacterConfig.getModelParameter());
 
                     if (defaultCharacterConfig.isAgentMode()) {
-                        if (ModelType.QWEN != ModelType.valueOf(model.getModelType())) {
+                        ModelType modelType = ModelType.valueOf(model.getModelType());
+                        if (ModelType.QWEN != modelType && ModelType.QWEN2 != modelType) {
                             throw new IllegalArgumentException("AI Agent only supports Qwen series model");
                         }
                         PluginManager.getInstance().loadPlugins();
