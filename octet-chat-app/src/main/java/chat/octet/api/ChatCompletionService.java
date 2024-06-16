@@ -8,6 +8,7 @@ import chat.octet.model.Generator;
 import chat.octet.model.LlamaService;
 import chat.octet.model.Model;
 import chat.octet.model.TokenDecoder;
+import chat.octet.model.beans.ChatMessage;
 import chat.octet.model.beans.CompletionResult;
 import chat.octet.model.beans.Token;
 import chat.octet.model.enums.LlamaTokenAttr;
@@ -256,7 +257,7 @@ public class ChatCompletionService {
 
                     Map<String, CharacterConfig> configs = CharacterModelBuilder.getInstance().getCharacterConfigs();
                     configs.forEach((name, config) -> {
-                        CharacterModel cm = new CharacterModel(name, config.getModelParameter().getModelName(), config.getModelParameter().getModelType());
+                        CharacterModel cm = new CharacterModel(name);
                         result.add(cm);
                     });
 

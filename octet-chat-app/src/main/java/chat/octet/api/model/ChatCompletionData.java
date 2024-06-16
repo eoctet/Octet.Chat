@@ -1,5 +1,6 @@
 package chat.octet.api.model;
 
+import chat.octet.model.beans.ChatMessage;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

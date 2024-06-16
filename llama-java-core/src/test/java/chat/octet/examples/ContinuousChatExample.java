@@ -27,11 +27,7 @@ public class ContinuousChatExample {
 
         try (Model model = new Model(MODEL_PATH)) {
             for (String question : questions) {
-                //Example 1: Continuous generation example.
-                //String text = PromptBuilder.toPrompt(system, question);
-                //model.generate(generateParams, text).output();
-
-                //Example 2: Continuous chat example
+                //Example: Continuous chat example
                 model.chat(generateParams, system, question).output();
                 System.out.println("\n");
                 model.metrics();

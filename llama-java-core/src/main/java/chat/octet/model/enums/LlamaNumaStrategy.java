@@ -39,8 +39,6 @@ public enum LlamaNumaStrategy {
      */
     NUMA_STRATEGY_COUNT(5);
 
-    private final int type;
-
     private static final Map<Integer, LlamaNumaStrategy> TYPES;
 
     static {
@@ -53,6 +51,8 @@ public enum LlamaNumaStrategy {
         }
         TYPES = Collections.unmodifiableMap(map);
     }
+
+    private final int type;
 
     LlamaNumaStrategy(int type) {
         this.type = type;

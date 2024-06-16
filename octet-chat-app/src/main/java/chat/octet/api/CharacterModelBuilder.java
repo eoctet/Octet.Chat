@@ -5,7 +5,6 @@ import chat.octet.agent.plugin.PluginManager;
 import chat.octet.config.CharacterConfig;
 import chat.octet.exceptions.ServerException;
 import chat.octet.model.Model;
-import chat.octet.model.enums.ModelType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -73,8 +72,7 @@ public final class CharacterModelBuilder implements AutoCloseable {
                     model = new Model(defaultCharacterConfig.getModelParameter());
 
                     if (defaultCharacterConfig.isAgentMode()) {
-                        ModelType modelType = ModelType.valueOf(model.getModelType());
-                        if (ModelType.QWEN != modelType && ModelType.QWEN2 != modelType) {
+                        if (!StringUtils.startsWithIgnoreCase(model.getModelType(), "qwen")) {
                             throw new IllegalArgumentException("AI Agent only supports Qwen series model");
                         }
                         PluginManager.getInstance().loadPlugins();

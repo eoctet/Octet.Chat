@@ -29,6 +29,7 @@ public class FormatUtils {
     public static final String ACTION_INPUT = "Action Input:";
     public static final String OBSERVATION = "Observation:";
     public static final String FINAL_ANSWER = "Final Answer:";
+
     private FormatUtils() {
     }
 

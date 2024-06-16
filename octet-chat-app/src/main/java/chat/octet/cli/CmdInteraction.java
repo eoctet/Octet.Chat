@@ -5,8 +5,8 @@ import chat.octet.api.CharacterModelBuilder;
 import chat.octet.config.CharacterConfig;
 import chat.octet.model.Model;
 import chat.octet.model.parameters.GenerateParameter;
+import chat.octet.model.utils.ChatFormatter;
 import chat.octet.model.utils.ColorConsole;
-import chat.octet.model.utils.PromptBuilder;
 import chat.octet.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
@@ -58,7 +58,7 @@ public class CmdInteraction {
 
             CharacterConfig config = CharacterModelBuilder.getInstance().getCharacterConfig();
             GenerateParameter generateParams = config.getGenerateParameter();
-            String system = Optional.ofNullable(StringUtils.stripToNull(config.getPrompt())).orElse(PromptBuilder.DEFAULT_COMMON_SYSTEM);
+            String system = Optional.ofNullable(StringUtils.stripToNull(config.getPrompt())).orElse(ChatFormatter.DEFAULT_COMMON_SYSTEM);
 
             for (String input : lines) {
                 String question = StringUtils.trimToEmpty(input);
@@ -79,7 +79,7 @@ public class CmdInteraction {
 
             CharacterConfig config = CharacterModelBuilder.getInstance().getCharacterConfig();
             GenerateParameter generateParams = config.getGenerateParameter();
-            String system = Optional.ofNullable(StringUtils.stripToNull(config.getPrompt())).orElse(PromptBuilder.DEFAULT_COMMON_SYSTEM);
+            String system = Optional.ofNullable(StringUtils.stripToNull(config.getPrompt())).orElse(ChatFormatter.DEFAULT_COMMON_SYSTEM);
 
             while (true) {
                 String userInputPrefix = ColorConsole.green(generateParams.getUser() + ": ");

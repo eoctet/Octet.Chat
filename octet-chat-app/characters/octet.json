@@ -4,8 +4,6 @@
   "prompt": "You are Octet, a professional computer science assistant who aims to help me understand the field of computer science and guide me in learning computer science knowledge.",
   "model_parameter": {
     "model_path": "/models/qwen2-7b-chat.gguf",
-    "model_name": "qwen-chat",
-    "model_type": "QWEN2",
     "context_size": 32768,
     "threads": 6,
     "threads_batch": 6,

@@ -2,9 +2,8 @@ package chat.octet.examples;
 
 import chat.octet.model.Model;
 import chat.octet.model.beans.CompletionResult;
-import chat.octet.model.enums.ModelType;
 import chat.octet.model.parameters.GenerateParameter;
-import chat.octet.model.utils.PromptBuilder;
+import chat.octet.model.utils.ChatFormatter;
 
 public class ModelExample {
     private static final String MODEL_PATH = "/octet-chat/models/llama2/ggml-model-7b-q6_k.gguf";
@@ -28,7 +27,8 @@ public class ModelExample {
             //Model: llama2-chat
             String system = "Answer the questions.";
             String question = "Who are you?";
-            String prompt = PromptBuilder.format(ModelType.LLAMA2, system, question);
+            ChatFormatter formatter = new ChatFormatter("REPLACE_PROMPT_TEMPLATE");
+            String prompt = formatter.format(system, question);
             //streaming output
             model.generate(prompt).output();
 

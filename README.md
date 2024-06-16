@@ -61,7 +61,6 @@ Edit `characters.template.json` to set a custom AI character. Run command line i
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
-    "model_type": "LLAMA3",
     "context_size": 4096,
     "threads": 6,
     "threads_batch": 6,

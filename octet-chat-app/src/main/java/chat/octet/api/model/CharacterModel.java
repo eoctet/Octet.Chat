@@ -10,13 +10,9 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CharacterModel {
     private String name;
-    private String modelName;
-    private String modelType;
 
-    public CharacterModel(String name, String modelName, String modelType) {
+    public CharacterModel(String name) {
         this.name = name;
-        this.modelName = modelName;
-        this.modelType = modelType;
     }
 
     public CharacterModel() {

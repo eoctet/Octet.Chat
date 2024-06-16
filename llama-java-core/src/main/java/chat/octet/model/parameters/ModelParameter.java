@@ -2,7 +2,10 @@ package chat.octet.model.parameters;
 
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
-import chat.octet.model.enums.*;
+import chat.octet.model.enums.LlamaNumaStrategy;
+import chat.octet.model.enums.LlamaPoolingType;
+import chat.octet.model.enums.LlamaRoPEScalingType;
+import chat.octet.model.enums.LlamaSplitMode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -36,19 +39,6 @@ public class ModelParameter {
      * Llama model path
      */
     private String modelPath;
-
-    /**
-     * Llama model name
-     */
-    private String modelName;
-
-    /**
-     * Llama model type (default model type: Llama3).
-     *
-     * @see ModelType
-     */
-    @Builder.Default
-    private String modelType = ModelType.LLAMA3.name();
 
     /**
      * Optional model to use as a base for the layers modified by the LoRA adapter.

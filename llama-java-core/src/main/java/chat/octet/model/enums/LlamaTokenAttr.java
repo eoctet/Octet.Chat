@@ -59,8 +59,6 @@ public enum LlamaTokenAttr {
      */
     LLAMA_TOKEN_ATTR_SINGLE_WORD(1 << 9);
 
-    private final int type;
-
     private static final Map<Integer, LlamaTokenAttr> TYPES;
 
     static {
@@ -73,6 +71,8 @@ public enum LlamaTokenAttr {
         }
         TYPES = Collections.unmodifiableMap(map);
     }
+
+    private final int type;
 
     LlamaTokenAttr(int type) {
         this.type = type;

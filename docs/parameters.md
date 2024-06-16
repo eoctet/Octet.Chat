@@ -15,8 +15,6 @@ documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_g
 | Parameter     | Default | Description                                                                                                                           |
 |---------------|---------|---------------------------------------------------------------------------------------------------------------------------------------|
 | model_path    | /       | Llama model path.                                                                                                                     |
-| model_name    | /       | Llama model name.                                                                                                                     |
-| model_type    | LLAMA3  | Llama model type. `enum` **ModelType**                                                                                                |
 | lora_base     | /       | Optional model to use as a base for the layers modified by the LoRA adapter.                                                          |
 | lora_path     | /       | Apply a LoRA (Low-Rank Adaptation) adapter to the model (implies --no-mmap).                                                          |
 | lora_scale    | 0.0     | apply LoRA adapter with user defined scaling S (implies --no-mmap).                                                                   |
@@ -67,8 +65,6 @@ documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_g
 ```json
 {
   "model_path": "",
-  "model_name": "",
-  "model_type": "LLAMA3",
   "lora_base": "",
   "lora_path": "",
   "lora_scale": 0.0,

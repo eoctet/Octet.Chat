@@ -396,13 +396,4 @@ public class LlamaService {
      */
     public static native String llamaModelMeta(String key);
 
-    /**
-     * Retrieves the chat template for the model.
-     *
-     * @return String, The chat template for the model, returns an empty string if the template does not exist or the key does not match.
-     */
-    public static String getChatTemplate() {
-        return llamaModelMeta("tokenizer.chat_template");
-    }
-
 }

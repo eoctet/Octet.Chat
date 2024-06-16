@@ -19,16 +19,20 @@ public class TokenDecoder {
     private TokenDecoder() {
     }
 
-    public static String decodeToken(int... tokens) {
+    public static String decodeToken(boolean special, int... tokens) {
         byte[] buffer = new byte[tokens.length * 64];
         int length = 0;
         for (int token : tokens) {
             byte[] bytes = new byte[64];
-            int size = LlamaService.tokenToPiece(token, bytes, bytes.length, false);
+            int size = LlamaService.tokenToPiece(token, bytes, bytes.length, special);
             System.arraycopy(bytes, 0, buffer, length, size);
             length += size;
         }
         return new String(buffer, 0, length, StandardCharsets.UTF_8);
+    }
+
+    public static String decodeToken(int... tokens) {
+        return decodeToken(false, tokens);
     }
 
     public static int getByteLength(byte[] buffer, int length) {

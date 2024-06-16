@@ -31,8 +31,6 @@ public enum LlamaPoolingType {
      */
     LLAMA_POOLING_TYPE_CLS(2);
 
-    private final int type;
-
     private static final Map<Integer, LlamaPoolingType> TYPES;
 
     static {
@@ -45,6 +43,8 @@ public enum LlamaPoolingType {
         }
         TYPES = Collections.unmodifiableMap(map);
     }
+
+    private final int type;
 
     LlamaPoolingType(int type) {
         this.type = type;

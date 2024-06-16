@@ -7,13 +7,14 @@ import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.beans.Status;
 import chat.octet.model.components.criteria.impl.StoppingWordCriteria;
 import chat.octet.model.components.processor.impl.CustomBiasLogitsProcessor;
-import chat.octet.model.enums.ModelType;
 import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
-import chat.octet.model.utils.PromptBuilder;
+import chat.octet.model.utils.ChatFormatter;
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.google.common.io.Resources;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,8 @@ public class Model implements AutoCloseable {
     private final String modelName;
     @Getter
     private final String modelType;
+
+    private final ChatFormatter chatFormatter;
     private final Map<String, Status> chatStatus = Maps.newConcurrentMap();
 
     public Model(String modelPath) {
@@ -50,9 +53,6 @@ public class Model implements AutoCloseable {
             throw new ModelException("Model file is not exists, please check the file path");
         }
         this.modelParams = modelParams;
-        this.modelName = modelParams.getModelName();
-        this.modelType = modelParams.getModelType();
-        Preconditions.checkNotNull(modelType, "Model type cannot be null");
         //init llama backend
         LlamaService.llamaBackendInit();
         //use NUMA optimizations
@@ -74,6 +74,28 @@ public class Model implements AutoCloseable {
                 throw new ModelException(String.format("Failed to apply LoRA from lora path: %s to base path: %s", modelParams.getLoraPath(), modelParams.getLoraBase()));
             }
         }
+        //load model meta
+        this.modelName = LlamaService.llamaModelMeta("general.name");
+        this.modelType = LlamaService.llamaModelMeta("general.architecture");
+
+        //load chat template, by default use the template from local resource.
+        String chatTemplateStr;
+        try {
+            chatTemplateStr = Resources.toString(Resources.getResource("chat-templates/" + this.modelType + ".tmpl"), Charsets.UTF_8);
+        } catch (Exception e) {
+            chatTemplateStr = LlamaService.llamaModelMeta("tokenizer.chat_template");
+            log.error("Failed to load local chat template, attempting to load chat template from the model.", e);
+        }
+        if (StringUtils.isBlank(chatTemplateStr)) {
+            this.chatFormatter = new ChatFormatter();
+            log.warn("Chat template is not found, use default template.");
+        } else {
+            this.chatFormatter = new ChatFormatter(chatTemplateStr,
+                    TokenDecoder.decodeToken(true, LlamaService.getTokenBOS()),
+                    TokenDecoder.decodeToken(true, LlamaService.getTokenEOS())
+            );
+        }
+
         if (modelParams.isVerbose()) {
             log.info("system info: {}", LlamaService.getSystemInfo());
         }
@@ -318,7 +340,7 @@ public class Model implements AutoCloseable {
         if (StringUtils.isNotBlank(system) && StringUtils.isBlank(userStatus.getInitialSystemPrompt())) {
             userStatus.setInitialSystemPrompt(system);
         }
-        String prompt = PromptBuilder.format(ModelType.valueOf(modelType.toUpperCase()), system, question);
+        String prompt = chatFormatter.format(system, question);
         return new Generator(generateParams, prompt, userStatus);
     }
 

@@ -27,8 +27,6 @@ public enum LlamaSplitMode {
      */
     LLAMA_SPLIT_MODE_ROW(2);
 
-    private final int type;
-
     private static final Map<Integer, LlamaSplitMode> TYPES;
 
     static {
@@ -41,6 +39,8 @@ public enum LlamaSplitMode {
         }
         TYPES = Collections.unmodifiableMap(map);
     }
+
+    private final int type;
 
     LlamaSplitMode(int type) {
         this.type = type;

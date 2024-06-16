@@ -1,4 +1,4 @@
-package chat.octet.api.model;
+package chat.octet.model.beans;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -57,6 +57,11 @@ public class ChatMessage {
         /**
          * Assistant role
          */
-        ASSISTANT
+        ASSISTANT;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
 }
