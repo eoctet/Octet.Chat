@@ -33,6 +33,7 @@
 - [X] 🚀 支持动态温度采样
 - [X] 🚀 Octet-chat-app 增加了 WebUI
 - [X] 🚀 更新API参数
+- [X] 🚀 优化聊天提示词解析、Windows Cli
 
 </details>
 

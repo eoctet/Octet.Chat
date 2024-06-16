@@ -34,6 +34,7 @@ You can use it to deploy your own private services, supports the `Llama3` and `G
 - [X] 🚀 Supported dynamic temperature sampling.
 - [X] 🚀 Added WebUI to octet-chat-app.
 - [X] 🚀 Updated API parameters.
+- [X] 🚀 Optimized chat formatter and Windows Cli.
 
 </details>
 

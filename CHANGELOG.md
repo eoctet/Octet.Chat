@@ -1,8 +1,8 @@
-☕️ __LLaMA-Java-Core__
+🎉 __Optimized chat formatter and Windows Cli__
 
-- Update llama-java libs.
-
-🤖 __Octet-Chat-App__
-
+- Refactor the chat message formatting module to use JinJava.
+- Add a new native API `llamaModelMeta`.
+- Optimize model parameters.
+- Fix Windows Cli output format error.
 - Update Maven dependencies.
-- update model config load.
+- Update llama Java libs.
