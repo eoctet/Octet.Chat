@@ -850,6 +850,20 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
         /*.imatrix                     =*/ nullptr,
         /*.kv_overrides                =*/ nullptr,
     };
+    return llama_model_quantize(ToCString(env, source_model_file_path), ToCString(env, output_model_file_path), &params);
+}
 
-   return llama_model_quantize(ToCString(env, source_model_file_path), ToCString(env, output_model_file_path), &params);
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    llamaModelMeta
+ */
+JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_llamaModelMeta
+        (JNIEnv *env, jclass thisClass, jstring data_key){
+    std::vector<char> meta_data_buffer(2048, 0);
+    int32_t res = llama_model_meta_val_str(model, ToCString(env, data_key), meta_data_buffer.data(), meta_data_buffer.size());
+    if (res <= 0) {
+        return nullptr;
+    }
+    std::string meta_data_str(meta_data_buffer.data(), meta_data_buffer.size());
+    return env->NewStringUTF(meta_data_str.c_str());
 }

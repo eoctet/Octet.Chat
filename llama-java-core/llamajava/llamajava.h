@@ -219,6 +219,12 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
         (JNIEnv *, jclass, jstring, jstring, jobject);
 
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    llamaModelMeta
+ */
+JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_llamaModelMeta
+        (JNIEnv *, jclass, jstring);
 
 #ifdef __cplusplus
 }

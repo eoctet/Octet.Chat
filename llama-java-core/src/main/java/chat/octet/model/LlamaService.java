@@ -385,4 +385,24 @@ public class LlamaService {
         return LlamaTokenAttr.valueOfType(getTokenAttr(token));
     }
 
+    /**
+     * Retrieves the metadata information of the llama model based on the given key.
+     * This native method is used to obtain specific information about the model, which is identified by the key parameter.
+     * The information obtained may include model structure, parameters, version, etc.
+     *
+     * @param key The key used to identify the specific metadata information to retrieve.
+     * @return String, The metadata information corresponding to the key. Returns a String type,
+     * which may be a description of the model, the model's version number, or other information.
+     */
+    public static native String llamaModelMeta(String key);
+
+    /**
+     * Retrieves the chat template for the model.
+     *
+     * @return String, The chat template for the model, returns an empty string if the template does not exist or the key does not match.
+     */
+    public static String getChatTemplate() {
+        return llamaModelMeta("tokenizer.chat_template");
+    }
+
 }
