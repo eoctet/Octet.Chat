@@ -47,12 +47,6 @@
             <groupId>chat.octet</groupId>
             <artifactId>llama-java-core</artifactId>
             <version>${llama.java.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
