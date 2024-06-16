@@ -4,8 +4,7 @@ The following is a list of all the parameters involved in this project.
 
 > [!NOTE]
 > Other reference
->
-documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">
+> documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">
 > Transformers docs</a>.
 
 ### Model parameters
