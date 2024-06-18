@@ -18,6 +18,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.util.Optional;
 
 /**
  * Llama.cpp API
@@ -30,13 +31,23 @@ public class LlamaService {
 
     static {
         System.load(Platform.LIB_RESOURCE_PATH);
-        initNative();
+
+        String logLevel = Optional.ofNullable(System.getProperty("octet.llama.log")).orElse("info");
+        if ("debug".equalsIgnoreCase(logLevel)) {
+            setLogLevel(0);
+        } else if ("warn".equalsIgnoreCase(logLevel)) {
+            setLogLevel(2);
+        } else if ("error".equalsIgnoreCase(logLevel)) {
+            setLogLevel(3);
+        } else {
+            setLogLevel(1);
+        }
     }
 
     /**
      * initial JNI context.
      */
-    public static native void initNative();
+    public static native void setLogLevel(int logLevel);
 
     /**
      * Get llama model default params.
@@ -60,16 +71,6 @@ public class LlamaService {
     public static native LlamaModelQuantizeParams getLlamaModelQuantizeDefaultParams();
 
     /**
-     * Initialize the llama + ggml backend.
-     */
-    public static native void llamaBackendInit();
-
-    /**
-     * Initialize NUMA optimizations.
-     */
-    public static native void llamaNumaInit(int numaStrategy);
-
-    /**
      * Call once at the end of the program.
      * NOTE: currently only used for MPI.
      */
@@ -78,19 +79,13 @@ public class LlamaService {
     /**
      * Load Llama model from file.
      *
-     * @param modelPath Llama model file path.
-     * @param params    Llama model params.
+     * @param modelPath     Llama model file path.
+     * @param modelParams   Llama model params.
+     * @param contextParams Llama context params.
      * @see LlamaModelParams
-     */
-    public static native void loadLlamaModelFromFile(String modelPath, LlamaModelParams params) throws ModelException;
-
-    /**
-     * Create new context with model.
-     *
-     * @param params Llama context params.
      * @see LlamaContextParams
      */
-    public static native void createNewContextWithModel(LlamaContextParams params) throws ModelException;
+    public static native void loadLlamaModelFromFile(String modelPath, LlamaModelParams modelParams, LlamaContextParams contextParams) throws ModelException;
 
     /**
      * Close model and release all resources.

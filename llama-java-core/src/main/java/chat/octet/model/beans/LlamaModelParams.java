@@ -45,6 +45,9 @@ public class LlamaModelParams {
      * validate model tensor data.
      */
     public boolean checkTensors;
-
+    /**
+     * Attempt one of the below optimization strategies that may help on some NUMA systems.
+     */
+    public int numaStrategy;
 
 }

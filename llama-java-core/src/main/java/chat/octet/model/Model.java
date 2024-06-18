@@ -53,16 +53,11 @@ public class Model implements AutoCloseable {
             throw new ModelException("Model file is not exists, please check the file path");
         }
         this.modelParams = modelParams;
-        //init llama backend
-        LlamaService.llamaBackendInit();
-        //use NUMA optimizations
-        LlamaService.llamaNumaInit(modelParams.getNumaStrategy());
-        //setting model parameters
+
+        //Load model and initialize
         LlamaModelParams llamaModelParams = getLlamaModelParameters(modelParams);
-        LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams);
-        //setting context parameters
         LlamaContextParams llamaContextParams = getLlamaContextParameters(modelParams);
-        LlamaService.createNewContextWithModel(llamaContextParams);
+        LlamaService.loadLlamaModelFromFile(modelParams.getModelPath(), llamaModelParams, llamaContextParams);
 
         //apple lora from file
         if (StringUtils.isNotBlank(modelParams.getLoraPath())) {
@@ -120,6 +115,7 @@ public class Model implements AutoCloseable {
             llamaModelParams.mlock = true;
         }
         llamaModelParams.checkTensors = modelParams.isCheckTensors();
+        llamaModelParams.numaStrategy = modelParams.getNumaStrategy();
         return llamaModelParams;
     }
 

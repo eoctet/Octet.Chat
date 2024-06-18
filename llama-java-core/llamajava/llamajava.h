@@ -10,10 +10,10 @@ extern "C" {
 
 /*
 * Class:     chat_octet_model_LlamaService
-* Method:    initNative
+* Method:    setLogLevel
 */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_initNative
-        (JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_setLogLevel
+        (JNIEnv *, jclass, jint);
 
 /*
 * Class:     chat_octet_model_LlamaService
@@ -38,20 +38,6 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuanti
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    llamaBackendInit
- */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendInit
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    llamaNumaInit
- */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaNumaInit
-        (JNIEnv *, jclass, jint);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    llamaBackendFree
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree
@@ -62,14 +48,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree
  * Method:    loadLlamaModelFromFile
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
-        (JNIEnv *, jclass, jstring, jobject);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    createNewContextWithModel
- */
-JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_createNewContextWithModel
-        (JNIEnv *, jclass, jobject);
+        (JNIEnv *, jclass, jstring, jobject, jobject);
 
 /*
  * Class:     chat_octet_model_LlamaService
