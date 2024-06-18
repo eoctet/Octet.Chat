@@ -881,8 +881,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     int decode_status = 0;
     int default_n_seq_max = 1;
     int n_batch = params.n_batch;
-    JLOG_DEBUG("Start batch decoding, sequence id: %d, input length: %d, past token size: %d, n_batch: %d.",
-               sequence_id, input_length, past_tokens, n_batch);
+    JLOG_DEBUG("Start batch decoding, sequence id: %d, input length: %d, past token size: %d, batch decoding size: %d.",
+               sequence_id, input_length, past_tokens, (input_length - past_tokens));
 
     while (past_tokens < input_length) {
         int decode_size = input_length - past_tokens;
