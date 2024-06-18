@@ -920,7 +920,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     }
     //clear all resources
     env->ReleaseIntArrayElements(tokens_arrays, (jint *) tokens, 0);
-    JLOG_DEBUG("Finish batch decoding, sequence id: %d.", sequence_id);
     return decode_status;
 }
 
