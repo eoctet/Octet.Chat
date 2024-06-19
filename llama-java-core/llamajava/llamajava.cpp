@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <time.h>
 
+#define UNUSED(x) (void)(x)
+
 //log level define
 enum log_level_type {
     LOG_DEBUG = 0,
@@ -102,8 +104,8 @@ static jfieldID FIELD_LOGITS_ALL;
 static jfieldID FIELD_EMBEDDING;
 static jfieldID FIELD_OFFLOAD_KQV;
 static jfieldID FIELD_FLASH_ATTN;
-static jfieldID FIELD_ABORT_CALLBACK;
-static jfieldID FIELD_ABORT_CALLBACK_DATA;
+//static jfieldID FIELD_ABORT_CALLBACK;
+//static jfieldID FIELD_ABORT_CALLBACK_DATA;
 //Class LlamaModelParams
 static jclass LLAMA_MODEL_PARAMS_CLASS;
 static jmethodID MD_CONS_LLAMA_MODEL_PARAMS;
@@ -128,8 +130,8 @@ static jfieldID FIELD_QUANTIZE_OUTPUT_TENSOR;
 static jfieldID FIELD_ONLY_COPY;
 static jfieldID FIELD_PURE;
 static jfieldID FIELD_KEEP_SPLIT;
-static jfieldID FIELD_IMATRIX;
-static jfieldID FIELD_KV_OVERRIDES;
+//static jfieldID FIELD_IMATRIX;
+//static jfieldID FIELD_KV_OVERRIDES;
 //Class Metrics
 static jclass METRICS_CLASS;
 static jmethodID MD_CONS_METRICS;
@@ -161,6 +163,7 @@ static bool To_CBool(jboolean value) {
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     // Obtain the JNIEnv from the VM and confirm JNI_VERSION
+    UNUSED(reserved);
     JNIEnv *env;
     if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION) != JNI_OK) {
         return JNI_ERR;
@@ -256,6 +259,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 
 void JNI_OnUnload(JavaVM *vm, void *reserved) {
+    UNUSED(reserved);
     JNIEnv *env;
     vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION);
     // Destroy the global references
@@ -275,6 +279,8 @@ void JNI_OnUnload(JavaVM *vm, void *reserved) {
 */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_setLogLevel
         (JNIEnv *env, jclass thisClass, jint log_level) {
+    UNUSED(env);
+    UNUSED(thisClass);
     DEFAULT_LOG_LEVEL = log_level;
 }
 
@@ -284,6 +290,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_setLogLevel
 */
 JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelDefaultParams
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     llama_model_params defaults = llama_model_default_params();
 
     jobject llama_model_params = env->NewObject(LLAMA_MODEL_PARAMS_CLASS, MD_CONS_LLAMA_MODEL_PARAMS);
@@ -303,6 +310,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelDefaul
 */
 JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefaultParams
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     llama_context_params defaults = llama_context_default_params();
 
     //new llama_context_params object instance
@@ -340,6 +348,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
 */
 JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuantizeDefaultParams
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     llama_model_quantize_params defaults = llama_model_quantize_default_params();
 
     jobject llama_model_quantize_params = env->NewObject(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS,
@@ -362,6 +371,8 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuanti
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_llamaBackendFree
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(env);
+    UNUSED(thisClass);
     llama_backend_free();
     JLOG_INFO("Released backend resources.");
 }
@@ -469,6 +480,8 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(env);
+    UNUSED(thisClass);
     if (main_ctx == nullptr) return;
 
     if (main_ctx->grammar != nullptr) {
@@ -495,6 +508,8 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_release
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMmapSupported
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(env);
+    UNUSED(thisClass);
     return To_JBoolean(llama_supports_mmap());
 }
 
@@ -504,6 +519,8 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMmapSupported
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(env);
+    UNUSED(thisClass);
     return To_JBoolean(llama_supports_mlock());
 }
 
@@ -513,6 +530,8 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isMlockSupported
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isGpuOffloadSupported
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(env);
+    UNUSED(thisClass);
     return To_JBoolean(llama_supports_gpu_offload());
 }
 
@@ -522,6 +541,7 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_isGpuOffloadSuppor
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     return llama_n_vocab(main_ctx->model);
 }
@@ -532,6 +552,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getVocabSize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     return llama_n_ctx(main_ctx->llama_ctx);
 }
@@ -543,6 +564,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getContextSize
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
         (JNIEnv *env, jclass thisClass, jstring lora_path, jfloat scale, jstring base_model_path,
          jint threads) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     int status = llama_model_apply_lora_from_file(main_ctx->model,
                                                   env->GetStringUTFChars(lora_path, JNI_FALSE),
@@ -560,6 +582,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
         (JNIEnv *env, jclass thisClass, jint index) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return nullptr;
     llama_context_params params = main_ctx->params;
     int n_ctx = params.n_ctx;
@@ -586,6 +609,7 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
  */
 JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbedding
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return nullptr;
     float *embeddings = llama_get_embeddings(main_ctx->llama_ctx);
     const int embd_size = llama_n_embd(main_ctx->model);
@@ -601,6 +625,7 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getEmbedding
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenAttr
         (JNIEnv *env, jclass thisClass, jint token) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     return llama_token_get_attr(main_ctx->model, token);
 }
@@ -611,6 +636,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenAttr
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     return llama_token_bos(main_ctx->model);
 }
@@ -621,6 +647,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     return llama_token_eos(main_ctx->model);
 }
@@ -633,6 +660,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
         (JNIEnv *env, jclass thisClass, jbyteArray buf, jint buffer_length,
          jintArray tokens_arrays,
          jint maxTokens, jboolean addBos, jboolean specialTokens) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokens_arrays, JNI_FALSE);
 
@@ -653,6 +681,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenToPiece
         (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint buffer_length, jboolean special) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
 
     jbyte *buffer = new jbyte[buffer_length];
@@ -667,6 +696,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenToPiece
  */
 JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getSamplingMetrics
         (JNIEnv *env, jclass thisClass, jboolean reset) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return nullptr;
 
     struct llama_timings timings = llama_get_timings(main_ctx->llama_ctx);
@@ -694,6 +724,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getSamplingMetrics
  */
 JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_getSystemInfo
         (JNIEnv *env, jclass thisClass) {
+    UNUSED(thisClass);
     const char *system_info = llama_print_system_info();
     return env->NewStringUTF(system_info);
 }
@@ -726,6 +757,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
          jint sequence_id,
          jint past_token_size) {
 
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
 
     float *logits = env->GetFloatArrayElements(jlogits, JNI_FALSE);
@@ -833,6 +865,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
  */
 JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
         (JNIEnv *env, jclass thisClass, jstring grammar_rules_text) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return false;
     if (grammar_rules_text == nullptr) return false;
 
@@ -847,12 +880,9 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
     jboolean status = false;
     if (!parsed_grammar.rules.empty()) {
         std::vector<const llama_grammar_element *> grammar_rules(parsed_grammar.c_rules());
-        main_ctx->grammar = llama_grammar_init(grammar_rules.data(), grammar_rules.size(),
-                                               parsed_grammar.symbol_ids.at("root"));
+        main_ctx->grammar = llama_grammar_init(grammar_rules.data(), grammar_rules.size(), parsed_grammar.symbol_ids.at("root"));
         status = true;
         JLOG_DEBUG("Grammar rules loaded, rules count: %d.", grammar_rules.size());
-    } else {
-        JLOG_WARN("Grammar rules is empty, No rules loaded.");
     }
     env->ReleaseStringUTFChars(grammar_rules_text, grammar_chars);
     return status;
@@ -865,6 +895,7 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         (JNIEnv *env, jclass thisClass, jint sequence_id, jintArray tokens_arrays, jint input_length,
          jint past_token_size) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
 
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokens_arrays, JNI_FALSE);
@@ -929,6 +960,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
  */
 JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
         (JNIEnv *env, jclass thisClass, jint sequence_id, jint pos_start, jint pos_end) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return;
 
     llama_kv_cache_seq_rm(main_ctx->llama_ctx, sequence_id, pos_start, pos_end);
@@ -942,7 +974,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
         (JNIEnv *env, jclass thisClass, jstring source_model_file_path, jstring output_model_file_path,
          jobject quantize_params) {
-
+    UNUSED(thisClass);
     struct llama_model_quantize_params params = {
             /*.nthread                     =*/ env->GetIntField(quantize_params, FIELD_THREAD),
             /*.ftype                       =*/ static_cast<enum llama_ftype>(env->GetIntField(quantize_params, FIELD_MODEL_FILE_TYPE)),
@@ -970,6 +1002,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
  */
 JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_llamaModelMeta
         (JNIEnv *env, jclass thisClass, jstring data_key) {
+    UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return nullptr;
 
     std::vector<char> meta_data_buffer(2048, 0);
