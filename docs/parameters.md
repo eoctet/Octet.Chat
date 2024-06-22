@@ -4,7 +4,8 @@ The following is a list of all the parameters involved in this project.
 
 > [!NOTE]
 > Other reference
-> documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">
+>
+documents: <a href="https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig">
 > Transformers docs</a>.
 
 ### Model parameters
@@ -122,14 +123,20 @@ The following is a list of all the parameters involved in this project.
 | dynatemp_exponent  | 1.0       | **Dynamic Temperature Sampling** Dynamic temperature exponent.                                                                                                               |
 | grammar_rules      | /         | Specify a grammar (defined inline or in a file) to constrain model output to a specific format.                                                                              |
 | max_new_token_size | 512       | Maximum new token generation size.                                                                                                                                           |
-| last_tokens_size   | 64        | Maximum number of tokens to keep in the last_n_tokens deque.                                                                                                                 |
 | verbose_prompt     | false     | Print the prompt before generating text.                                                                                                                                     |
-| user               | User      | Specify user nickname.                                                                                                                                                       |
-| assistant          | Assistant | Specify bot nickname.                                                                                                                                                        |
-| add_bos            | true      | Add BOS token.                                                                                                                                                               |
-| special_tokens     | true      | Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext.                                                                     |
+| last_tokens_size   | 64        | Maximum number of tokens to keep in the last_n_tokens deque.                                                                                                                 |
+| special            | false     | If true, special tokens are rendered in the output.                                                                                                                          |
 | logit_bias         | /         | Adjust the probability distribution of words.                                                                                                                                |
 | stopping_word      | /         | Control the stop word list for generating stops, with values that can be text or token IDs.                                                                                  |
+| infill             | false     | Enable infill mode for the model.                                                                                                                                            |
+| spm_fill           | false     | Use Suffix/Prefix/Middle pattern for infill (instead of Prefix/Suffix/Middle) as some models prefer this.                                                                    |
+| prefix_token       | /         | Specify a prefix token in fill mode. (If not specified, read from the model by default)                                                                                      |
+| suffix_token       | /         | Specify a suffix token in fill mode.                                                                                                                                         |
+| middle_token       | /         | Specify a middle token in fill mode.                                                                                                                                         |
+| session_cache      | false     | If enabled, each chat conversation will be stored in the session cache.                                                                                                      |
+| prompt_cache       | false     | Cache the system prompt in the session and does not update them again.                                                                                                       |
+| user               | User      | Specify user nickname.                                                                                                                                                       |
+| assistant          | Assistant | Specify bot nickname.                                                                                                                                                        |
 
 **JSON template**
 
@@ -153,12 +160,18 @@ The following is a list of all the parameters involved in this project.
   "grammar_rules": null,
   "max_new_token_size": 512,
   "verbose_prompt": false,
-  "user": "User",
-  "assistant": "Assistant",
   "last_tokens_size": 64,
-  "add_bos": true,
-  "special_tokens": true,
-  "logit_bias": "",
-  "stopping_word": ""
+  "special": false,
+  "logit_bias": null,
+  "stopping_word": null,
+  "infill": false,
+  "spm_fill": false,
+  "prefix_token": "",
+  "suffix_token": "",
+  "middle_token": "",
+  "session_cache": false,
+  "prompt_cache": false,
+  "user": "User",
+  "assistant": "Assistant"
 }
 ```

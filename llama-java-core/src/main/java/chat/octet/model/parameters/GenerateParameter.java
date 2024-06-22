@@ -4,7 +4,6 @@ import chat.octet.model.beans.LogitBias;
 import chat.octet.model.components.criteria.StoppingCriteriaList;
 import chat.octet.model.components.processor.LogitsProcessorList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
@@ -27,7 +26,7 @@ import javax.annotation.Nullable;
 @Builder
 @ToString
 @Jacksonized
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class GenerateParameter {
 
@@ -209,17 +208,20 @@ public final class GenerateParameter {
     private boolean spmFill = false;
 
     /**
-     * Specify a prefix token in fill mode.
+     * Specify a prefix token in fill mode,
+     * If not specified, read from the model by default.
      */
     private String prefixToken;
 
     /**
-     * Specify a suffix token in fill mode.
+     * Specify a suffix token in fill mode,
+     * If not specified, read from the model by default.
      */
     private String suffixToken;
 
     /**
-     * Specify a middle token in fill mode.
+     * Specify a middle token in fill mode,
+     * If not specified, read from the model by default.
      */
     private String middleToken;
 
@@ -227,12 +229,14 @@ public final class GenerateParameter {
 
     /**
      * If enabled, each chat conversation will be stored in the session cache.
+     * (Only supports chat mode)
      */
     @Builder.Default
     private boolean sessionCache = false;
 
     /**
      * Cache the system prompt in the session and does not update them again.
+     * (Only supports chat mode)
      */
     @Builder.Default
     private boolean promptCache = false;
