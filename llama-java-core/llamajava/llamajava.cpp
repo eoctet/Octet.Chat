@@ -21,6 +21,19 @@ enum log_level_type {
     LOG_ERROR = 3,
 };
 
+//llama special token type define
+enum llama_special_token_type {
+    TOKEN_BOS = 0,
+    TOKEN_EOS = 1,
+    TOKEN_CLS = 2,
+    TOKEN_SEP = 3,
+    TOKEN_NL  = 4 ,
+    TOKEN_PREFIX = 5,
+    TOKEN_MIDDLE = 6,
+    TOKEN_SUFFIX = 7,
+    TOKEN_EOT = 8,
+};
+
 //global context
 struct llama_java_context {
     llama_model *model;
@@ -632,28 +645,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenAttr
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getTokenBOS
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
-        (JNIEnv *env, jclass thisClass) {
-    UNUSED(thisClass);
-    if (Check_Context_Is_Null(env)) return -1;
-    return llama_token_bos(main_ctx->model);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenEOS
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
-        (JNIEnv *env, jclass thisClass) {
-    UNUSED(thisClass);
-    if (Check_Context_Is_Null(env)) return -1;
-    return llama_token_eos(main_ctx->model);
-}
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    tokenize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
@@ -1009,9 +1000,55 @@ JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_llamaModelMeta
     const char *d_key = env->GetStringUTFChars(data_key, JNI_FALSE);
     int32_t res = llama_model_meta_val_str(main_ctx->model, d_key, meta_data_buffer.data(), meta_data_buffer.size());
     if (res <= 0) {
-        JLOG_ERROR("Cannot find the meta data key: %s.", d_key);
+        JLOG_DEBUG("Cannot find the meta data key: %s.", d_key);
         return nullptr;
     }
     std::string meta_data_str(meta_data_buffer.data(), meta_data_buffer.size());
     return env->NewStringUTF(meta_data_str.c_str());
+}
+
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    getSpecialToken
+ */
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getSpecialToken
+        (JNIEnv *env, jclass thisClass, jint special_token_type) {
+    UNUSED(thisClass);
+    if (Check_Context_Is_Null(env)) return -1;
+
+    llama_special_token_type type = static_cast<enum llama_special_token_type>(special_token_type);
+    jint token_id = -1;
+    switch (type) {
+        case TOKEN_BOS:
+            token_id = llama_token_bos(main_ctx->model);
+            break;
+        case TOKEN_EOS:
+            token_id = llama_token_eos(main_ctx->model);
+            break;
+        case TOKEN_CLS:
+            token_id = llama_token_cls(main_ctx->model);
+            break;
+        case TOKEN_SEP:
+            token_id = llama_token_sep(main_ctx->model);
+            break;
+        case TOKEN_NL:
+            token_id = llama_token_nl(main_ctx->model);
+            break;
+        case TOKEN_PREFIX:
+            token_id = llama_token_prefix(main_ctx->model);
+            break;
+        case TOKEN_MIDDLE:
+            token_id = llama_token_middle(main_ctx->model);
+            break;
+        case TOKEN_SUFFIX:
+            token_id = llama_token_suffix(main_ctx->model);
+            break;
+        case TOKEN_EOT:
+            token_id = llama_token_eot(main_ctx->model);
+            break;
+        default:
+            JLOG_ERROR("Cannot find the special token type: %d.", special_token_type);
+
+    }
+    return token_id;
 }

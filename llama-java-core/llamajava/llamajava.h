@@ -122,20 +122,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenAttr
 
 /*
  * Class:     chat_octet_model_LlamaService
- * Method:    getTokenBOS
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenBOS
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
- * Method:    getTokenEOS
- */
-JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenEOS
-        (JNIEnv *, jclass);
-
-/*
- * Class:     chat_octet_model_LlamaService
  * Method:    tokenize
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
@@ -202,8 +188,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_llamaModelQuantize
  * Class:     chat_octet_model_LlamaService
  * Method:    llamaModelMeta
  */
-JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_llamaModelMeta
-        (JNIEnv *, jclass, jstring);
+JNIEXPORT jstring JNICALL Java_chat_octet_model_LlamaService_llamaModelMeta(JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     chat_octet_model_LlamaService
+ * Method:    getSpecialToken
+ */
+JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getSpecialToken(JNIEnv *, jclass, jint);
 
 #ifdef __cplusplus
 }

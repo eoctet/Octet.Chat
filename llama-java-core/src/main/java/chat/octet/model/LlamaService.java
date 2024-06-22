@@ -5,6 +5,7 @@ import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.beans.LlamaModelQuantizeParams;
 import chat.octet.model.beans.Metrics;
+import chat.octet.model.enums.LlamaSpecialTokenType;
 import chat.octet.model.enums.LlamaTokenAttr;
 import chat.octet.model.enums.ModelFileType;
 import chat.octet.model.exceptions.DecodeException;
@@ -12,6 +13,7 @@ import chat.octet.model.exceptions.ModelException;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.Platform;
 import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
@@ -27,6 +29,7 @@ import java.util.Optional;
  * @author <a href="https://github.com/eoctet">William</a>
  * @since b3091 20240611
  */
+@Slf4j
 public class LlamaService {
 
     static {
@@ -166,18 +169,15 @@ public class LlamaService {
     public static native int getTokenAttr(int token);
 
     /**
-     * Get special BOS token.
+     * Get token type define.
      *
-     * @return int, Returns token id.
+     * @param token Token id.
+     * @return LlamaTokenAttr
+     * @see LlamaTokenAttr
      */
-    public static native int getTokenBOS();
-
-    /**
-     * Get special EOS token.
-     *
-     * @return int, Returns token id.
-     */
-    public static native int getTokenEOS();
+    public static LlamaTokenAttr getLlamaTokenAttr(int token) {
+        return LlamaTokenAttr.valueOfType(getTokenAttr(token));
+    }
 
     /**
      * Convert the provided text into tokens.
@@ -370,17 +370,6 @@ public class LlamaService {
     }
 
     /**
-     * Get token type define.
-     *
-     * @param token Token id.
-     * @return LlamaTokenAttr
-     * @see LlamaTokenAttr
-     */
-    public static LlamaTokenAttr getLlamaTokenAttr(int token) {
-        return LlamaTokenAttr.valueOfType(getTokenAttr(token));
-    }
-
-    /**
      * Retrieves the metadata information of the llama model based on the given key.
      * This native method is used to obtain specific information about the model, which is identified by the key parameter.
      * The information obtained may include model structure, parameters, version, etc.
@@ -390,5 +379,98 @@ public class LlamaService {
      * which may be a description of the model, the model's version number, or other information.
      */
     public static native String llamaModelMeta(String key);
+
+    /**
+     * Get special token id by type.
+     *
+     * @param llamaSpecialTokenType Special token type.
+     * @return Token id.
+     * @see LlamaSpecialTokenType
+     */
+    public static native int getSpecialToken(int llamaSpecialTokenType);
+
+    /**
+     * Get bos token id.
+     *
+     * @return Token id.
+     */
+    public static int getBosToken() {
+        return getSpecialToken(LlamaSpecialTokenType.TOKEN_BOS.getType());
+    }
+
+    /**
+     * Get eos token id.
+     *
+     * @return Token id.
+     */
+    public static int getEosToken() {
+        return getSpecialToken(LlamaSpecialTokenType.TOKEN_EOS.getType());
+    }
+
+    /**
+     * Get prefix token id.
+     *
+     * @return Token id.
+     */
+    public static int getPrefixToken() {
+        int prefixTokenId = getSpecialToken(LlamaSpecialTokenType.TOKEN_PREFIX.getType());
+        if (prefixTokenId == -1) {
+            log.error("Prefix token is not found in model, please set prefix token in generate parameter.");
+        }
+        return prefixTokenId;
+    }
+
+    /**
+     * Get suffix token id.
+     *
+     * @return Token id.
+     */
+    public static int getSuffixToken() {
+        int suffixTokenId = getSpecialToken(LlamaSpecialTokenType.TOKEN_SUFFIX.getType());
+        if (suffixTokenId == -1) {
+            log.error("Suffix token is not found in model, please set suffix token in generate parameter.");
+        }
+        return suffixTokenId;
+    }
+
+    /**
+     * Get middle token id.
+     *
+     * @return Token id.
+     */
+    public static int getMiddleToken() {
+        int middleTokenId = getSpecialToken(LlamaSpecialTokenType.TOKEN_MIDDLE.getType());
+        if (middleTokenId == -1) {
+            log.error("Middle token is not found in model, please set middle token in generate parameter.");
+        }
+        return middleTokenId;
+    }
+
+    /**
+     * Whether to add BOS token.
+     *
+     * @return boolean
+     */
+    public static boolean addBosToken() {
+        return Boolean.parseBoolean(Optional.ofNullable(llamaModelMeta("tokenizer.ggml.add_bos_token")).orElse("false"));
+    }
+
+    /**
+     * Whether to add EOS token.
+     *
+     * @return boolean
+     */
+    public static boolean addEosToken() {
+        return Boolean.parseBoolean(Optional.ofNullable(llamaModelMeta("tokenizer.ggml.add_eos_token")).orElse("false"));
+    }
+
+    /**
+     * Whether to add space prefix.
+     *
+     * @return boolean
+     */
+    public static boolean addSpacePrefix() {
+        return Boolean.parseBoolean(Optional.ofNullable(llamaModelMeta("tokenizer.ggml.add_space_prefix")).orElse("false"));
+    }
 
 }
