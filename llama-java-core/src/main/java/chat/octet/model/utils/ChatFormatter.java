@@ -48,6 +48,7 @@ public class ChatFormatter {
         this.template = template;
         this.bos = bos;
         this.eos = eos;
+        log.debug("Created a new chat formatter, bos: {}, eos: {}, chat template: {}", bos, eos, template);
     }
 
     public ChatFormatter(String template) {

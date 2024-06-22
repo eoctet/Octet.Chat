@@ -18,6 +18,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Model inference generator,
@@ -118,7 +119,7 @@ public class Generator implements Iterable<Token> {
      * Close inference generator.
      */
     public void close() {
-        if (chatStatus != null) {
+        if (chatStatus != null && inference.isSessionCache()) {
             chatStatus.copyToStatus(inference.getStatus());
         } else {
             inference.clearCache();
@@ -152,13 +153,39 @@ public class Generator implements Iterable<Token> {
             this.contextSize = LlamaService.getContextSize();
             this.status = srcStatus == null ? new Status() : new Status(srcStatus);
 
-            int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(prompt, generateParams.isAddBos(), generateParams.isSpecialTokens()) : new int[]{LlamaService.getTokenBOS()};
+            //format prompt text
+            String bosToken = StringUtils.EMPTY;
+            if (LlamaService.addBosToken() && LlamaService.getBosToken() != -1) {
+                bosToken = TokenDecoder.decodeToken(true, LlamaService.getBosToken());
+                if (StringUtils.startsWithIgnoreCase(prompt.trim(), bosToken)) {
+                    log.warn("Detect duplicate {} leading in prompt, automatically remove it now.", bosToken);
+                    prompt = StringUtils.removeStartIgnoreCase(prompt, bosToken);
+                }
+            }
+            String eosToken = StringUtils.EMPTY;
+            if (LlamaService.addEosToken() && LlamaService.getEosToken() != -1) {
+                eosToken = TokenDecoder.decodeToken(true, LlamaService.getEosToken());
+                if (StringUtils.endsWithIgnoreCase(prompt, eosToken)) {
+                    log.warn("Detect duplicate ending {} in prompt, automatically remove it now.", eosToken);
+                    prompt = StringUtils.removeEndIgnoreCase(prompt, eosToken);
+                }
+            }
+            if (generateParams.isInfill()) {
+                prompt = formatPromptInfill(prompt);
+            }
+            if (LlamaService.addSpacePrefix() && StringUtils.isNotBlank(prompt) && !StringUtils.startsWith(prompt, StringUtils.SPACE)) {
+                prompt = StringUtils.SPACE + prompt;
+            }
+            String finalPrompt = bosToken + prompt + eosToken;
+            if (generateParams.isVerbosePrompt()) {
+                log.info("Final prompt text:\n{}", finalPrompt);
+            }
+
+            //prompt tokenization
+            int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(finalPrompt, false, false) : new int[]{LlamaService.getBosToken()};
             this.promptTokens = tokens.length;
             if (tokens.length >= contextSize) {
                 throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
-            }
-            if (generateParams.isVerbosePrompt()) {
-                log.info("Print prompt text:\n{}", prompt);
             }
             this.status.appendTokens(tokens);
 
@@ -170,7 +197,7 @@ public class Generator implements Iterable<Token> {
                 }
             }
             log.debug("Generate starting, input token size: {}, past token size: {}.", tokens.length, this.status.getPastTokenSize());
-            decodePrompt();
+            batchDecode();
         }
 
         /**
@@ -191,10 +218,48 @@ public class Generator implements Iterable<Token> {
             return promptTokens;
         }
 
+        protected boolean isSessionCache() {
+            return generateParams.isSessionCache();
+        }
+
+        private String formatPromptInfill(String prompt) {
+            StringBuilder buffer = new StringBuilder(prompt);
+            // prefix token
+            String prefixToken = Optional.ofNullable(generateParams.getPrefixToken()).orElse(StringUtils.EMPTY);
+            if (StringUtils.isBlank(prefixToken) && LlamaService.getPrefixToken() != -1) {
+                prefixToken = TokenDecoder.decodeToken(true, LlamaService.getPrefixToken());
+            }
+            if (StringUtils.containsIgnoreCase(prompt, prefixToken.trim())) {
+                prefixToken = StringUtils.EMPTY;
+            }
+
+            // suffix token
+            String suffixToken = Optional.ofNullable(generateParams.getSuffixToken()).orElse(StringUtils.EMPTY);
+            if (StringUtils.isBlank(suffixToken) && LlamaService.getSuffixToken() != -1) {
+                suffixToken = TokenDecoder.decodeToken(true, LlamaService.getSuffixToken());
+            }
+            if (StringUtils.containsIgnoreCase(prompt, suffixToken.trim())) {
+                suffixToken = StringUtils.EMPTY;
+            }
+
+            // middle token
+            String middleToken = Optional.ofNullable(generateParams.getMiddleToken()).orElse(StringUtils.EMPTY);
+            if (StringUtils.isBlank(middleToken) && LlamaService.getMiddleToken() != -1) {
+                middleToken = TokenDecoder.decodeToken(true, LlamaService.getMiddleToken());
+            }
+            if (StringUtils.endsWithIgnoreCase(prompt, middleToken.trim())) {
+                middleToken = StringUtils.EMPTY;
+            }
+
+            return generateParams.isSpmFill() ?
+                    buffer.insert(0, suffixToken).append(prefixToken).append(middleToken).toString() :
+                    buffer.insert(0, prefixToken).append(suffixToken).append(middleToken).toString();
+        }
+
         /**
-         * Batch decode prompt text.
+         * Batch decoding prompt text.
          */
-        private void decodePrompt() {
+        private void batchDecode() {
             //batch decode input tokens
             int decodeStatus = LlamaService.batchDecode(status.getId(), status.getInputIds(), status.getInputLength(), status.getPastTokenSize());
             if (decodeStatus != 0) {
@@ -202,7 +267,7 @@ public class Generator implements Iterable<Token> {
             }
             int size = status.getInputLength() - status.getPastTokenSize();
             status.addPastTokensSize(size);
-            log.debug("Batch decode prompt completed, decode token size: {}, sequence id: {}.", size, status.getId());
+            log.debug("Batch decoding prompt completed, sequence id: {}, decode token size: {}.", status.getId(), size);
         }
 
         /**
@@ -213,7 +278,7 @@ public class Generator implements Iterable<Token> {
          * @return boolean
          */
         private boolean breakOrContinue(Token token, float[] logits) {
-            if (token.getId() == LlamaService.getTokenEOS()) {
+            if (token.getId() == LlamaService.getEosToken() || token.getId() == LlamaService.getEotToken()) {
                 token.updateFinishReason(FinishReason.FINISHED);
                 return true;
             }
@@ -265,7 +330,7 @@ public class Generator implements Iterable<Token> {
          */
         private String tokenToText(int token) {
             byte[] buffer = new byte[64];
-            int length = LlamaService.tokenToPiece(token, buffer, buffer.length, false);
+            int length = LlamaService.tokenToPiece(token, buffer, buffer.length, generateParams.isSpecial());
             if (length == 0) {
                 return StringUtils.EMPTY;
             }

@@ -11,10 +11,10 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 
 /**
  * <p>Llama model parameters</p>
@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
  */
 @Getter
 @Builder
-@ToString
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -256,4 +255,45 @@ public class ModelParameter {
     @Builder.Default
     private boolean checkTensors = false;
 
+
+    @Override
+    public String toString() {
+        return "{" +
+                "modelPath: '" + modelPath + '\'' +
+                ", loraBase: '" + loraBase + '\'' +
+                ", loraPath: '" + loraPath + '\'' +
+                ", loraScale: " + loraScale +
+                ", verbose: " + verbose +
+                ", numaStrategy: " + numaStrategy +
+                ", seed: " + seed +
+                ", contextSize: " + contextSize +
+                ", batchSize: " + batchSize +
+                ", ubatch: " + ubatch +
+                ", seqMax: " + seqMax +
+                ", threads: " + threads +
+                ", threadsBatch: " + threadsBatch +
+                ", ropeScalingType: " + ropeScalingType +
+                ", poolingType: " + poolingType +
+                ", ropeFreqBase: " + ropeFreqBase +
+                ", ropeFreqScale: " + ropeFreqScale +
+                ", yarnExtFactor: " + yarnExtFactor +
+                ", yarnAttnFactor: " + yarnAttnFactor +
+                ", yarnBetaFast: " + yarnBetaFast +
+                ", yarnBetaSlow: " + yarnBetaSlow +
+                ", yarnOrigCtx: " + yarnOrigCtx +
+                ", defragThold: " + defragThold +
+                ", logitsAll: " + logitsAll +
+                ", embedding: " + embedding +
+                ", offloadKqv: " + offloadKqv +
+                ", flashAttn: " + flashAttn +
+                ", gpuLayers: " + gpuLayers +
+                ", splitMode: " + splitMode +
+                ", mainGpu: " + mainGpu +
+                ", tensorSplit: " + Arrays.toString(tensorSplit) +
+                ", vocabOnly: " + vocabOnly +
+                ", mmap: " + mmap +
+                ", mlock: " + mlock +
+                ", checkTensors: " + checkTensors +
+                '}';
+    }
 }

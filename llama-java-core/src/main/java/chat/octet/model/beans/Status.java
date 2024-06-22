@@ -23,7 +23,7 @@ public class Status {
     private int inputLength;
     private int pastTokenSize;
     @Setter
-    private String initialSystemPrompt;
+    private String systemPromptCache;
 
     public Status() {
         this.id = RandomUtils.nextInt(10000, 50000);
@@ -44,7 +44,7 @@ public class Status {
         }
         this.inputLength = srcStatus.getInputLength();
         this.pastTokenSize = srcStatus.getPastTokenSize();
-        this.initialSystemPrompt = srcStatus.getInitialSystemPrompt();
+        this.systemPromptCache = srcStatus.getSystemPromptCache();
     }
 
     public void appendTokens(int[] tokens) {
@@ -75,7 +75,7 @@ public class Status {
             inputLength = srcStatus.getInputLength();
             pastTokenSize = srcStatus.getPastTokenSize();
             generateTokens = Lists.newArrayList(srcStatus.getGenerateTokens());
-            initialSystemPrompt = srcStatus.getInitialSystemPrompt();
+            systemPromptCache = srcStatus.getSystemPromptCache();
         }
     }
 
@@ -100,7 +100,7 @@ public class Status {
         Arrays.fill(inputIds, 0);
         pastTokenSize = 0;
         inputLength = 0;
-        initialSystemPrompt = null;
+        systemPromptCache = null;
     }
 
 }

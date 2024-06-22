@@ -44,4 +44,9 @@ public enum FinishReason {
     public boolean isFinished() {
         return this == FINISHED || this == LENGTH || this == STOP || this == TRUNCATED;
     }
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }

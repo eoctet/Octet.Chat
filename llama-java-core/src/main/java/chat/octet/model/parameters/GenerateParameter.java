@@ -31,6 +31,8 @@ import javax.annotation.Nullable;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class GenerateParameter {
 
+    //generate parameters
+
     /**
      * Adjust the randomness of the generated text (default: 0.8).
      */
@@ -169,37 +171,16 @@ public final class GenerateParameter {
     private StoppingCriteriaList stoppingCriteriaList = new StoppingCriteriaList();
 
     /**
-     * Specify user nickname, default: User.
-     */
-    @Builder.Default
-    @Setter
-    private String user = "User";
-
-    /**
-     * Specify bot nickname, default: Assistant.
-     */
-    @Builder.Default
-    private String assistant = "Assistant";
-
-    /**
      * Maximum number of tokens to keep in the last_n_tokens deque.
      */
     @Builder.Default
     private int lastTokensSize = 64;
 
     /**
-     * Add BOS token.
+     * If true, special tokens are rendered in the output.
      */
-    @Setter
     @Builder.Default
-    private boolean addBos = true;
-
-    /**
-     * Allow tokenizing special and/or control tokens which otherwise are not exposed and treated as plaintext.
-     */
-    @Setter
-    @Builder.Default
-    private boolean specialTokens = true;
+    private boolean special = false;
 
     /**
      * Adjust the probability distribution of words.
@@ -212,6 +193,62 @@ public final class GenerateParameter {
      */
     @Nullable
     private String[] stoppingWord;
+
+    //infill
+
+    /**
+     * Enable infill mode for the model.
+     */
+    @Builder.Default
+    private boolean infill = false;
+
+    /**
+     * Use Suffix/Prefix/Middle pattern for infill (instead of Prefix/Suffix/Middle) as some models prefer this.
+     */
+    @Builder.Default
+    private boolean spmFill = false;
+
+    /**
+     * Specify a prefix token in fill mode.
+     */
+    private String prefixToken;
+
+    /**
+     * Specify a suffix token in fill mode.
+     */
+    private String suffixToken;
+
+    /**
+     * Specify a middle token in fill mode.
+     */
+    private String middleToken;
+
+    //chat session
+
+    /**
+     * If enabled, each chat conversation will be stored in the session cache.
+     */
+    @Builder.Default
+    private boolean sessionCache = false;
+
+    /**
+     * Cache the system prompt in the session and does not update them again.
+     */
+    @Builder.Default
+    private boolean promptCache = false;
+
+    /**
+     * Specify user nickname, default: User.
+     */
+    @Builder.Default
+    @Setter
+    private String user = "User";
+
+    /**
+     * Specify bot nickname, default: Assistant.
+     */
+    @Builder.Default
+    private String assistant = "Assistant";
 
     /**
      * User session id.

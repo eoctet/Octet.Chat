@@ -390,7 +390,7 @@ public class LlamaService {
     public static native int getSpecialToken(int llamaSpecialTokenType);
 
     /**
-     * Get bos token id.
+     * Get BOS token id.
      *
      * @return Token id.
      */
@@ -399,12 +399,21 @@ public class LlamaService {
     }
 
     /**
-     * Get eos token id.
+     * Get EOS token id.
      *
      * @return Token id.
      */
     public static int getEosToken() {
         return getSpecialToken(LlamaSpecialTokenType.TOKEN_EOS.getType());
+    }
+
+    /**
+     * Get EOT token id.
+     *
+     * @return Token id.
+     */
+    public static int getEotToken() {
+        return getSpecialToken(LlamaSpecialTokenType.TOKEN_EOT.getType());
     }
 
     /**
@@ -445,6 +454,7 @@ public class LlamaService {
         }
         return middleTokenId;
     }
+
 
     /**
      * Whether to add BOS token.

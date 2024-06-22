@@ -1,10 +1,7 @@
 package chat.octet.model;
 
 
-import chat.octet.model.beans.CompletionResult;
-import chat.octet.model.beans.LlamaContextParams;
-import chat.octet.model.beans.LlamaModelParams;
-import chat.octet.model.beans.Status;
+import chat.octet.model.beans.*;
 import chat.octet.model.components.criteria.impl.StoppingWordCriteria;
 import chat.octet.model.components.processor.impl.CustomBiasLogitsProcessor;
 import chat.octet.model.exceptions.ModelException;
@@ -76,25 +73,25 @@ public class Model implements AutoCloseable {
         //load chat template, by default use the template from local resource.
         String chatTemplateStr;
         try {
-            chatTemplateStr = Resources.toString(Resources.getResource("chat-templates/" + this.modelType + ".tmpl"), Charsets.UTF_8);
+            String resourceName = "chat-templates/" + this.modelType + ".tmpl";
+            chatTemplateStr = Resources.toString(Resources.getResource(resourceName), Charsets.UTF_8);
+            log.info("Loaded chat template from local resource: {}", resourceName);
         } catch (Exception e) {
             chatTemplateStr = LlamaService.llamaModelMeta("tokenizer.chat_template");
-            log.error("Failed to load local chat template, attempting to load chat template from the model.", e);
+            log.warn("Failed to load local chat template, attempting to load chat template from the model.", e);
         }
         if (StringUtils.isBlank(chatTemplateStr)) {
             this.chatFormatter = new ChatFormatter();
-            log.warn("Chat template is not found, use default template.");
+            log.warn("Chat template is not found in model, use default template.");
         } else {
             this.chatFormatter = new ChatFormatter(chatTemplateStr,
-                    TokenDecoder.decodeToken(true, LlamaService.getTokenBOS()),
-                    TokenDecoder.decodeToken(true, LlamaService.getTokenEOS())
+                    TokenDecoder.decodeToken(true, LlamaService.getBosToken()),
+                    TokenDecoder.decodeToken(true, LlamaService.getEosToken())
             );
         }
-
-        if (modelParams.isVerbose()) {
-            log.info("system info: {}", LlamaService.getSystemInfo());
-        }
-        log.info("model parameters: {}", modelParams);
+        log.info(LlamaService.getSystemInfo());
+        log.info(this.toString());
+        log.info("Model loaded successfully.");
     }
 
     private LlamaModelParams getLlamaModelParameters(ModelParameter modelParams) {
@@ -239,7 +236,7 @@ public class Model implements AutoCloseable {
      * @see CompletionResult
      */
     public CompletionResult chatCompletions(String question) {
-        return chatCompletions(GenerateParameter.builder().build(), null, question);
+        return chat(GenerateParameter.builder().build(), null, question).result();
     }
 
     /**
@@ -251,20 +248,19 @@ public class Model implements AutoCloseable {
      * @see CompletionResult
      */
     public CompletionResult chatCompletions(GenerateParameter generateParams, String question) {
-        return chatCompletions(generateParams, null, question);
+        return chat(generateParams, null, question).result();
     }
 
     /**
      * Start a conversation and chat.
      *
      * @param generateParams Specify a generation parameter.
-     * @param system         System prompt.
-     * @param question       User question.
+     * @param messages       Chat message list.
      * @return CompletionResult, generated text and completion reason.
      * @see CompletionResult
      */
-    public CompletionResult chatCompletions(GenerateParameter generateParams, String system, String question) {
-        return chat(generateParams, system, question).result();
+    public CompletionResult chatCompletions(GenerateParameter generateParams, ChatMessage... messages) {
+        return chat(generateParams, messages).result();
     }
 
     /**
@@ -294,50 +290,75 @@ public class Model implements AutoCloseable {
      * Start a conversation and chat in streaming format.
      *
      * @param generateParams Specify a generation parameter.
-     * @param question       User question.
-     * @return Inference generator.
-     * @see Generator
-     */
-    public Generator chat(GenerateParameter generateParams, String question) {
-        return chat(generateParams, null, question);
-    }
-
-    /**
-     * Start a conversation and chat in streaming format.
-     *
-     * @param generateParams Specify a generation parameter.
      * @param system         System prompt.
      * @param question       User question.
      * @return Inference generator.
      * @see Generator
      */
     public Generator chat(GenerateParameter generateParams, String system, String question) {
+        Preconditions.checkNotNull(question, "User question cannot be null");
+        if (StringUtils.isNotBlank(system)) {
+            return chat(generateParams, ChatMessage.toSystem(system), ChatMessage.toUser(question));
+        } else {
+            return chat(generateParams, ChatMessage.toUser(question));
+        }
+    }
+
+    /**
+     * Start a conversation and chat in streaming format.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param messages       Chat messages.
+     * @return Inference generator.
+     * @see Generator
+     */
+    public Generator chat(GenerateParameter generateParams, ChatMessage... messages) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
-        Preconditions.checkNotNull(question, "Question cannot be null");
-        Preconditions.checkNotNull(generateParams.getUser(), "User id cannot be null");
+        Preconditions.checkNotNull(generateParams, "Chat messages cannot be null");
+        if (messages.length == 1 && ChatMessage.ChatRole.SYSTEM == messages[0].getRole()) {
+            throw new IllegalArgumentException("Chat messages cannot be only one system message");
+        }
+
+        //add custom logit bias
         if (generateParams.getLogitBias() != null && !generateParams.getLogitBias().isEmpty()) {
             generateParams.getLogitsProcessorList().add(new CustomBiasLogitsProcessor(generateParams.getLogitBias(), LlamaService.getVocabSize()));
         }
+        //add custom stopping word
         if (generateParams.getStoppingWord() != null) {
             generateParams.getStoppingCriteriaList().add(new StoppingWordCriteria(generateParams.getStoppingWord()));
         }
-        String key = StringUtils.isBlank(generateParams.getSession()) ? generateParams.getUser() : (generateParams.getUser() + ":" + generateParams.getSession());
 
-        boolean exists = chatStatus.containsKey(key);
-        if (!exists) {
-            Status userStatus = new Status();
-            chatStatus.put(key, userStatus);
-            log.debug("Create new chat session, session: {} id: {}, chat session cache size: {}.", key, userStatus.getId(), chatStatus.size());
+        String prompt = chatFormatter.format(messages);
+        Status status = null;
+        //if session cache is enabled, try to retrieve the chat session from the cache
+        //otherwise does not use session cache in chat
+        if (generateParams.isSessionCache()) {
+            Preconditions.checkNotNull(generateParams.getUser(), "Chat user cannot be null, please set user in generate parameter.");
+            String key = StringUtils.isBlank(generateParams.getSession()) ? generateParams.getUser() : (generateParams.getUser() + ":" + generateParams.getSession());
+            boolean exists = chatStatus.containsKey(key);
+            if (!exists) {
+                status = new Status();
+                chatStatus.put(key, status);
+                log.debug("Create new chat session, session: {} id: {}, chat session cache size: {}.", key, status.getId(), chatStatus.size());
+            }
+            status = chatStatus.get(key);
+
+            //if prompt cache is enabled, set the initial system prompt and does not update it again
+            if (generateParams.isPromptCache()) {
+                ChatMessage msg = messages.length > 0 ? messages[0] : null;
+                if (msg != null && ChatMessage.ChatRole.SYSTEM == msg.getRole() && StringUtils.isNotBlank(msg.getContent())) {
+                    if (!msg.getContent().equals(status.getSystemPromptCache())) {
+                        status.setSystemPromptCache(msg.getContent());
+                    } else {
+                        //remove the system prompt in messages
+                        ChatMessage[] newMessages = new ChatMessage[Math.max(1, messages.length - 1)];
+                        System.arraycopy(messages, 1, newMessages, 0, newMessages.length);
+                        prompt = chatFormatter.format(newMessages);
+                    }
+                }
+            }
         }
-        Status userStatus = chatStatus.get(key);
-        if (StringUtils.isNotBlank(system) && system.equals(userStatus.getInitialSystemPrompt())) {
-            system = null;
-        }
-        if (StringUtils.isNotBlank(system) && StringUtils.isBlank(userStatus.getInitialSystemPrompt())) {
-            userStatus.setInitialSystemPrompt(system);
-        }
-        String prompt = chatFormatter.format(system, question);
-        return new Generator(generateParams, prompt, userStatus);
+        return new Generator(generateParams, prompt, status);
     }
 
     /**
@@ -363,9 +384,9 @@ public class Model implements AutoCloseable {
 
     @Override
     public String toString() {
-        return "LlamaModel (" +
-                "modelParams=" + modelParams +
-                ')';
+        return "model name: " + modelName +
+                ", model type: " + modelType +
+                ", model parameters: " + modelParams;
     }
 
 
