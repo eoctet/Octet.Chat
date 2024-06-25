@@ -74,7 +74,7 @@ public class FunctionRegister {
         if (file.isFile() && file.exists()) {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
                 String json = bufferedReader.lines().collect(Collectors.joining());
-                return JsonUtils.parseJsonToList(json, FunctionConfig.class);
+                return Optional.ofNullable(JsonUtils.parseJsonToList(json, FunctionConfig.class)).orElse(Lists.newLinkedList());
             } catch (Exception e) {
                 log.error("Read function configuration file failed", e);
             }

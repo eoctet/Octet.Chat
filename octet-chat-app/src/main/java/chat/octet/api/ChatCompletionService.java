@@ -16,6 +16,7 @@ import chat.octet.model.enums.LlamaTokenAttr;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.JsonUtils;
 import chat.octet.utils.CommonUtils;
+import chat.octet.utils.Shortcuts;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -106,7 +107,9 @@ public class ChatCompletionService {
                     }
 
                     String id = CommonUtils.randomString("chatcmpl");
-                    boolean isFunctionCall = "auto".equalsIgnoreCase(requestParams.getToolChoice()) && config.isFunctionCall();
+                    boolean useFunctionCall = Shortcuts.useFunctionCall(messages);
+                    boolean isFunctionCall = ("auto".equalsIgnoreCase(requestParams.getToolChoice()) || useFunctionCall) && config.isFunctionCall();
+
                     if (requestParams.isStream()) {
                         if (isFunctionCall) {
                             CompletionResult result = FunctionRegister.getInstance().functionCall(model, generateParams, messages);

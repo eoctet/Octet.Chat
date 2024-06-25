@@ -1,6 +1,7 @@
 package chat.octet.cli;
 
 import chat.octet.api.CharacterModelBuilder;
+import chat.octet.utils.Shortcuts;
 import chat.octet.api.functions.FunctionRegister;
 import chat.octet.config.CharacterConfig;
 import chat.octet.model.Model;
@@ -44,8 +45,9 @@ public class CmdInteraction {
             System.out.print(botInputPrefix);
 
             List<ChatMessage> messages = Lists.newArrayList(ChatMessage.toSystem(system), ChatMessage.toUser(input));
+            boolean useFunctionCall = Shortcuts.useFunctionCall(messages);
 
-            if (function && config.isFunctionCall()) {
+            if ((function || useFunctionCall) && config.isFunctionCall()) {
                 System.out.println(ColorConsole.grey("[ I'm thinking, please wait a moment.. ]"));
                 CompletionResult result = FunctionRegister.getInstance().functionCall(model, config.getGenerateParameter(), messages);
                 System.out.print(ColorConsole.cyan(result.getContent()));
