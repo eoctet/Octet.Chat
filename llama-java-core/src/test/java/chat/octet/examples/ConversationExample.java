@@ -1,9 +1,12 @@
 package chat.octet.examples;
 
 import chat.octet.model.Model;
+import chat.octet.model.beans.ChatMessage;
+import chat.octet.model.components.prompt.DefaultChatTemplateFormatter;
+import chat.octet.model.enums.ModelType;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
-import chat.octet.model.utils.ChatFormatter;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -49,8 +52,8 @@ public class ConversationExample {
                 if (chatMode) {
                     model.chat(generateParams, system, input).forEach(e -> System.out.print(e.getText()));
                 } else {
-                    ChatFormatter formatter = new ChatFormatter("REPLACE_PROMPT_TEMPLATE");
-                    String text = formatter.format(system, input);
+                    DefaultChatTemplateFormatter formatter = new DefaultChatTemplateFormatter(ModelType.LLAMA2.name());
+                    String text = formatter.format(Lists.newArrayList(ChatMessage.toSystem(system), ChatMessage.toUser(input)));
                     model.generate(generateParams, text).output();
                 }
                 System.out.print("\n");

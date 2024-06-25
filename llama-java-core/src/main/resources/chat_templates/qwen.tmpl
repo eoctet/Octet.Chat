@@ -1,0 +1,33 @@
+{% for message in messages %}{% if add_function_calls && message.role == 'user' %}
+<|im_start|>{{message.role}}
+Answer the following questions as best you can. You have access to the following tools:
+
+{% for func in functions %}
+{{func.desc.name}}: Call this tool to interact with the {{func.desc.alias}} API. What is the {{func.desc.alias}} API useful for? {{func.desc.description}} Parameters: {{func.desc.parameters}} Format the arguments as a JSON object.{{'\n'}}
+{% endfor %}
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{% for func in functions %}{{func.desc.name}}{% if !loop.last %}, {% endif %}{% endfor %}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin!
+
+Question: {{query}}
+{% if function_call %}
+Thought: {{assistant}}
+Action: {{function_name}}
+Action Input: {{function_input}}
+{% endif %}
+{% if function_feedback %}Observation: {{function_result}}{% endif %}<|im_end|>
+{% else %}
+<|im_start|>{{message.role}}
+{{message.content}}<|im_end|>
+{% endif %}
+{% endfor %}
+{% if add_generation_prompt %}{{'<|im_start|>assistant\n'}}{% endif %}

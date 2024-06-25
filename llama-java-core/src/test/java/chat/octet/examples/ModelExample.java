@@ -1,9 +1,12 @@
 package chat.octet.examples;
 
 import chat.octet.model.Model;
+import chat.octet.model.beans.ChatMessage;
 import chat.octet.model.beans.CompletionResult;
+import chat.octet.model.components.prompt.DefaultChatTemplateFormatter;
+import chat.octet.model.enums.ModelType;
 import chat.octet.model.parameters.GenerateParameter;
-import chat.octet.model.utils.ChatFormatter;
+import com.google.common.collect.Lists;
 
 public class ModelExample {
     private static final String MODEL_PATH = "/octet-chat/models/llama2/ggml-model-7b-q6_k.gguf";
@@ -27,8 +30,8 @@ public class ModelExample {
             //Model: llama2-chat
             String system = "Answer the questions.";
             String question = "Who are you?";
-            ChatFormatter formatter = new ChatFormatter("REPLACE_PROMPT_TEMPLATE");
-            String prompt = formatter.format(system, question);
+            DefaultChatTemplateFormatter formatter = new DefaultChatTemplateFormatter(ModelType.LLAMA2.name());
+            String prompt = formatter.format(Lists.newArrayList(ChatMessage.toSystem(system), ChatMessage.toUser(question)));
             //streaming output
             model.generate(prompt).output();
 
@@ -41,10 +44,6 @@ public class ModelExample {
 
             //streaming output
             model.chat(generateParams, system, question).output();
-
-            //completion output
-            CompletionResult response = model.chatCompletions(generateParams, prompt);
-            System.out.println(response);
         }
     }
 }

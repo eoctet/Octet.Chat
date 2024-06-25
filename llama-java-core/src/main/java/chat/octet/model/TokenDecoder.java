@@ -1,13 +1,7 @@
 package chat.octet.model;
 
 
-import chat.octet.model.beans.Token;
-import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.StringUtils;
-
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Token decoder
@@ -66,42 +60,4 @@ public class TokenDecoder {
         }
     }
 
-    private static int findTokenIndex(List<Token> sources, int[] target, boolean toEnd) {
-        for (int i = 0; i < sources.size(); i++) {
-            int toIndex = Math.min(sources.size() - 1, i + target.length);
-            int[] temp = sources.subList(i, toIndex).stream().mapToInt(Token::getId).toArray();
-
-            if (Arrays.equals(temp, target)) {
-                if (toEnd) {
-                    return toIndex;
-                } else {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
-    public static List<Token> subTokensBetween(List<Token> tokens, String startWord) {
-        return subTokensBetween(tokens, startWord, null);
-    }
-
-    public static List<Token> subTokensBetween(List<Token> tokens, String startWord, String endWord) {
-        Preconditions.checkNotNull(tokens, "Tokens cannot be null");
-
-        int startIndex = 0;
-        if (StringUtils.isNotBlank(startWord)) {
-            int[] startIds = LlamaService.tokenize(startWord, false, true);
-            int index = findTokenIndex(tokens, startIds, true);
-            startIndex = (index == -1) ? 0 : index;
-        }
-
-        int endIndex = tokens.size();
-        if (StringUtils.isNotBlank(endWord)) {
-            int[] endIds = LlamaService.tokenize(endWord, false, true);
-            int index = findTokenIndex(tokens, endIds, false);
-            endIndex = (index == -1) ? tokens.size() : index;
-        }
-        return tokens.subList(startIndex, endIndex);
-    }
 }

@@ -29,6 +29,13 @@ public final class Token implements Serializable {
         this.finishReason = FinishReason.NONE;
     }
 
+    public Token(int id, LlamaTokenAttr tokenAttr, String text, FinishReason finishReason) {
+        this.id = id;
+        this.text = text;
+        this.tokenAttr = tokenAttr;
+        this.finishReason = finishReason;
+    }
+
     public void updateFinishReason(FinishReason finishReason) {
         this.finishReason = finishReason;
     }

@@ -38,7 +38,7 @@ public class GrammarExample {
         GenerateParameter generateParams = GenerateParameter.builder().grammarRules(grammarRules).build();
 
         try (Model model = new Model(MODEL_PATH)) {
-            CompletionResult result = model.chatCompletions(generateParams, "Who are you?");
+            CompletionResult result = model.chat(generateParams, null, "Who are you?").result();
             System.out.println(result);
         }
     }

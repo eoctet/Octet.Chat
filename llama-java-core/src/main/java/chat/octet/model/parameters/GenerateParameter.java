@@ -4,6 +4,7 @@ import chat.octet.model.beans.LogitBias;
 import chat.octet.model.components.criteria.StoppingCriteriaList;
 import chat.octet.model.components.processor.LogitsProcessorList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
@@ -26,7 +27,7 @@ import javax.annotation.Nullable;
 @Builder
 @ToString
 @Jacksonized
-//@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class GenerateParameter {
 

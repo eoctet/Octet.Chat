@@ -33,7 +33,11 @@ public enum FinishReason {
     /**
      * Generation has exceeded the maximum context limit and has been truncated.
      */
-    TRUNCATED;
+    TRUNCATED,
+    /**
+     * Generation has been interrupted by the tool calls.
+     */
+    TOOL_CALLS;
 
     /**
      * Check if the token has been completed else return false.
@@ -42,7 +46,7 @@ public enum FinishReason {
      * @return boolean
      */
     public boolean isFinished() {
-        return this == FINISHED || this == LENGTH || this == STOP || this == TRUNCATED;
+        return this == FINISHED || this == LENGTH || this == STOP || this == TRUNCATED || this == TOOL_CALLS;
     }
 
     @Override

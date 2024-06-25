@@ -2,6 +2,7 @@ package chat.octet.model.parameters;
 
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
+import chat.octet.model.components.prompt.ChatTemplateFormatter;
 import chat.octet.model.enums.LlamaNumaStrategy;
 import chat.octet.model.enums.LlamaPoolingType;
 import chat.octet.model.enums.LlamaRoPEScalingType;
@@ -61,6 +62,11 @@ public class ModelParameter {
      */
     @Builder.Default
     private boolean verbose = false;
+
+    /**
+     * Specify a chat formatter to use for the chat interface.
+     */
+    private ChatTemplateFormatter chatTemplateFormatter;
 
     /**
      * Attempt one of the below optimization strategies that may help on some NUMA systems (default: disabled).

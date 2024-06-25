@@ -1,0 +1,12 @@
+{% for message in messages %}
+{% if message.role == 'system' %}
+{{message.content | trim}}{{'\n\n'}}
+{% endif %}
+{% if message.role == 'user' %}
+User: {{message.content | trim}}{{'\n'}}
+{% endif %}
+{% if message.role == 'assistant' %}
+Assistant: {{message.content | trim}}{{'\n'}}
+{% endif %}
+{% endfor %}
+{% if add_generation_prompt %}Assistant: {% endif %}

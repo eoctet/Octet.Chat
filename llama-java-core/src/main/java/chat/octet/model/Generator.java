@@ -196,7 +196,7 @@ public class Generator implements Iterable<Token> {
                     log.error("Grammar rule parsing failed, Please check the grammar rule format.");
                 }
             }
-            log.debug("Generate starting, input token size: {}, past token size: {}.", tokens.length, this.status.getPastTokenSize());
+            log.debug("Inference starting, input token size: {}, past token size: {}.", tokens.length, this.status.getPastTokenSize());
             batchDecode();
         }
 

@@ -4,21 +4,24 @@ package chat.octet.model;
 import chat.octet.model.beans.*;
 import chat.octet.model.components.criteria.impl.StoppingWordCriteria;
 import chat.octet.model.components.processor.impl.CustomBiasLogitsProcessor;
+import chat.octet.model.components.prompt.ChatTemplateFormatter;
+import chat.octet.model.components.prompt.DefaultChatTemplateFormatter;
 import chat.octet.model.exceptions.ModelException;
+import chat.octet.model.functions.Function;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.parameters.ModelParameter;
-import chat.octet.model.utils.ChatFormatter;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Resources;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * LLama model, which provides functions for generating and chatting conversations.
@@ -35,7 +38,7 @@ public class Model implements AutoCloseable {
     @Getter
     private final String modelType;
 
-    private final ChatFormatter chatFormatter;
+    private final ChatTemplateFormatter chatFormatter;
     private final Map<String, Status> chatStatus = Maps.newConcurrentMap();
 
     public Model(String modelPath) {
@@ -71,24 +74,10 @@ public class Model implements AutoCloseable {
         this.modelType = LlamaService.llamaModelMeta("general.architecture");
 
         //load chat template, by default use the template from local resource.
-        String chatTemplateStr;
-        try {
-            String resourceName = "chat-templates/" + this.modelType + ".tmpl";
-            chatTemplateStr = Resources.toString(Resources.getResource(resourceName), Charsets.UTF_8);
-            log.info("Loaded chat template from local resource: {}", resourceName);
-        } catch (Exception e) {
-            chatTemplateStr = LlamaService.llamaModelMeta("tokenizer.chat_template");
-            log.warn("Failed to load local chat template, attempting to load chat template from the model.", e);
-        }
-        if (StringUtils.isBlank(chatTemplateStr)) {
-            this.chatFormatter = new ChatFormatter();
-            log.warn("Chat template is not found in model, use default template.");
-        } else {
-            this.chatFormatter = new ChatFormatter(chatTemplateStr,
-                    TokenDecoder.decodeToken(true, LlamaService.getBosToken()),
-                    TokenDecoder.decodeToken(true, LlamaService.getEosToken())
-            );
-        }
+        String defaultChatTemplate = LlamaService.llamaModelMeta("tokenizer.chat_template");
+        this.chatFormatter = Optional.ofNullable(modelParams.getChatTemplateFormatter())
+                .orElse(new DefaultChatTemplateFormatter(this.modelType, defaultChatTemplate));
+
         log.info(LlamaService.getSystemInfo());
         log.info(this.toString());
         log.info("Model loaded successfully.");
@@ -229,41 +218,6 @@ public class Model implements AutoCloseable {
     }
 
     /**
-     * Start a conversation and chat.
-     *
-     * @param question User question.
-     * @return CompletionResult, generated text and completion reason.
-     * @see CompletionResult
-     */
-    public CompletionResult chatCompletions(String question) {
-        return chat(GenerateParameter.builder().build(), null, question).result();
-    }
-
-    /**
-     * Start a conversation and chat.
-     *
-     * @param generateParams Specify a generation parameter.
-     * @param question       User question.
-     * @return CompletionResult, generated text and completion reason.
-     * @see CompletionResult
-     */
-    public CompletionResult chatCompletions(GenerateParameter generateParams, String question) {
-        return chat(generateParams, null, question).result();
-    }
-
-    /**
-     * Start a conversation and chat.
-     *
-     * @param generateParams Specify a generation parameter.
-     * @param messages       Chat message list.
-     * @return CompletionResult, generated text and completion reason.
-     * @see CompletionResult
-     */
-    public CompletionResult chatCompletions(GenerateParameter generateParams, ChatMessage... messages) {
-        return chat(generateParams, messages).result();
-    }
-
-    /**
      * Start a conversation and chat in streaming format.
      *
      * @param question User question.
@@ -298,9 +252,9 @@ public class Model implements AutoCloseable {
     public Generator chat(GenerateParameter generateParams, String system, String question) {
         Preconditions.checkNotNull(question, "User question cannot be null");
         if (StringUtils.isNotBlank(system)) {
-            return chat(generateParams, ChatMessage.toSystem(system), ChatMessage.toUser(question));
+            return chat(generateParams, Lists.newArrayList(ChatMessage.toSystem(system), ChatMessage.toUser(question)));
         } else {
-            return chat(generateParams, ChatMessage.toUser(question));
+            return chat(generateParams, Lists.newArrayList(ChatMessage.toUser(question)));
         }
     }
 
@@ -312,10 +266,28 @@ public class Model implements AutoCloseable {
      * @return Inference generator.
      * @see Generator
      */
-    public Generator chat(GenerateParameter generateParams, ChatMessage... messages) {
+    public Generator chat(GenerateParameter generateParams, List<ChatMessage> messages) {
+        return chat(generateParams, messages, null, null);
+    }
+
+    public Generator chat(GenerateParameter generateParams, List<ChatMessage> messages, List<Function> functions) {
+        return chat(generateParams, messages, functions, null);
+    }
+
+    /**
+     * Start a conversation and chat in streaming format.
+     *
+     * @param generateParams Specify a generation parameter.
+     * @param messages       Chat messages list.
+     * @param functions      Function list.
+     * @param params         Chat template parameters.
+     * @return Inference generator.
+     * @see Generator
+     */
+    public Generator chat(GenerateParameter generateParams, List<ChatMessage> messages, List<Function> functions, Map<String, Object> params) {
         Preconditions.checkNotNull(generateParams, "Generate parameter cannot be null");
         Preconditions.checkNotNull(generateParams, "Chat messages cannot be null");
-        if (messages.length == 1 && ChatMessage.ChatRole.SYSTEM == messages[0].getRole()) {
+        if (messages.size() == 1 && ChatMessage.ChatRole.SYSTEM == messages.get(0).getRole()) {
             throw new IllegalArgumentException("Chat messages cannot be only one system message");
         }
 
@@ -328,7 +300,6 @@ public class Model implements AutoCloseable {
             generateParams.getStoppingCriteriaList().add(new StoppingWordCriteria(generateParams.getStoppingWord()));
         }
 
-        String prompt = chatFormatter.format(messages);
         Status status = null;
         //if session cache is enabled, try to retrieve the chat session from the cache
         //otherwise does not use session cache in chat
@@ -345,19 +316,19 @@ public class Model implements AutoCloseable {
 
             //if prompt cache is enabled, set the initial system prompt and does not update it again
             if (generateParams.isPromptCache()) {
-                ChatMessage msg = messages.length > 0 ? messages[0] : null;
-                if (msg != null && ChatMessage.ChatRole.SYSTEM == msg.getRole() && StringUtils.isNotBlank(msg.getContent())) {
+                ChatMessage msg = messages.stream().filter(m -> ChatMessage.ChatRole.SYSTEM == m.getRole()).findFirst().orElse(null);
+                if (msg != null && StringUtils.isNotBlank(msg.getContent())) {
                     if (!msg.getContent().equals(status.getSystemPromptCache())) {
                         status.setSystemPromptCache(msg.getContent());
                     } else {
                         //remove the system prompt in messages
-                        ChatMessage[] newMessages = new ChatMessage[Math.max(1, messages.length - 1)];
-                        System.arraycopy(messages, 1, newMessages, 0, newMessages.length);
-                        prompt = chatFormatter.format(newMessages);
+                        messages.remove(msg);
                     }
                 }
             }
         }
+
+        String prompt = chatFormatter.format(messages, functions, true, params);
         return new Generator(generateParams, prompt, status);
     }
 

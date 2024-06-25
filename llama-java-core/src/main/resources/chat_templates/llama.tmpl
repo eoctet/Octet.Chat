@@ -1,0 +1,11 @@
+{% for message in messages %}
+{% if message.role == 'system' %}
+{{bos_token}} [INST] <<SYS>>{{'\n'}}{{message.content | trim}}{{'\n'}}<</SYS>>{{'\n'}}
+{% endif %}
+{% if message.role == 'user' %}
+{% if messages[loop.index0-1]['role'] != 'system' %}{{bos_token}} [INST] {{message.content | trim}} [/INST] {% else %}{{message.content | trim}} [/INST] {% endif%}
+{% endif %}
+{% if message.role == 'assistant' %}
+{{message.content | trim}}{% if !loop.last %}{{eos_token}}{% endif %}
+{% endif %}
+{% endfor %}

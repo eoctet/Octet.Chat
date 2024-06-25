@@ -1,14 +1,16 @@
-package chat.octet.utils;
+package chat.octet.model.utils;
 
+import chat.octet.model.beans.ChatMessage;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.TimeZone;
@@ -21,6 +23,12 @@ public class JsonUtils {
     static {
         JACKSON_MAPPER = JsonMapper.builder()
                 .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                .addModule(new SimpleModule().addSerializer(ChatMessage.ChatRole.class, new JsonSerializer<ChatMessage.ChatRole>() {
+                    @Override
+                    public void serialize(ChatMessage.ChatRole value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                        gen.writeString(value.name().toLowerCase());
+                    }
+                }))
                 .build();
         JACKSON_MAPPER.setTimeZone(TimeZone.getDefault());
     }
