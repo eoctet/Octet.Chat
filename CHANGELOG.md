@@ -1,8 +1,6 @@
-🎉 __Optimized chat formatter and Windows Cli__
+🎉 __Refactored function calls & Optimized chat formatter and APIs.__
 
-- Refactor the chat message formatting module to use JinJava.
-- Add a new native API `llamaModelMeta`.
-- Optimize model parameters.
-- Fix Windows Cli output format error.
-- Update Maven dependencies.
-- Update llama Java libs.
+- Refactored function calls, provided function call APIs, now able to adapt to more models.
+- Optimized API parameters using the OpenAPI v2 styles.
+- Support the use of custom Jinja templates for chat.
+- Updated llama Java libs.

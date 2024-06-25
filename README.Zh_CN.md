@@ -28,12 +28,11 @@
 
    ...
 
-- [X] 🚀 新增自定义AI角色、优化OpenAPI
-- [X] 🚀 新增AI智能体，可调用插件的能力
 - [X] 🚀 支持动态温度采样
 - [X] 🚀 Octet-chat-app 增加了 WebUI
 - [X] 🚀 更新API参数
 - [X] 🚀 优化聊天提示词解析、Windows Cli
+- [X] 🚀 重构函数调用，优化聊天提示词解析和接口
 
 </details>
 
@@ -57,7 +56,7 @@ __如何使用__
 ```json
 {
   "name": "Assistant Octet",
-  "agent_mode": false,
+  "function_call": false,
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
@@ -103,10 +102,11 @@ usage: Octet.Chat
  -h,--help               Show this help message and exit.
  -q,--questions <arg>    Load the specified user question list, example:
                          /PATH/questions.txt.
+ -f,--function           Enable the function call in chat.      
 ```
 
 
-### 🚀 AI Agent
+### 🚀 函数调用
 
 > [!NOTE]
 >
@@ -114,17 +114,17 @@ usage: Octet.Chat
 
 __如何使用__
 
-下载 `Qwen-chat` 模型，编辑 [`octet.json`](octet-chat-app/characters/octet.json) 设置模型文件路径，将 `agent_mode` 修改为 `true` 即可开启智能体模式。
+下载 `Qwen-chat` 模型，编辑 [`octet.json`](octet-chat-app/characters/octet.json) 设置模型文件路径，将 `function_call` 修改为 `true` 开启函数调用。
 
 
-* 目前实现了两个插件，作为示例你可以继续丰富扩展它们。
+* 目前实现了两个函数，作为示例你可以继续丰富扩展它们。
 
 | 插件   | 描述                                 |
 |------|------------------------------------|
-| 时间查询 | 可以查询当前系统时间的插件。                     |
-| 接口调用 | 通用的接口调用插件，基于此你可以实现天气、文生图、搜索等服务的接入。 |
+| 时间查询 | 可以查询当前系统时间的函数。                     |
+| 接口调用 | 通用的接口调用函数，基于此你可以实现天气、文生图、搜索等服务的接入。 |
 
-> 插件配置文件示例：[plugins.json](octet-chat-app/characters/plugins.json)
+> 函数配置文件示例：[functions.json](octet-chat-app/characters/functions.json)
 
 ![Octet Agent](docs/agent.png)
 

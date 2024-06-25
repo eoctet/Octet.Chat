@@ -29,12 +29,11 @@ You can use it to deploy your own private services, supports the `Llama3` and `G
 
    ...
 
-- [X] 🚀 Added custom AI character and optimized OpenAPI
-- [X] 🚀 Added AI Agent and implemented Function calling
 - [X] 🚀 Supported dynamic temperature sampling.
 - [X] 🚀 Added WebUI to octet-chat-app.
 - [X] 🚀 Updated API parameters.
 - [X] 🚀 Optimized chat formatter and Windows Cli.
+- [X] 🚀 Refactored function calls, Optimized chat formatter and APIs.
 
 </details>
 
@@ -58,7 +57,7 @@ Edit `characters.template.json` to set a custom AI character. Run command line i
 ```json
 {
   "name": "Assistant Octet",
-  "agent_mode": false,
+  "function_call": false,
   "prompt": "Answer the questions.",
   "model_parameter": {
     "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
@@ -102,10 +101,11 @@ usage: Octet.Chat
  -h,--help               Show this help message and exit.
  -q,--questions <arg>    Load the specified user question list, example:
                          /PATH/questions.txt.
+ -f,--function           Enable the function call in chat.                  
 ```
 
 
-### 🚀 AI Agent
+### 🚀 Function Calling
 
 > [!NOTE]
 >
@@ -113,17 +113,17 @@ usage: Octet.Chat
 
 __How to use__
 
-Download the `Qwen-chat` model, edit [`octet.json`](octet-chat-app/characters/octet.json) to set the model file path, and change `agent_mode` to `true` to start the agent mode.
+Download the `Qwen-chat` model, edit [`octet.json`](octet-chat-app/characters/octet.json) to set the model file path, and change `function_call` to `true`.
 
 
-* Two plugins are currently implemented, and as examples you can continue to enrich them.
+* Two functions are currently implemented, and as examples you can continue to enrich them.
 
-| Plugin   | Description                                                                                                                   |
-|----------|-------------------------------------------------------------------------------------------------------------------------------|
-| Datetime | A plugin that can query the current system time.                                                                              |
-| API      | A universal API calling plugin, based on which you can achieve access to services such as weather, text to image, and search. |
+| Plugin   | Description                                                                                                                     |
+|----------|---------------------------------------------------------------------------------------------------------------------------------|
+| DateTime | A function that can query the current system time.                                                                              |
+| API      | A universal API calling function, based on which you can achieve access to services such as weather, text to image, and search. |
 
-> Plugin configuration file example: [plugins.json](octet-chat-app/characters/plugins.json)
+> function configuration file example: [functions.json](octet-chat-app/characters/functions.json)
 
 ![Octet Agent](docs/agent.png)
 
