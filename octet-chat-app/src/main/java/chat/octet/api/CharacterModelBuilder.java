@@ -1,7 +1,5 @@
 package chat.octet.api;
 
-import chat.octet.agent.OctetAgent;
-import chat.octet.agent.plugin.PluginManager;
 import chat.octet.config.CharacterConfig;
 import chat.octet.exceptions.ServerException;
 import chat.octet.model.Model;
@@ -70,14 +68,6 @@ public final class CharacterModelBuilder implements AutoCloseable {
                     }
                     defaultCharacterConfig = characterConfigs.get(characterName);
                     model = new Model(defaultCharacterConfig.getModelParameter());
-
-                    if (defaultCharacterConfig.isAgentMode()) {
-                        if (!StringUtils.startsWithIgnoreCase(model.getModelType(), "qwen")) {
-                            throw new IllegalArgumentException("AI Agent only supports Qwen series model");
-                        }
-                        PluginManager.getInstance().loadPlugins();
-                        OctetAgent.getInstance().reset();
-                    }
                 }
             }
         }
@@ -106,7 +96,7 @@ public final class CharacterModelBuilder implements AutoCloseable {
             paths.forEach(path -> {
                 try {
                     File file = path.toFile();
-                    if (file.getName().endsWith(".json") && !file.getName().equalsIgnoreCase("plugins.json")) {
+                    if (file.getName().endsWith(".json") && !file.getName().equalsIgnoreCase("functions.json")) {
                         CharacterConfig config = getCharacterConfig(path.toFile());
                         if (config != null) {
                             characterConfigs.put(config.getName(), config);

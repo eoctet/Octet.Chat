@@ -1,6 +1,6 @@
 package chat.octet.utils;
 
-import chat.octet.agent.plugin.enums.DataType;
+import chat.octet.api.functions.enums.DataType;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

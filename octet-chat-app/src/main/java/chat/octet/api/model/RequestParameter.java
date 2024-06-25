@@ -1,6 +1,7 @@
 package chat.octet.api.model;
 
 import chat.octet.model.beans.ChatMessage;
+import chat.octet.model.functions.FunctionDescriptor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -32,5 +33,9 @@ public class RequestParameter {
     //tokenize & detokenize parameters
     private String content;
     private int[] tokens;
+
+    //function calls parameters
+    private String toolChoice;
+    private List<FunctionDescriptor> tools;
 
 }

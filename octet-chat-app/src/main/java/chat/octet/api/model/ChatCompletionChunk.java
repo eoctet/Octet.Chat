@@ -10,6 +10,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatCompletionChunk {
     private String id;
+    private String object;
     private String model;
     private long created;
     private ChatCompletionUsage usage;
@@ -18,15 +19,17 @@ public class ChatCompletionChunk {
     public ChatCompletionChunk() {
     }
 
-    public ChatCompletionChunk(String id, String model, List<ChatCompletionData> choices) {
+    public ChatCompletionChunk(String id, String object, String model, List<ChatCompletionData> choices) {
         this.id = id;
+        this.object = object;
         this.model = model;
         this.created = System.currentTimeMillis();
         this.choices = choices;
     }
 
-    public ChatCompletionChunk(String id, String model, ChatCompletionUsage usage, List<ChatCompletionData> choices) {
+    public ChatCompletionChunk(String id, String object, String model, ChatCompletionUsage usage, List<ChatCompletionData> choices) {
         this.id = id;
+        this.object = object;
         this.model = model;
         this.created = System.currentTimeMillis();
         this.usage = usage;

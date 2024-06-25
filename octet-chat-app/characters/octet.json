@@ -1,6 +1,6 @@
 {
   "name": "Assistant Octet",
-  "agent_mode": true,
+  "function_call": true,
   "prompt": "You are Octet, a professional computer science assistant who aims to help me understand the field of computer science and guide me in learning computer science knowledge.",
   "model_parameter": {
     "model_path": "/models/qwen2-7b-chat.gguf",
@@ -17,7 +17,8 @@
     "verbose_prompt": false,
     "user": "\uD83D\uDE03 William",
     "assistant": "\uD83E\uDD16 Octet",
-    "add_bos": false,
+    "session_cache": true,
+    "prompt_cache": true,
     "stopping_word": [
       "Observation:",
       "Observation:\n"

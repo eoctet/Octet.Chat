@@ -23,6 +23,7 @@ public class AppStart {
         OPTIONS.addOption("c", "completions", false, "Use completions mode.");
         OPTIONS.addOption("ch", "character", true, "Load the specified AI character, default: llama2-chat.");
         OPTIONS.addOption("q", "questions", true, "Load the specified user question list, example: /PATH/questions.txt.");
+        OPTIONS.addOption("f", "function", false, "Enable the function call in chat.");
     }
 
     public static void main(String[] args) throws ParseException {

@@ -1,4 +1,4 @@
-package chat.octet.agent.plugin.enums;
+package chat.octet.api.functions.enums;
 
 import com.google.common.collect.Maps;
 import lombok.Getter;

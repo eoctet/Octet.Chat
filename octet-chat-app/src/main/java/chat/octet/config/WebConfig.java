@@ -1,6 +1,6 @@
 package chat.octet.config;
 
-import chat.octet.utils.JsonUtils;
+import chat.octet.model.utils.JsonUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;

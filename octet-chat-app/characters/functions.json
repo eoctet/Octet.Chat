@@ -1,0 +1,46 @@
+[
+  {
+    "name": "searxng",
+    "alias": "网络搜索",
+    "description": "网络搜索是一个通用搜索引擎，可用于访问互联网、查询百科知识、了解时事新闻等",
+    "config": {
+      "url": "https://s.octet.pro",
+      "method": "get",
+      "headers": {},
+      "request": {
+        "q": "${query}",
+        "engines": "bing",
+        "format": "json"
+      },
+      "timeout": 60000,
+      "retry_on_connection_failure": true,
+      "response_data_format": "json",
+      "response_result_limit": 5
+    },
+    "input_parameters": [
+      {
+        "name": "query",
+        "description": "搜索关键词或短语",
+        "required": true,
+        "type": "string"
+      }
+    ],
+    "output_parameters": [
+      {
+        "name": "results.url",
+        "description": "来源网址",
+        "type": "string"
+      },
+      {
+        "name": "results.title",
+        "description": "标题",
+        "type": "string"
+      },
+      {
+        "name": "results.content",
+        "description": "内容",
+        "type": "string"
+      }
+    ]
+  }
+]

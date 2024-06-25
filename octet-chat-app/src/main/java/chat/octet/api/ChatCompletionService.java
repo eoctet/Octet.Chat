@@ -1,6 +1,6 @@
 package chat.octet.api;
 
-import chat.octet.agent.OctetAgent;
+import chat.octet.api.functions.FunctionRegister;
 import chat.octet.api.handler.ProcessFunction;
 import chat.octet.api.model.*;
 import chat.octet.config.CharacterConfig;
@@ -11,10 +11,11 @@ import chat.octet.model.TokenDecoder;
 import chat.octet.model.beans.ChatMessage;
 import chat.octet.model.beans.CompletionResult;
 import chat.octet.model.beans.Token;
+import chat.octet.model.enums.FinishReason;
 import chat.octet.model.enums.LlamaTokenAttr;
 import chat.octet.model.parameters.GenerateParameter;
+import chat.octet.model.utils.JsonUtils;
 import chat.octet.utils.CommonUtils;
-import chat.octet.utils.JsonUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -63,24 +64,6 @@ public class ChatCompletionService {
 
     private final Semaphore semaphore = new Semaphore(1);
 
-    private RouterFunction<ServerResponse> handler(RequestPredicate requestPredicate, ProcessFunction<RequestParameter> function) {
-        return RouterFunctions.route(
-                requestPredicate.and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
-                request -> Mono.fromSupplier(semaphore::tryAcquire).flatMap(acquired -> {
-                    if (acquired) {
-                        return request.bodyToMono(RequestParameter.class).flatMap(function::process).doFinally(signalType -> semaphore.release());
-                    } else {
-                        return ServerResponse.status(HttpStatus.NO_CONTENT).header("Retry-After", "5").build();
-                    }
-                })
-        );
-    }
-
-    private Mono<ServerResponse> response(HttpStatus status, String body) {
-        return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(body));
-    }
-
-
     @Bean
     @RouterOperation(
             method = RequestMethod.POST,
@@ -88,7 +71,7 @@ public class ChatCompletionService {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_EVENT_STREAM_VALUE},
             operation = @Operation(
                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RequestParameter.class))),
-                    description = "Chat with local agent.",
+                    description = "Chat with local AI.",
                     operationId = "chat",
                     tags = "Chat & Completions",
                     responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatCompletionChunk.class)))
@@ -98,15 +81,62 @@ public class ChatCompletionService {
         return handler(
                 POST("/v1/chat/completions"),
                 requestParams -> {
-                    if (StringUtils.isBlank(requestParams.getUser())) {
-                        return response(HttpStatus.BAD_REQUEST, "Request parameter 'user' cannot be empty");
-                    }
                     List<ChatMessage> messages = requestParams.getMessages();
                     if (CommonUtils.isEmpty(messages)) {
                         return response(HttpStatus.BAD_REQUEST, "Request parameter 'messages' cannot be empty");
                     }
-                    ChatMessage message = messages.get(messages.size() - 1);
-                    return handler(requestParams, message, true);
+                    long startTime = System.currentTimeMillis();
+
+                    //load model and generate parameters
+                    Model model = CharacterModelBuilder.getInstance().getCharacterModel();
+                    CharacterConfig config = CharacterModelBuilder.getInstance().getCharacterConfig();
+                    GenerateParameter generateParams = config.getGenerateParameter();
+                    generateParams.setUser(Optional.ofNullable(requestParams.getUser()).orElse(generateParams.getUser()));
+                    generateParams.setSession(Optional.ofNullable(requestParams.getSession()).orElse(""));
+
+                    //default use of preset system prompt
+                    String system = config.getPrompt();
+                    if (StringUtils.isNotBlank(system)) {
+                        ChatMessage msg = !messages.isEmpty() ? messages.get(0) : null;
+                        if (msg != null && ChatMessage.ChatRole.SYSTEM == msg.getRole()) {
+                            msg.setContent(system);
+                        } else {
+                            messages.add(0, ChatMessage.toSystem(system));
+                        }
+                    }
+
+                    String id = CommonUtils.randomString("chatcmpl");
+                    boolean isFunctionCall = "auto".equalsIgnoreCase(requestParams.getToolChoice()) && config.isFunctionCall();
+                    if (requestParams.isStream()) {
+                        if (isFunctionCall) {
+                            CompletionResult result = FunctionRegister.getInstance().functionCall(model, generateParams, messages);
+                            List<Token> tokens = Lists.newArrayList(new Token(0, LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED, result.getContent(), FinishReason.FINISHED));
+                            return response(model, tokens, startTime, token -> {
+                                if (token.getId() == -1 && token.getTokenAttr() == LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED) {
+                                    return token.getText();
+                                } else {
+                                    ChatCompletionData data = new ChatCompletionData("content", token.getText(), token.getFinishReason().toString());
+                                    return new ChatCompletionChunk(id, "chat.completion", model.getModelName(), Lists.newArrayList(data));
+                                }
+                            });
+                        } else {
+                            Generator generator = model.chat(generateParams, messages);
+                            return response(model, generator, startTime, token -> {
+                                if (token.getId() == -1 && token.getTokenAttr() == LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED) {
+                                    return token.getText();
+                                } else {
+                                    ChatCompletionData data = new ChatCompletionData("content", token.getText(), token.getFinishReason().toString());
+                                    return new ChatCompletionChunk(id, "chat.completion", model.getModelName(), Lists.newArrayList(data));
+                                }
+                            });
+                        }
+                    } else {
+                        CompletionResult result = isFunctionCall ? FunctionRegister.getInstance().functionCall(model, generateParams, messages) : model.chat(generateParams, messages).result();
+                        ChatCompletionData data = new ChatCompletionData(ChatMessage.toAssistant(result.getContent()), result.getFinishReason().toString());
+                        ChatCompletionUsage usage = new ChatCompletionUsage(result.getPromptTokens(), result.getCompletionTokens(), (result.getPromptTokens() + result.getCompletionTokens()));
+                        ChatCompletionChunk chunk = new ChatCompletionChunk(id, "chat.completion", model.getModelName(), usage, Lists.newArrayList(data));
+                        return response(model, chunk, startTime);
+                    }
                 }
         );
     }
@@ -118,7 +148,7 @@ public class ChatCompletionService {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_EVENT_STREAM_VALUE},
             operation = @Operation(
                     requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = RequestParameter.class))),
-                    description = "Completions with local agent.",
+                    description = "Completions with local AI.",
                     operationId = "completions",
                     tags = "Chat & Completions",
                     responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChatCompletionChunk.class)))
@@ -131,8 +161,30 @@ public class ChatCompletionService {
                     if (StringUtils.isBlank(requestParams.getPrompt())) {
                         return response(HttpStatus.BAD_REQUEST, "Request parameter 'prompt' cannot be empty");
                     }
-                    ChatMessage message = ChatMessage.toUser(requestParams.getPrompt());
-                    return handler(requestParams, message, false);
+                    long startTime = System.currentTimeMillis();
+
+                    Model model = CharacterModelBuilder.getInstance().getCharacterModel();
+                    CharacterConfig config = CharacterModelBuilder.getInstance().getCharacterConfig();
+                    GenerateParameter generateParams = config.getGenerateParameter();
+
+                    String id = CommonUtils.randomString("cmpl");
+                    if (requestParams.isStream()) {
+                        Generator generator = model.generate(generateParams, requestParams.getPrompt());
+                        return response(model, generator, startTime, token -> {
+                            if (token.getId() == -1 && token.getTokenAttr() == LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED) {
+                                return token.getText();
+                            } else {
+                                ChatCompletionData data = new ChatCompletionData(token.getText(), token.getFinishReason().toString());
+                                return new ChatCompletionChunk(id, "text_completion", model.getModelName(), Lists.newArrayList(data));
+                            }
+                        });
+                    } else {
+                        CompletionResult result = model.completions(generateParams, requestParams.getPrompt());
+                        ChatCompletionData data = new ChatCompletionData(result.getContent(), result.getFinishReason().toString());
+                        ChatCompletionUsage usage = new ChatCompletionUsage(result.getPromptTokens(), result.getCompletionTokens(), (result.getPromptTokens() + result.getCompletionTokens()));
+                        ChatCompletionChunk chunk = new ChatCompletionChunk(id, "text_completion", model.getModelName(), usage, Lists.newArrayList(data));
+                        return response(model, chunk, startTime);
+                    }
                 }
         );
     }
@@ -227,10 +279,6 @@ public class ChatCompletionService {
                     }
                     String key = user + ":" + sessionId;
                     model.removeChatStatus(key);
-
-                    if (CharacterModelBuilder.getInstance().getCharacterConfig().isAgentMode()) {
-                        OctetAgent.getInstance().reset(key);
-                    }
                     return response(HttpStatus.OK, "success");
                 }
         );
@@ -322,98 +370,54 @@ public class ChatCompletionService {
                 .body(BodyInserters.fromDataBuffers(dataBufferMono));
     }
 
-    private Mono<ServerResponse> handler(RequestParameter requestParams, ChatMessage message, boolean chat) {
-        Model model = CharacterModelBuilder.getInstance().getCharacterModel();
-        CharacterConfig config = CharacterModelBuilder.getInstance().getCharacterConfig();
-
-        GenerateParameter generateParams = config.getGenerateParameter();
-        generateParams.setUser(requestParams.getUser());
-        generateParams.setSession(Optional.ofNullable(requestParams.getSession()).orElse(""));
-
-        String system = config.getPrompt();
-        String input = message.getContent();
-
-        if (requestParams.isStream()) {
-            if (config.isAgentMode()) {
-                return doAgent(model, generateParams, system, input);
-            } else {
-                return doCompletions(model, generateParams, system, input, chat);
-            }
-        } else {
-            return doCompletions(model, generateParams, system, input, chat, requestParams.isEcho());
-        }
+    private RouterFunction<ServerResponse> handler(RequestPredicate requestPredicate, ProcessFunction<RequestParameter> function) {
+        return RouterFunctions.route(
+                requestPredicate.and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                request -> Mono.fromSupplier(semaphore::tryAcquire).flatMap(acquired -> {
+                    if (acquired) {
+                        return request.bodyToMono(RequestParameter.class).flatMap(function::process).doFinally(signalType -> semaphore.release());
+                    } else {
+                        return ServerResponse.status(HttpStatus.NO_CONTENT).header("Retry-After", "5").build();
+                    }
+                })
+        );
     }
 
-    private Mono<ServerResponse> doCompletions(Model model, GenerateParameter generateParams, String system, String input, boolean chat, boolean isEcho) {
-        long startTime = System.currentTimeMillis();
-        String id = chat ? CommonUtils.randomString("chat") : CommonUtils.randomString("cmpl");
-        CompletionResult result;
-        ChatCompletionData data;
-        if (chat) {
-            result = model.chatCompletions(generateParams, system, input);
-            String content = isEcho ? (input + result.getContent()) : result.getContent();
-            data = new ChatCompletionData(ChatMessage.toAssistant(content), result.getFinishReason().toString());
-        } else {
-            result = model.completions(generateParams, input);
-            data = new ChatCompletionData(result.getContent(), result.getFinishReason().toString());
-        }
-        ChatCompletionUsage usage = new ChatCompletionUsage(result.getPromptTokens(), result.getCompletionTokens(), (result.getPromptTokens() + result.getCompletionTokens()));
-        ChatCompletionChunk chunk = new ChatCompletionChunk(id, model.getModelName(), usage, Lists.newArrayList(data));
-
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(Flux.just(chunk).doOnCancel(() -> {
-                    log.info(MessageFormat.format("Generate cancel, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
-                    model.metrics();
-                }).doOnComplete(() -> {
-                    log.info(MessageFormat.format("Generate completed, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
-                    model.metrics();
-                }), ChatCompletionChunk.class);
+    private Mono<ServerResponse> response(HttpStatus status, String body) {
+        return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(body));
     }
 
-    private Mono<ServerResponse> doCompletions(Model model, GenerateParameter generateParams, String system, String input, boolean chat) {
-        long startTime = System.currentTimeMillis();
-        String id = chat ? CommonUtils.randomString("chat") : CommonUtils.randomString("cmpl");
-        Generator generator = chat ? model.chat(generateParams, system, input) : model.generate(generateParams, input);
-
+    private Mono<ServerResponse> response(Model model, Iterable<Token> tokens, long startTime, java.util.function.Function<Token, Object> fn) {
         return ServerResponse.ok().contentType(MediaType.TEXT_EVENT_STREAM)
-                .body(Flux.fromIterable(generator)
-                        .concatWithValues(new Token(-1, LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED, "[DONE]")).map(token -> {
-                            if (token.getId() == -1 && token.getTokenAttr() == LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED) {
-                                return token.getText();
-                            } else {
-                                ChatCompletionData data = chat ? new ChatCompletionData("content", token.getText(), token.getFinishReason().name())
-                                        : new ChatCompletionData(token.getText(), token.getFinishReason().name());
-                                return new ChatCompletionChunk(id, model.getModelName(), Lists.newArrayList(data));
-                            }
-                        }).doOnCancel(() -> {
-                            log.info(MessageFormat.format("Generate cancel, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
+                .body(Flux.fromIterable(tokens)
+                        .concatWithValues(new Token(-1, LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED, "[DONE]")).map(fn).doOnCancel(() -> {
+                            log.info(MessageFormat.format("Inference cancel, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
                             model.metrics();
                         }).doOnComplete(() -> {
-                            log.info(MessageFormat.format("Generate completed, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
+                            log.info(MessageFormat.format("Inference completed, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
+                            model.metrics();
+                        }), ChatCompletionChunk.class);
+    }
+
+    private Mono<ServerResponse> response(Model model, Generator generator, long startTime, java.util.function.Function<Token, Object> fn) {
+        return ServerResponse.ok().contentType(MediaType.TEXT_EVENT_STREAM)
+                .body(Flux.fromIterable(generator)
+                        .concatWithValues(new Token(-1, LlamaTokenAttr.LLAMA_TOKEN_ATTR_USER_DEFINED, "[DONE]")).map(fn).doOnCancel(() -> {
+                            log.info(MessageFormat.format("Inference cancel, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
+                            model.metrics();
+                        }).doOnComplete(() -> {
+                            log.info(MessageFormat.format("Inference completed, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
                             model.metrics();
                         }), ChatCompletionChunk.class).doFinally(signalType -> generator.close());
     }
 
-    private Mono<ServerResponse> doAgent(Model model, GenerateParameter generateParams, String system, String input) {
-        long startTime = System.currentTimeMillis();
-        String id = CommonUtils.randomString("chat");
-        OctetAgent.Generator generator = OctetAgent.getInstance().chat(model, generateParams, system, input);
-
-        return ServerResponse.ok().contentType(MediaType.TEXT_EVENT_STREAM)
-                .body(Flux.fromIterable(generator).flatMap(tokenList -> Flux.fromIterable(tokenList)
-                        .map(token -> new ChatCompletionData("content", token.getText(), token.getFinishReason().name()))
-                        .map(data -> {
-                            if ("[DONE]".equals(data.getDelta().getValue())) {
-                                return data.getDelta().getValue();
-                            } else {
-                                return new ChatCompletionChunk(id, model.getModelName(), Lists.newArrayList(data));
-                            }
-                        })
-                ).doOnCancel(() -> {
-                    log.info(MessageFormat.format("Generate cancel, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
+    public Mono<ServerResponse> response(Model model, ChatCompletionChunk chunk, long startTime) {
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(Flux.just(chunk).doOnCancel(() -> {
+                    log.info(MessageFormat.format("Inference cancel, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
                     model.metrics();
                 }).doOnComplete(() -> {
-                    log.info(MessageFormat.format("Generate completed, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
+                    log.info(MessageFormat.format("Inference completed, elapsed time: {0} ms.", (System.currentTimeMillis() - startTime)));
                     model.metrics();
                 }), ChatCompletionChunk.class);
     }

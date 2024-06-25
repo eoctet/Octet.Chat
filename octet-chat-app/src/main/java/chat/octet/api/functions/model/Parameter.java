@@ -1,5 +1,4 @@
-package chat.octet.agent.plugin.model;
-
+package chat.octet.api.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
