@@ -5,11 +5,11 @@ add_library(${TARGET}
             llamajava.cpp
             ${PROJECT_SOURCE_DIR}/common/grammar-parser.h
             ${PROJECT_SOURCE_DIR}/common/grammar-parser.cpp
-            ${PROJECT_SOURCE_DIR}/llama.cpp
-            ${PROJECT_SOURCE_DIR}/llama.h
-            ${PROJECT_SOURCE_DIR}/unicode.h
-            ${PROJECT_SOURCE_DIR}/unicode.cpp
-            ${PROJECT_SOURCE_DIR}/unicode-data.cpp
+            ${PROJECT_SOURCE_DIR}/src/llama.cpp
+            ${PROJECT_SOURCE_DIR}/include/llama.h
+            ${PROJECT_SOURCE_DIR}/src/unicode.h
+            ${PROJECT_SOURCE_DIR}/src/unicode.cpp
+            ${PROJECT_SOURCE_DIR}/src/unicode-data.cpp
         )
 
 target_include_directories(${TARGET} PRIVATE llamajava)

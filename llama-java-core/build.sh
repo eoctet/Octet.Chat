@@ -17,7 +17,7 @@ CMAKE_ARGS="-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS -DBUILD_SHARED_LIBS=ON 
 
 if [ "$1" == "macos" ]; then
   # Manually compile Metal to be compatible with certain Macbook versions
-  xcrun -sdk macosx metal -o ggml_metal.ir -c ggml-metal.metal
+  xcrun -sdk macosx metal -o ggml_metal.ir -c ggml/src/ggml-metal.metal
   xcrun -sdk macosx metallib -o default.metallib ggml_metal.ir
   CMAKE_ARGS="-DBUILD_SHARED_LIBS=ON -DLLAMA_NATIVE=OFF -DLLAMA_METAL=ON"
   echo "=> Cmake in macos."
