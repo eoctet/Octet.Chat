@@ -650,7 +650,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getTokenAttr
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
         (JNIEnv *env, jclass thisClass, jbyteArray buf, jint buffer_length,
          jintArray tokens_arrays,
-         jint maxTokens, jboolean addBos, jboolean specialTokens) {
+         jint maxTokens, jboolean add_special, jboolean parse_special) {
     UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
     llama_token *tokens = (llama_token *) env->GetIntArrayElements(tokens_arrays, JNI_FALSE);
@@ -659,8 +659,8 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
     env->GetByteArrayRegion(buf, 0, buffer_length, buffer);
     const char *text = (char *) buffer;
 
-    int code = llama_tokenize(main_ctx->model, text, buffer_length, tokens, maxTokens, To_CBool(addBos),
-                              To_CBool(specialTokens));
+    int code = llama_tokenize(main_ctx->model, text, buffer_length, tokens, maxTokens, To_CBool(add_special),
+                              To_CBool(parse_special));
     env->ReleaseIntArrayElements(tokens_arrays, (jint *) tokens, 0);
     env->ReleaseByteArrayElements(buf, buffer, 0);
     return code;
