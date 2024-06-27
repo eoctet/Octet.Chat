@@ -79,10 +79,6 @@ public class Status {
         }
     }
 
-    public int getLogitsIndex() {
-        return (generateTokens.isEmpty() && pastTokenSize > 0) ? pastTokenSize - 1 : 0;
-    }
-
     public FinishReason getFinishReason() {
         return (generateTokens == null || generateTokens.isEmpty()) ? FinishReason.UNKNOWN : generateTokens.get(generateTokens.size() - 1).getFinishReason();
     }

@@ -256,6 +256,11 @@ public class Generator implements Iterable<Token> {
                     buffer.insert(0, prefixToken).append(suffixToken).append(middleToken).toString();
         }
 
+
+        private int getLogitsIndex() {
+            return status.getGenerateTokens().isEmpty() ? promptTokens - 1 : 0;
+        }
+
         /**
          * Batch decoding prompt text.
          */
@@ -278,7 +283,7 @@ public class Generator implements Iterable<Token> {
          * @return boolean
          */
         private boolean breakOrContinue(Token token, float[] logits) {
-            if (token.getId() == LlamaService.getEosToken() || token.getId() == LlamaService.getEotToken()) {
+            if (LlamaService.isEndOfGeneration(token.getId())) {
                 token.updateFinishReason(FinishReason.FINISHED);
                 return true;
             }
@@ -362,7 +367,7 @@ public class Generator implements Iterable<Token> {
          */
         @Override
         public Token next() {
-            float[] logits = LlamaService.getLogits(status.getLogitsIndex());
+            float[] logits = LlamaService.getLogits(getLogitsIndex());
             //execute logits processor
             if (!generateParams.getLogitsProcessorList().isEmpty()) {
                 logits = generateParams.getLogitsProcessorList().processor(status.getInputIds(), logits);

@@ -27,7 +27,7 @@ enum llama_special_token_type {
     TOKEN_EOS = 1,
     TOKEN_CLS = 2,
     TOKEN_SEP = 3,
-    TOKEN_NL  = 4 ,
+    TOKEN_NL = 4,
     TOKEN_PREFIX = 5,
     TOKEN_MIDDLE = 6,
     TOKEN_SUFFIX = 7,
@@ -172,6 +172,19 @@ static jboolean To_JBoolean(bool value) {
 
 static bool To_CBool(jboolean value) {
     return value == JNI_TRUE;
+}
+
+static void llama_batch_add(struct llama_batch &batch, llama_token id, llama_pos pos, const std::vector <llama_seq_id> &seq_ids,
+                bool logits) {
+    batch.token[batch.n_tokens] = id;
+    batch.pos[batch.n_tokens] = pos;
+    batch.n_seq_id[batch.n_tokens] = seq_ids.size();
+    for (size_t i = 0; i < seq_ids.size(); ++i) {
+        batch.seq_id[batch.n_tokens][i] = seq_ids[i];
+    }
+    batch.logits[batch.n_tokens] = logits;
+
+    batch.n_tokens++;
 }
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -364,8 +377,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaModelQuanti
     UNUSED(thisClass);
     llama_model_quantize_params defaults = llama_model_quantize_default_params();
 
-    jobject llama_model_quantize_params = env->NewObject(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS,
-                                                         MD_CONS_LLAMA_MODEL_QUANTIZE_PARAMS);
+    jobject llama_model_quantize_params = env->NewObject(LLAMA_MODEL_QUANTIZE_PARAMS_CLASS, MD_CONS_LLAMA_MODEL_QUANTIZE_PARAMS);
     env->SetIntField(llama_model_quantize_params, FIELD_THREAD, defaults.nthread);
     env->SetIntField(llama_model_quantize_params, FIELD_MODEL_FILE_TYPE, defaults.ftype);
     env->SetIntField(llama_model_quantize_params, FIELD_OUTPUT_TENSOR_TYPE, defaults.output_tensor_type);
@@ -597,19 +609,8 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
         (JNIEnv *env, jclass thisClass, jint index) {
     UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return nullptr;
-    llama_context_params params = main_ctx->params;
-    int n_ctx = params.n_ctx;
-    if (index < 0 || index > n_ctx) {
-        std::string msg = "Invalid index, range 0 to " + std::to_string(n_ctx);
-        env->ThrowNew(MODEL_EXCEPTION_CLASS, msg.c_str());
-        return nullptr;
-    }
-    float *logits;
-    if (params.logits_all) {
-        logits = llama_get_logits_ith(main_ctx->llama_ctx, index);
-    } else {
-        logits = llama_get_logits(main_ctx->llama_ctx);
-    }
+
+    float *logits = llama_get_logits_ith(main_ctx->llama_ctx, index);
     const int vocab_size = llama_n_vocab(main_ctx->model);
     jfloatArray arrays = env->NewFloatArray(vocab_size);
     env->SetFloatArrayRegion(arrays, 0, vocab_size, logits);
@@ -795,14 +796,11 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
             const int mirostat_m = 100;
             static float final_mirostat_mu = 2.0f * mirostat_tau;
             llama_sample_temp(main_ctx->llama_ctx, &candidates_p, temperature);
-            token = llama_sample_token_mirostat(main_ctx->llama_ctx, &candidates_p, mirostat_tau, mirostat_eta,
-                                                mirostat_m,
-                                                &final_mirostat_mu);
+            token = llama_sample_token_mirostat(main_ctx->llama_ctx, &candidates_p, mirostat_tau, mirostat_eta, mirostat_m, &final_mirostat_mu);
         } else if (mirostat_mode == 2) {
             static float final_mirostat_mu = 2.0f * mirostat_tau;
             llama_sample_temp(main_ctx->llama_ctx, &candidates_p, temperature);
-            token = llama_sample_token_mirostat_v2(main_ctx->llama_ctx, &candidates_p, mirostat_tau, mirostat_eta,
-                                                   &final_mirostat_mu);
+            token = llama_sample_token_mirostat_v2(main_ctx->llama_ctx, &candidates_p, mirostat_tau, mirostat_eta, &final_mirostat_mu);
         } else {
             llama_sample_top_k(main_ctx->llama_ctx, &candidates_p, final_top_k, 1);
             llama_sample_tail_free(main_ctx->llama_ctx, &candidates_p, tsf, 1);
@@ -824,20 +822,11 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
         llama_grammar_accept_token(main_ctx->llama_ctx, main_ctx->grammar, token);
     }
 
-    int decode_status = 0;
-    if (token != llama_token_eos(main_ctx->model)) {
-        //decode the next new token
-        int default_n_seq_max = 1;
-        llama_batch batch = llama_batch_init(1, 0, default_n_seq_max);
-        batch.token[0] = token;
-        batch.pos[0] = past_token_size;
-        batch.n_seq_id[0] = default_n_seq_max;
-        batch.seq_id[0][0] = sequence_id;
-        batch.logits[0] = true;
-        batch.n_tokens = 1;
-        decode_status = llama_decode(main_ctx->llama_ctx, batch);
-        llama_batch_free(batch);
-    }
+    //decode the next new token
+    llama_batch batch = llama_batch_init(1, 0, 1);
+    llama_batch_add(batch, token, past_token_size, {sequence_id}, true);
+    int decode_status = llama_decode(main_ctx->llama_ctx, batch);
+    llama_batch_free(batch);
 
     //clear all resources
     env->ReleaseFloatArrayElements(jlogits, logits, 0);
@@ -871,7 +860,8 @@ JNIEXPORT jboolean JNICALL Java_chat_octet_model_LlamaService_loadLlamaGrammar
     jboolean status = false;
     if (!parsed_grammar.rules.empty()) {
         std::vector<const llama_grammar_element *> grammar_rules(parsed_grammar.c_rules());
-        main_ctx->grammar = llama_grammar_init(grammar_rules.data(), grammar_rules.size(), parsed_grammar.symbol_ids.at("root"));
+        main_ctx->grammar = llama_grammar_init(grammar_rules.data(), grammar_rules.size(),
+                                               parsed_grammar.symbol_ids.at("root"));
         status = true;
         JLOG_DEBUG("Grammar rules loaded, rules count: %d.", grammar_rules.size());
     }
@@ -901,7 +891,6 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
     llama_context_params params = main_ctx->params;
     int past_tokens = past_token_size;
     int decode_status = 0;
-    int default_n_seq_max = 1;
     int n_batch = params.n_batch;
     JLOG_DEBUG("Start batch decoding, sequence id: %d, input length: %d, past token size: %d, batch decoding size: %d.",
                sequence_id, input_length, past_tokens, (input_length - past_tokens));
@@ -914,23 +903,13 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_batchDecode
         int end_index = decode_size + past_tokens;
         std::vector <llama_token> batch_tokens(src_tokens.begin() + past_tokens, src_tokens.begin() + end_index);
 
-        llama_batch batch = llama_batch_init(decode_size, 0, default_n_seq_max);
-        batch.n_tokens = decode_size;
-        for (int32_t i = 0; i < batch.n_tokens; i++) {
-            batch.token[i] = batch_tokens[i];
-            batch.pos[i] = i + past_tokens;
-            batch.n_seq_id[i] = default_n_seq_max;
-            batch.seq_id[i][0] = sequence_id;
-            batch.logits[i] = false;
+        llama_batch batch = llama_batch_init(decode_size, 0, 1);
+        for (int32_t i = 0; i < decode_size; i++) {
+            llama_batch_add(batch, batch_tokens[i], i + past_tokens, {sequence_id}, false);
         }
 
-        if (params.logits_all) {
-            //set logits for the last token of the prompt
-            if (input_length == end_index) {
-                batch.logits[batch.n_tokens - 1] = true;
-            }
-        } else {
-            batch.logits = nullptr;
+        if (input_length == end_index) {
+            batch.logits[batch.n_tokens - 1] = true;
         }
 
         decode_status = llama_decode(main_ctx->llama_ctx, batch);
@@ -953,7 +932,6 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_clearCache
         (JNIEnv *env, jclass thisClass, jint sequence_id, jint pos_start, jint pos_end) {
     UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return;
-
     llama_kv_cache_seq_rm(main_ctx->llama_ctx, sequence_id, pos_start, pos_end);
     JLOG_DEBUG("KV cache removed, sequence id: %d, pos start: %d, pos end: %d.", sequence_id, pos_start, pos_end);
 }
@@ -1019,36 +997,16 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_getSpecialToken
     llama_special_token_type type = static_cast<enum llama_special_token_type>(special_token_type);
     jint token_id = -1;
     switch (type) {
-        case TOKEN_BOS:
-            token_id = llama_token_bos(main_ctx->model);
-            break;
-        case TOKEN_EOS:
-            token_id = llama_token_eos(main_ctx->model);
-            break;
-        case TOKEN_CLS:
-            token_id = llama_token_cls(main_ctx->model);
-            break;
-        case TOKEN_SEP:
-            token_id = llama_token_sep(main_ctx->model);
-            break;
-        case TOKEN_NL:
-            token_id = llama_token_nl(main_ctx->model);
-            break;
-        case TOKEN_PREFIX:
-            token_id = llama_token_prefix(main_ctx->model);
-            break;
-        case TOKEN_MIDDLE:
-            token_id = llama_token_middle(main_ctx->model);
-            break;
-        case TOKEN_SUFFIX:
-            token_id = llama_token_suffix(main_ctx->model);
-            break;
-        case TOKEN_EOT:
-            token_id = llama_token_eot(main_ctx->model);
-            break;
-        default:
-            JLOG_ERROR("Cannot find the special token type: %d.", special_token_type);
-
+        case TOKEN_BOS: token_id = llama_token_bos(main_ctx->model); break;
+        case TOKEN_EOS: token_id = llama_token_eos(main_ctx->model); break;
+        case TOKEN_CLS: token_id = llama_token_cls(main_ctx->model); break;
+        case TOKEN_SEP: token_id = llama_token_sep(main_ctx->model); break;
+        case TOKEN_NL: token_id = llama_token_nl(main_ctx->model); break;
+        case TOKEN_PREFIX: token_id = llama_token_prefix(main_ctx->model); break;
+        case TOKEN_MIDDLE: token_id = llama_token_middle(main_ctx->model); break;
+        case TOKEN_SUFFIX: token_id = llama_token_suffix(main_ctx->model); break;
+        case TOKEN_EOT: token_id = llama_token_eot(main_ctx->model); break;
+        default: JLOG_ERROR("Cannot find the special token type: %d.", special_token_type);
     }
     return token_id;
 }

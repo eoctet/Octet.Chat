@@ -483,4 +483,14 @@ public class LlamaService {
         return Boolean.parseBoolean(Optional.ofNullable(llamaModelMeta("tokenizer.ggml.add_space_prefix")).orElse("false"));
     }
 
+    /**
+     * Whether the token is the end of generation.
+     *
+     * @param tokenId Token id.
+     * @return boolean
+     */
+    public static boolean isEndOfGeneration(int tokenId) {
+        return tokenId != -1 && (tokenId == getEosToken() || tokenId == getEotToken());
+    }
+
 }
