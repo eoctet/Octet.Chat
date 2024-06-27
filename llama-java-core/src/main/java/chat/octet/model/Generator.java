@@ -182,7 +182,7 @@ public class Generator implements Iterable<Token> {
             }
 
             //prompt tokenization
-            int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(finalPrompt, false, false) : new int[]{LlamaService.getBosToken()};
+            int[] tokens = StringUtils.isNotBlank(prompt) ? LlamaService.tokenize(finalPrompt, false, true) : new int[]{LlamaService.getBosToken()};
             this.promptTokens = tokens.length;
             if (tokens.length >= contextSize) {
                 throw new IllegalArgumentException(MessageFormat.format("Requested tokens ({0}) exceed context window of {1}.", tokens.length, contextSize));
