@@ -3,7 +3,7 @@
 //
 #include "llama.h"
 #include "llamajava.h"
-#include "common/grammar-parser.h"
+#include "grammar-parser.h"
 #include <vector>
 #include <string>
 #include <iostream>

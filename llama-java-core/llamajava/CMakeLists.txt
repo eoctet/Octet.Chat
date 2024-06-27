@@ -12,6 +12,8 @@ add_library(${TARGET}
             ${PROJECT_SOURCE_DIR}/src/unicode-data.cpp
         )
 
+target_include_directories(${TARGET} PUBLIC . ../common)
+target_include_directories(${TARGET} PUBLIC . ../include)
 target_include_directories(${TARGET} PRIVATE llamajava)
 target_compile_features(${TARGET} PUBLIC cxx_std_11)
 target_link_libraries(${TARGET} PRIVATE ggml ${LLAMA_EXTRA_LIBS})
