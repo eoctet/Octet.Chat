@@ -26,15 +26,13 @@ jobs:
 
       - name: Build lib
         id: build_lib
-        run: |
-          cd llama-java-core
-          /bin/bash build.sh linux
+        run: cd llama-java-core & /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
         with:
           name: linux-libllama
-          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.so
+          path: llama-java-core/build/libllamajava.so
 
   #build macos lib
   build-macos-lib:
@@ -46,21 +44,19 @@ jobs:
 
       - name: Build lib
         id: build_lib
-        run: |
-          cd llama-java-core
-          /bin/bash build.sh macos
+        run: cd llama-java-core & /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
         with:
           name: macos-libllama
-          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
+          path: llama-java-core/build/libllamajava.dylib
 
       - name: Upload metal lib
         uses: actions/upload-artifact@v4
         with:
           name: macos-metallib
-          path: llama-java-core/llama.cpp/default.metallib
+          path: llama-java-core/build/bin/default.metallib
 
   #build macos arm lib
   build-macos-arm-lib:
@@ -72,28 +68,25 @@ jobs:
 
       - name: Build lib
         id: build_lib
-        run: |
-          cd llama-java-core
-          /bin/bash build.sh macos
+        run: cd llama-java-core & /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
         with:
           name: macos-arm-libllama
-          path: llama-java-core/llama.cpp/build/llamajava/libllamajava.dylib
+          path: llama-java-core/build/libllamajava.dylib
 
       - name: Upload metal lib
         uses: actions/upload-artifact@v4
         with:
           name: macos-arm-metallib
-          path: llama-java-core/llama.cpp/default.metallib
+          path: llama-java-core/build/bin/default.metallib
 
   #build windows lib
   build-windows-lib:
     runs-on: windows-latest
     env:
       OPENBLAS_VERSION: 0.3.23
-      BUILD_ARGS: '-DLLAMA_NATIVE=OFF -DLLAMA_CUBLAS=ON -DLLAMA_BLAS=ON -DBUILD_SHARED_LIBS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS -DBLAS_INCLUDE_DIRS="$env:RUNNER_TEMP/openblas/include" -DBLAS_LIBRARIES="$env:RUNNER_TEMP/openblas/lib/openblas.lib"'
 
     steps:
       - name: Download OpenBLAS
@@ -116,28 +109,21 @@ jobs:
         id: build_lib
         run: |
           cd llama-java-core
-          git.exe clone https://github.com/ggerganov/llama.cpp.git
-          if (!(Test-Path -Path "llama.cpp")) {
-            echo "Git clone llama.cpp failed."
-            exit 1
-          }
-          Copy-Item -Path llamajava/* -Destination llama.cpp/llamajava -Force
-          Copy-Item -Path llamajava/win/* -Destination llama.cpp/llamajava -Force
-          cd llama.cpp
-          $TAG_ID=(git.exe rev-list --tags --max-count=1)
-          $LATEST_TAG=(git.exe describe --tags $TAG_ID)
-          echo "=> Llama.cpp latest tag: $LATEST_TAG"
-          git.exe checkout $LATEST_TAG
-          Add-Content CMakeLists.txt "add_subdirectory(llamajava)"
-          echo "=> Checkout llama.cpp $LATEST_TAG finished."
-
           mkdir build
           cd build
-          cmake.exe .. ${env:BUILD_ARGS}
+          cmake.exe .. -DBLAS_INCLUDE_DIRS="$env:RUNNER_TEMP/openblas/include" -DBLAS_LIBRARIES="$env:RUNNER_TEMP/openblas/lib/openblas.lib"
           cmake.exe --build . --config Release
+          cp $env:RUNNER_TEMP/openblas/bin/libopenblas.dll ./build/bin/Release/openblas.dll
+          cp $env:RUNNER_TEMP/OpenBLAS.LICENSE.txt ./build/bin/Release/OpenBLAS-${env:OPENBLAS_VERSION}.txt
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
         with:
           name: windows-libllama
-          path: llama-java-core/llama.cpp/build/bin/Release/llamajava.dll
+          path: llama-java-core/build/bin/Release/llamajava.dll
+
+      - name: Upload openblas lib
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-openblas
+          path: llama-java-core/build/bin/Release/openblas.dll
