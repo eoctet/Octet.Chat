@@ -119,17 +119,17 @@ jobs:
           cd build
           cmake.exe .. -DBLAS_INCLUDE_DIRS="$env:RUNNER_TEMP/openblas/include" -DBLAS_LIBRARIES="$env:RUNNER_TEMP/openblas/lib/openblas.lib"
           cmake.exe --build . --config Release
-          cp $env:RUNNER_TEMP/openblas/bin/libopenblas.dll ./bin/Release/openblas.dll
-          cp $env:RUNNER_TEMP/OpenBLAS.LICENSE.txt ./bin/Release/OpenBLAS-${env:OPENBLAS_VERSION}.txt
+          cp $env:RUNNER_TEMP/openblas/bin/libopenblas.dll ./Release/openblas.dll
+          cp $env:RUNNER_TEMP/OpenBLAS.LICENSE.txt ./Release/OpenBLAS-${env:OPENBLAS_VERSION}.txt
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
         with:
           name: windows-libllama
-          path: llama-java-core/build/bin/Release/llamajava.dll
+          path: llama-java-core/build/Release/llamajava.dll
 
       - name: Upload openblas lib
         uses: actions/upload-artifact@v4
         with:
           name: windows-openblas
-          path: llama-java-core/build/bin/Release/openblas.dll
+          path: llama-java-core/build/Release/openblas.dll

@@ -10,6 +10,7 @@ set(BUILD_SHARED_LIBS_DEFAULT OFF)
 set(BUILD_SHARED_LIBS OFF)
 set(GGML_NATIVE OFF)
 set(GGML_BLAS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
@@ -40,13 +41,6 @@ endif()
 
 if (GGML_CUDA)
     find_package(CUDAToolkit REQUIRED)
-
-    if (CUDAToolkit_FOUND)
-        message(STATUS "CUDA found.")
-    else()
-        set(GGML_CUDA OFF)
-        message(WARNING "CUDA not found, set GGML_CUDA=OFF")
-    endif()
 endif()
 
 FetchContent_Declare(
