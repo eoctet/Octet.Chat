@@ -26,7 +26,9 @@ jobs:
 
       - name: Build lib
         id: build_lib
-        run: cd llama-java-core & /bin/bash build.sh
+        run: |
+          cd llama-java-core
+          /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
@@ -44,7 +46,9 @@ jobs:
 
       - name: Build lib
         id: build_lib
-        run: cd llama-java-core & /bin/bash build.sh
+        run: |
+          cd llama-java-core
+          /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
@@ -68,7 +72,9 @@ jobs:
 
       - name: Build lib
         id: build_lib
-        run: cd llama-java-core & /bin/bash build.sh
+        run: |
+          cd llama-java-core
+          /bin/bash build.sh
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
@@ -113,8 +119,8 @@ jobs:
           cd build
           cmake.exe .. -DBLAS_INCLUDE_DIRS="$env:RUNNER_TEMP/openblas/include" -DBLAS_LIBRARIES="$env:RUNNER_TEMP/openblas/lib/openblas.lib"
           cmake.exe --build . --config Release
-          cp $env:RUNNER_TEMP/openblas/bin/libopenblas.dll ./build/bin/Release/openblas.dll
-          cp $env:RUNNER_TEMP/OpenBLAS.LICENSE.txt ./build/bin/Release/OpenBLAS-${env:OPENBLAS_VERSION}.txt
+          cp $env:RUNNER_TEMP/openblas/bin/libopenblas.dll ./bin/Release/openblas.dll
+          cp $env:RUNNER_TEMP/OpenBLAS.LICENSE.txt ./bin/Release/OpenBLAS-${env:OPENBLAS_VERSION}.txt
 
       - name: Upload lib
         uses: actions/upload-artifact@v4
