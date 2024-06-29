@@ -203,6 +203,13 @@ jobs:
           name: windows-libllama
           path: llama-java-core/src/main/resources/win32-x86-64
 
+      - name: Download windows openblas
+        id: download_windows_openblas
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-openblas
+          path: llama-java-core/src/main/resources/win32-x86-64
+
       - name: Show libs
         id: show_libs
         run: |
