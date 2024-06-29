@@ -1,6 +1,7 @@
 package chat.octet.model.utils;
 
 import chat.octet.model.exceptions.ModelException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
@@ -8,9 +9,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 
+@Slf4j
 public class Platform {
     public static final int UNSPECIFIED = -1;
     public static final int MAC = 0;
@@ -27,6 +31,7 @@ public class Platform {
     public static final int NETBSD = 11;
     public static final String ARCH;
     private static final int osType;
+    public static final String LOCAL_LIBS_PATH;
     public static String LIB_RESOURCE_PATH;
 
     static {
@@ -66,6 +71,7 @@ public class Platform {
         }
 
         ARCH = getCanonicalArchitecture(System.getProperty("os.arch"), osType);
+        LOCAL_LIBS_PATH = StringUtils.join(System.getProperty("user.home"), File.separator, ".llama_java_core", File.separator);
         loadLibraryResource();
     }
 
@@ -114,70 +120,75 @@ public class Platform {
         return arch;
     }
 
-    private static void writeLibrary(File libraryFile) {
+    private static void writeLibrary(File lib) {
         try {
-            if (libraryFile.exists()) {
-                Files.delete(libraryFile.toPath());
+            if (lib.exists()) {
+                Files.delete(lib.toPath());
             }
-            if (!libraryFile.getParentFile().exists()) {
-                Files.createDirectory(libraryFile.getParentFile().toPath());
+            if (!lib.getParentFile().exists()) {
+                Files.createDirectory(lib.getParentFile().toPath());
             }
         } catch (Exception e) {
-            throw new ModelException("Delete old library file error: " + libraryFile.toPath(), e);
+            throw new ModelException("Delete old library file error: " + lib.toPath(), e);
         }
 
         String libraryPath = getLibraryResourcePrefix(getOSType(), System.getProperty("os.arch"), System.getProperty("os.name"));
-        String interLibraryPath = libraryPath + "/" + libraryFile.getName();
+        String interLibraryPath = libraryPath + "/" + lib.getName();
 
         try (InputStream in = Platform.class.getClassLoader().getResourceAsStream(interLibraryPath);
              BufferedInputStream reader = new BufferedInputStream(Objects.requireNonNull(in, "File not found: " + interLibraryPath));
-             FileOutputStream out = new FileOutputStream(libraryFile)
+             FileOutputStream out = new FileOutputStream(lib)
         ) {
             byte[] buf = new byte[1024];
             while (reader.read(buf) > 0) {
                 out.write(buf);
                 Arrays.fill(buf, (byte) 0);
             }
+            if (!lib.isFile() || !lib.exists()) {
+                throw new NoSuchFileException("Invalid file or size: " + lib.getAbsolutePath());
+            }
         } catch (Exception e) {
             throw new ModelException("Write native library file error ", e);
         }
     }
 
+    private static void loadExtensionResource() {
+        if (isMac()) {
+            writeLibrary(new File(LOCAL_LIBS_PATH + "default.metallib"));
+        } else if (isWindows()) {
+            File openblas = new File(LOCAL_LIBS_PATH + "openblas.dll");
+            writeLibrary(openblas);
+            System.load(openblas.getAbsolutePath());
+            log.debug("Openblas loaded: {}", openblas.getAbsolutePath());
+        }
+    }
+
     public synchronized static void loadLibraryResource() {
-        String libPathEnv = System.getProperty("octet.llama.lib");
-        if (StringUtils.isNotBlank(libPathEnv)) {
-            File libraryFileAbsolutePath = new File(libPathEnv);
-            if (libraryFileAbsolutePath.exists()) {
-                LIB_RESOURCE_PATH = libraryFileAbsolutePath.getAbsolutePath();
-                return;
+        String customLibs = System.getProperty("octet.llama.lib");
+
+        String localLibs;
+        boolean external = false;
+        if (StringUtils.isNotBlank(customLibs) && Files.exists(Paths.get(customLibs))) {
+            localLibs = customLibs;
+            external = true;
+        } else {
+            if (isMac()) {
+                localLibs = LOCAL_LIBS_PATH + "libllamajava.dylib";
+            } else if (isLinux()) {
+                localLibs = LOCAL_LIBS_PATH + "libllamajava.so";
+            } else if (isWindows()) {
+                localLibs = LOCAL_LIBS_PATH + "llamajava.dll";
+            } else {
+                throw new ModelException("Unsupported OS type " + System.getProperty("os.name"));
             }
         }
-
-        String libraryName;
-        String metallibName = "default.metallib";
-        if (isMac()) {
-            libraryName = "libllamajava.dylib";
-        } else if (isLinux()) {
-            libraryName = "libllamajava.so";
-        } else if (isWindows()) {
-            libraryName = "llamajava.dll";
-        } else {
-            throw new ModelException("Unsupported operating system");
-        }
-
-        String writeFileAbsolutePath = StringUtils.join(System.getProperty("user.home"), File.separator, ".llama_java_core", File.separator);
-
-        File libraryFile = new File(writeFileAbsolutePath + libraryName);
-        writeLibrary(libraryFile);
-        if (!libraryFile.isFile() || !libraryFile.exists()) {
-            throw new ModelException("Loading native library failed. file path: " + libraryFile.getAbsolutePath());
-        }
-
-        if (isMac()) {
-            File metalLibraryFile = new File(writeFileAbsolutePath + metallibName);
-            writeLibrary(metalLibraryFile);
-        }
-        LIB_RESOURCE_PATH = libraryFile.getAbsolutePath();
+        //load llama java library
+        File lib = new File(localLibs);
+        writeLibrary(lib);
+        LIB_RESOURCE_PATH = lib.getAbsolutePath();
+        log.debug((external ? "Using custom external library: {}" : "Using built-in library: {}"), localLibs);
+        //load extension library
+        loadExtensionResource();
     }
 
     private static String getLibraryResourcePrefix(int osType, String arch, String name) {
