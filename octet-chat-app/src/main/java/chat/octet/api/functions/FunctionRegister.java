@@ -9,20 +9,18 @@ import chat.octet.model.functions.*;
 import chat.octet.model.functions.impl.DataTimeFunction;
 import chat.octet.model.parameters.GenerateParameter;
 import chat.octet.model.utils.JsonUtils;
+import chat.octet.utils.CommonUtils;
 import chat.octet.utils.QwenRAGFormatter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static chat.octet.model.functions.FunctionConstants.*;
 
@@ -70,16 +68,8 @@ public class FunctionRegister {
 
     private List<FunctionConfig> getFunctionConfigs() {
         String filePath = StringUtils.join(Paths.get("").toAbsolutePath().toString(), File.separator, "characters", File.separator, "functions.json");
-        File file = new File(filePath);
-        if (file.isFile() && file.exists()) {
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-                String json = bufferedReader.lines().collect(Collectors.joining());
-                return Optional.ofNullable(JsonUtils.parseJsonToList(json, FunctionConfig.class)).orElse(Lists.newLinkedList());
-            } catch (Exception e) {
-                log.error("Read function configuration file failed", e);
-            }
-        }
-        return Lists.newArrayList();
+        String json = CommonUtils.readFile(filePath);
+        return Optional.ofNullable(JsonUtils.parseJsonToList(json, FunctionConfig.class)).orElse(Lists.newLinkedList());
     }
 
     public FunctionOutput execute(List<Function> tools, List<FunctionCall> toolCalls) {

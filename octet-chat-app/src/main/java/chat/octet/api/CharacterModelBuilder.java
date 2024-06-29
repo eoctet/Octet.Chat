@@ -3,25 +3,24 @@ package chat.octet.api;
 import chat.octet.config.CharacterConfig;
 import chat.octet.exceptions.ServerException;
 import chat.octet.model.Model;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import chat.octet.model.enums.ModelType;
+import chat.octet.model.utils.JsonUtils;
+import chat.octet.utils.CommonUtils;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 public final class CharacterModelBuilder implements AutoCloseable {
-    public static final String DEFAULT_CHARACTER_NAME = "llama2-chat";
+    public static final String DEFAULT_CHARACTER_NAME = ModelType.LLAMA3.toString();
     private static volatile Model model;
     private static volatile CharacterModelBuilder builder;
 
@@ -41,15 +40,6 @@ public final class CharacterModelBuilder implements AutoCloseable {
         return builder;
     }
 
-    private static CharacterConfig getCharacterConfig(File file) {
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            ObjectMapper mapper = new ObjectMapper();
-            String json = bufferedReader.lines().collect(Collectors.joining());
-            return mapper.readValue(json, CharacterConfig.class);
-        } catch (Exception e) {
-            throw new ServerException("Parse characters configuration file error: " + file.getName(), e);
-        }
-    }
 
     public Model getCharacterModel() {
         if (model == null) {
@@ -97,7 +87,8 @@ public final class CharacterModelBuilder implements AutoCloseable {
                 try {
                     File file = path.toFile();
                     if (file.getName().endsWith(".json") && !file.getName().equalsIgnoreCase("functions.json")) {
-                        CharacterConfig config = getCharacterConfig(path.toFile());
+                        String json = CommonUtils.readFile(file.getAbsolutePath());
+                        CharacterConfig config = JsonUtils.parseToObject(json, CharacterConfig.class);
                         if (config != null) {
                             characterConfigs.put(config.getName(), config);
                         }

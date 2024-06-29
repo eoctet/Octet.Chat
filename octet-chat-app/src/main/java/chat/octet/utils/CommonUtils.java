@@ -33,6 +33,10 @@ public class CommonUtils {
         }
     }
 
+    public static String readFile(String filePath) {
+        return String.join("\n", readFileLines(filePath));
+    }
+
     public static List<String> readFileLines(String filePath) {
         Path path = Paths.get(filePath);
         if (!Files.isRegularFile(path) || !Files.exists(path)) {
