@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1996, 2018, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  *
@@ -765,6 +765,11 @@ struct JNINativeInterface_ {
 
     jobjectRefType (JNICALL *GetObjectRefType)
         (JNIEnv* env, jobject obj);
+
+    /* Module Features */
+
+    jobject (JNICALL *GetModule)
+       (JNIEnv* env, jclass clazz);
 };
 
 /*
@@ -1857,9 +1862,29 @@ struct JNIEnv_ {
         return functions->GetObjectRefType(this, obj);
     }
 
+    /* Module Features */
+
+    jobject GetModule(jclass clazz) {
+        return functions->GetModule(this, clazz);
+    }
+
 #endif /* __cplusplus */
 };
 
+/*
+ * optionString may be any option accepted by the JVM, or one of the
+ * following:
+ *
+ * -D<name>=<value>          Set a system property.
+ * -verbose[:class|gc|jni]   Enable verbose output, comma-separated. E.g.
+ *                           "-verbose:class" or "-verbose:gc,class"
+ *                           Standard names include: gc, class, and jni.
+ *                           All nonstandard (VM-specific) names must begin
+ *                           with "X".
+ * vfprintf                  extraInfo is a pointer to the vfprintf hook.
+ * exit                      extraInfo is a pointer to the exit hook.
+ * abort                     extraInfo is a pointer to the abort hook.
+ */
 typedef struct JavaVMOption {
     char *optionString;
     void *extraInfo;
@@ -1952,6 +1977,8 @@ JNI_OnUnload(JavaVM *vm, void *reserved);
 #define JNI_VERSION_1_4 0x00010004
 #define JNI_VERSION_1_6 0x00010006
 #define JNI_VERSION_1_8 0x00010008
+#define JNI_VERSION_9   0x00090000
+#define JNI_VERSION_10  0x000a0000
 
 #ifdef __cplusplus
 } /* extern "C" */

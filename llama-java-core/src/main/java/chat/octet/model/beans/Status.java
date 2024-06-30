@@ -8,10 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.RandomUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.random.RandomGenerator;
 
 @Getter
 @Slf4j
@@ -26,7 +26,7 @@ public class Status {
     private String systemPromptCache;
 
     public Status() {
-        this.id = RandomUtils.nextInt(10000, 50000);
+        this.id = RandomGenerator.getDefault().nextInt(10000, 50000);
         this.contextSize = LlamaService.getContextSize();
         this.inputIds = new int[this.contextSize];
         this.generateTokens = Lists.newArrayList();

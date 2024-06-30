@@ -30,8 +30,8 @@ public class Platform {
     public static final int KFREEBSD = 10;
     public static final int NETBSD = 11;
     public static final String ARCH;
-    private static final int osType;
     public static final String LOCAL_LIBS_PATH;
+    private static final int osType;
     public static String LIB_RESOURCE_PATH;
 
     static {

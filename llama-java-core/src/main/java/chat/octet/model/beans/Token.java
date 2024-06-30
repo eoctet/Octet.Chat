@@ -43,8 +43,7 @@ public final class Token implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Token)) return false;
-        Token token = (Token) o;
+        if (!(o instanceof Token token)) return false;
         return id == token.id && Objects.equals(text, token.text);
     }
 

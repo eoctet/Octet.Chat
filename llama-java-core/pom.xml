@@ -6,7 +6,7 @@
     <parent>
         <groupId>chat.octet</groupId>
         <artifactId>octet-chat</artifactId>
-        <version>1.4.2</version>
+        <version>1.4.3</version>
     </parent>
 
     <artifactId>llama-java-core</artifactId>
@@ -98,7 +98,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.6.3</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <charset>${project.build.sourceEncoding}</charset>
@@ -118,7 +118,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

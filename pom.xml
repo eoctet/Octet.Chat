@@ -7,20 +7,18 @@
     <groupId>chat.octet</groupId>
     <artifactId>octet-chat</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.2</version>
+    <version>1.4.3</version>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <maven-compiler.version>3.8.1</maven-compiler.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-lang3.version>3.14.0</commons-lang3.version>
         <lombok.version>1.18.26</lombok.version>
         <guava.version>32.1.2-jre</guava.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <jackson.version>2.13.5</jackson.version>
-        <llama.java.version>1.4.2</llama.java.version>
+        <llama.java.version>1.4.3</llama.java.version>
     </properties>
 
     <name>octet-chat</name>
