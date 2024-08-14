@@ -1,6 +1,7 @@
 package chat.octet.model.beans;
 
 import chat.octet.model.functions.FunctionCall;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -9,6 +10,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Chat message entity
@@ -20,7 +22,8 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ChatMessage {
-
+    @JsonIgnore
+    private String id;
     private ChatRole role;
     private String content;
     private List<FunctionCall> toolCalls;
@@ -29,11 +32,13 @@ public class ChatMessage {
     }
 
     public ChatMessage(ChatRole role, String content) {
+        this.id = UUID.randomUUID().toString().toLowerCase();
         this.role = role;
         this.content = content;
     }
 
     public ChatMessage(ChatRole role, String content, List<FunctionCall> toolCalls) {
+        this.id = UUID.randomUUID().toString().toLowerCase();
         this.role = role;
         this.content = content;
         this.toolCalls = toolCalls;
@@ -59,12 +64,12 @@ public class ChatMessage {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ChatMessage that)) return false;
-        return role == that.role && Objects.equals(content, that.content);
+        return Objects.equals(id, that.id) && role == that.role;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(role, content);
+        return Objects.hash(id, role);
     }
 
     /**

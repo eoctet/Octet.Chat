@@ -37,6 +37,8 @@ public class Model implements AutoCloseable {
     private final String modelName;
     @Getter
     private final String modelType;
+    @Getter
+    private boolean closed;
 
     private final ChatTemplateFormatter chatFormatter;
     private final Map<String, Status> chatStatus = Maps.newConcurrentMap();
@@ -137,12 +139,8 @@ public class Model implements AutoCloseable {
      * @param session User session key.
      */
     public void removeChatStatus(String session) {
-        String id = "";
-        if (session.contains(":")) {
-            id = session.split(":")[1];
-        }
         for (String key : chatStatus.keySet()) {
-            if (key.equals(session) || key.endsWith(id)) {
+            if (key.equals(session)) {
                 Status status = chatStatus.remove(key);
                 if (status != null) {
                     status.reset();
@@ -305,7 +303,7 @@ public class Model implements AutoCloseable {
         //otherwise does not use session cache in chat
         if (generateParams.isSessionCache()) {
             Preconditions.checkNotNull(generateParams.getUser(), "Chat user cannot be null, please set user in generate parameter.");
-            String key = StringUtils.isBlank(generateParams.getSession()) ? generateParams.getUser() : (generateParams.getUser() + ":" + generateParams.getSession());
+            String key = StringUtils.isBlank(generateParams.getSession()) ? generateParams.getUser() : generateParams.getSession();
             boolean exists = chatStatus.containsKey(key);
             if (!exists) {
                 status = new Status();
@@ -350,6 +348,7 @@ public class Model implements AutoCloseable {
         removeAllChatStatus();
         LlamaService.release();
         LlamaService.llamaBackendFree();
+        this.closed = true;
         log.info("Closed model and context resources.");
     }
 

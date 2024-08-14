@@ -7,15 +7,14 @@ import chat.octet.model.enums.LlamaNumaStrategy;
 import chat.octet.model.enums.LlamaPoolingType;
 import chat.octet.model.enums.LlamaRoPEScalingType;
 import chat.octet.model.enums.LlamaSplitMode;
+import chat.octet.model.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
-
-import javax.annotation.Nullable;
-import java.util.Arrays;
 
 /**
  * <p>Llama model parameters</p>
@@ -38,18 +37,19 @@ public class ModelParameter {
     /**
      * Llama model path
      */
+    @Setter
     private String modelPath;
 
     /**
      * Optional model to use as a base for the layers modified by the LoRA adapter.
      */
-    @Nullable
+    @Setter
     private String loraBase;
 
     /**
      * Apply a LoRA (Low-Rank Adaptation) adapter to the model (implies --no-mmap).
      */
-    @Nullable
+    @Setter
     private String loraPath;
 
     /**
@@ -234,7 +234,6 @@ public class ModelParameter {
     /**
      * When using multiple GPUs this option controls how large tensors should be split across all GPUs.
      */
-    @Nullable
     private float[] tensorSplit;
 
     /**
@@ -264,42 +263,6 @@ public class ModelParameter {
 
     @Override
     public String toString() {
-        return "{" +
-                "modelPath: '" + modelPath + '\'' +
-                ", loraBase: '" + loraBase + '\'' +
-                ", loraPath: '" + loraPath + '\'' +
-                ", loraScale: " + loraScale +
-                ", verbose: " + verbose +
-                ", numaStrategy: " + numaStrategy +
-                ", seed: " + seed +
-                ", contextSize: " + contextSize +
-                ", batchSize: " + batchSize +
-                ", ubatch: " + ubatch +
-                ", seqMax: " + seqMax +
-                ", threads: " + threads +
-                ", threadsBatch: " + threadsBatch +
-                ", ropeScalingType: " + ropeScalingType +
-                ", poolingType: " + poolingType +
-                ", ropeFreqBase: " + ropeFreqBase +
-                ", ropeFreqScale: " + ropeFreqScale +
-                ", yarnExtFactor: " + yarnExtFactor +
-                ", yarnAttnFactor: " + yarnAttnFactor +
-                ", yarnBetaFast: " + yarnBetaFast +
-                ", yarnBetaSlow: " + yarnBetaSlow +
-                ", yarnOrigCtx: " + yarnOrigCtx +
-                ", defragThold: " + defragThold +
-                ", logitsAll: " + logitsAll +
-                ", embedding: " + embedding +
-                ", offloadKqv: " + offloadKqv +
-                ", flashAttn: " + flashAttn +
-                ", gpuLayers: " + gpuLayers +
-                ", splitMode: " + splitMode +
-                ", mainGpu: " + mainGpu +
-                ", tensorSplit: " + Arrays.toString(tensorSplit) +
-                ", vocabOnly: " + vocabOnly +
-                ", mmap: " + mmap +
-                ", mlock: " + mlock +
-                ", checkTensors: " + checkTensors +
-                '}';
+        return JsonUtils.toJson(this);
     }
 }

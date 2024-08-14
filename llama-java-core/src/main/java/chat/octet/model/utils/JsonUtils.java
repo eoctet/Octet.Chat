@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -40,7 +39,7 @@ public class JsonUtils {
         return JACKSON_MAPPER;
     }
 
-    public static <T> T parseToObject(String json, @Nullable Class<T> clazz) {
+    public static <T> T parseToObject(String json, Class<T> clazz) {
         try {
             if (StringUtils.isNotBlank(json)) {
                 return JACKSON_MAPPER.readValue(json, clazz);
@@ -52,15 +51,23 @@ public class JsonUtils {
     }
 
     public static String toJson(Object obj) {
+        return toJson(obj, false);
+    }
+
+    public static String toJson(Object obj, boolean prettyPrint) {
         try {
-            return JACKSON_MAPPER.writeValueAsString(obj);
+            if (prettyPrint) {
+                return JACKSON_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+            } else {
+                return JACKSON_MAPPER.writeValueAsString(obj);
+            }
         } catch (JsonProcessingException ex) {
             log.error("Parse Object to JSON error", ex);
         }
         return null;
     }
 
-    public static <K, V> LinkedHashMap<K, V> parseJsonToMap(String json, @Nullable Class<K> key, @Nullable Class<V> value) {
+    public static <K, V> LinkedHashMap<K, V> parseJsonToMap(String json, Class<K> key, Class<V> value) {
         JavaType javaType = JACKSON_MAPPER.getTypeFactory().constructMapType(LinkedHashMap.class, key, value);
         try {
             if (StringUtils.isNotBlank(json)) {
@@ -72,7 +79,7 @@ public class JsonUtils {
         return null;
     }
 
-    public static <E> LinkedList<E> parseJsonToList(String json, @Nullable Class<E> clazz) {
+    public static <E> LinkedList<E> parseJsonToList(String json, Class<E> clazz) {
         JavaType javaType = JACKSON_MAPPER.getTypeFactory().constructParametricType(LinkedList.class, clazz);
         try {
             if (StringUtils.isNotBlank(json)) {

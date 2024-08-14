@@ -3,6 +3,7 @@ package chat.octet.model.beans;
 
 import chat.octet.model.LlamaService;
 import chat.octet.model.enums.FinishReason;
+import chat.octet.model.utils.Platform;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.random.RandomGenerator;
 
 @Getter
 @Slf4j
@@ -26,7 +26,7 @@ public class Status {
     private String systemPromptCache;
 
     public Status() {
-        this.id = RandomGenerator.getDefault().nextInt(10000, 50000);
+        this.id = Platform.RANDOM_GENERATOR.nextInt(10000, 50000);
         this.contextSize = LlamaService.getContextSize();
         this.inputIds = new int[this.contextSize];
         this.generateTokens = Lists.newArrayList();

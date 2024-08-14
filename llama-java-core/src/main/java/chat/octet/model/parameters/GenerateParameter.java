@@ -13,8 +13,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
 
-import javax.annotation.Nullable;
-
 
 /**
  * <p>Generate parameter</p>
@@ -141,7 +139,6 @@ public final class GenerateParameter {
      * Specify a grammar (defined inline or in a file) to constrain model output to a specific format.
      * For example, you could force the model to output JSON or to speak only in emojis
      */
-    @Nullable
     private String grammarRules;
 
     /**
@@ -185,13 +182,11 @@ public final class GenerateParameter {
     /**
      * Adjust the probability distribution of words.
      */
-    @Nullable
     private LogitBias logitBias;
 
     /**
      * Control the stop word list for generating stops, with values that can be text or token IDs.
      */
-    @Nullable
     private String[] stoppingWord;
 
     //infill
@@ -260,6 +255,7 @@ public final class GenerateParameter {
      */
     @Builder.Default
     @Setter
+    @JsonIgnore
     private String session = "";
 
     /**

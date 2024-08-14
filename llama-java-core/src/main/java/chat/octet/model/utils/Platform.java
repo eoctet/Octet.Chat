@@ -13,6 +13,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.random.RandomGenerator;
+import java.util.random.RandomGeneratorFactory;
 
 @Slf4j
 public class Platform {
@@ -33,8 +35,11 @@ public class Platform {
     public static final String LOCAL_LIBS_PATH;
     private static final int osType;
     public static String LIB_RESOURCE_PATH;
+    public static final RandomGenerator RANDOM_GENERATOR;
 
     static {
+        RANDOM_GENERATOR = RandomGeneratorFactory.of("L64X128StarStarRandom").create();
+
         String osName = System.getProperty("os.name");
         if (osName.startsWith("Linux")) {
             if ("dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"))) {
@@ -71,7 +76,7 @@ public class Platform {
         }
 
         ARCH = getCanonicalArchitecture(System.getProperty("os.arch"), osType);
-        LOCAL_LIBS_PATH = StringUtils.join(System.getProperty("user.home"), File.separator, ".llama_java_core", File.separator);
+        LOCAL_LIBS_PATH = StringUtils.join(System.getProperty("user.home"), File.separator, ".llama_java", File.separator, "libs", File.separator);
         loadLibraryResource();
     }
 
@@ -126,7 +131,7 @@ public class Platform {
                 Files.delete(lib.toPath());
             }
             if (!lib.getParentFile().exists()) {
-                Files.createDirectory(lib.getParentFile().toPath());
+                Files.createDirectories(lib.getParentFile().toPath());
             }
         } catch (Exception e) {
             throw new ModelException("Delete old library file error: " + lib.toPath(), e);
