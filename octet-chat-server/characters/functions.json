@@ -4,7 +4,7 @@
     "alias": "网络搜索",
     "description": "网络搜索是一个通用搜索引擎，可用于访问互联网、查询百科知识、了解时事新闻等",
     "config": {
-      "url": "https://s.octet.pro",
+      "url": "https://localhost",
       "method": "get",
       "headers": {},
       "request": {

@@ -4,6 +4,7 @@ import chat.octet.api.functions.model.Parameter;
 import chat.octet.exceptions.ServerException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +48,14 @@ public class CommonUtils {
         } catch (Exception e) {
             throw new ServerException("Read file error", e);
         }
+    }
+
+    public static String getUserConfigPath() {
+        return StringUtils.join(System.getProperty("user.home"), File.separator, ".llama_java");
+    }
+
+    public static String getCharactersConfigPath() {
+        return StringUtils.join(getUserConfigPath(), File.separator, "characters");
     }
 
     public static Map<String, Object> parse(List<Parameter> outputParameter, Map<String, Object> result, int limit) {

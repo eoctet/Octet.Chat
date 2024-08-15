@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,7 +66,7 @@ public class FunctionRegister {
     }
 
     private List<FunctionConfig> getFunctionConfigs() {
-        String filePath = StringUtils.join(Paths.get("").toAbsolutePath().toString(), File.separator, "characters", File.separator, "functions.json");
+        String filePath = StringUtils.join(CommonUtils.getUserConfigPath(), File.separator, "functions.json");
         String json = CommonUtils.readFile(filePath);
         return Optional.ofNullable(JsonUtils.parseJsonToList(json, FunctionConfig.class)).orElse(Lists.newLinkedList());
     }
