@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
+<?import io.github.palexdev.mfxresources.fonts.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="chat.octet.app.controller.ChatController">
+    <padding>
+        <Insets left="10" right="10"/>
+    </padding>
+
+    <center>
+        <MFXScrollPane fx:id="messageScrollPane" fitToWidth="true">
+            <VBox fx:id="messagesContainer"/>
+        </MFXScrollPane>
+    </center>
+    <bottom>
+        <VBox spacing="10" BorderPane.alignment="BOTTOM_CENTER">
+            <padding>
+                <Insets bottom="10" top="10"/>
+            </padding>
+            <HBox fx:id="chatToolbar" alignment="CENTER_LEFT" spacing="20.0">
+                <padding>
+                    <Insets left="16"/>
+                </padding>
+                <MFXFontIcon fx:id="startChatIcon" description="fas-paper-plane"
+                             size="16.0"
+                             styleClass="message-send-icon,toolbar-btn-icon"/>
+                <MFXFontIcon fx:id="regenerateIcon" description="fas-repeat" size="16.0"
+                             styleClass="toolbar-btn-icon"/>
+                <MFXFontIcon fx:id="exportHistoryIcon" description="fas-file-export" size="16.0"
+                             styleClass="toolbar-btn-icon"/>
+                <MFXFontIcon fx:id="deleteSessionIcon" description="fas-trash-arrow-up" size="16.0"
+                             styleClass="toolbar-btn-icon"/>
+                <MFXFontIcon fx:id="resetIcon" description="fas-delete-left" size="16.0"
+                             styleClass="toolbar-btn-icon"/>
+                <MFXFontIcon fx:id="cancelChatIcon" description="fas-circle-stop" size="16.0"
+                             styleClass="toolbar-btn-icon" visible="false"/>
+            </HBox>
+            <TextArea fx:id="messageInputText"
+                      styleClass="mfx-scroll-pane"
+                      wrapText="true"
+                      prefHeight="100.0"
+                      promptText="%ui.chat.input.prompt"/>
+
+        </VBox>
+    </bottom>
+</BorderPane>

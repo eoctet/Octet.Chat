@@ -1,0 +1,380 @@
+@import "commons.css";
+
+/**************************************************
+ * Root
+**************************************************/
+* {
+    -mfx-blue: #2196f3;
+    -mfx-charcoal: #445055;
+    -mfx-green: #4caf50;
+    -mfx-onyx: #353935;
+    -mfx-orange: #ff9800;
+    -mfx-purple: #7a0ed9;
+    -mfx-red: #EF6E6B;
+    -mfx-yellow: #FFEA00;
+
+    -common-gradient: linear-gradient(to right bottom, #c4008b, #d00085, #dc007f, #e60b79, #ef1872, #f5276b, #fa3564, #fe415e, #ff5158, #ff5f52, #ff6c4e, #ff794b);
+    -secondary-gradient: linear-gradient(to right bottom, #1ec400, #00bd3a, #00b654, #00ae67, #00a574, #00a280, #009e8a, #009a91, #009b9d, #009ba8, #009bb2, #009abb);
+    -blues-gradient: linear-gradient(to right bottom, #6DC7FF, #2196F3, #1A6DFF, #7A0ED9, #C822FF, #E6ABFF);
+
+    /* Font Colors */
+    -fc-white: rgb(255, 255, 255);
+    -fc-black: rgba(0, 0, 0, 0.87);
+    -fc-prompt: rgba(244, 244, 244, 0.3);
+    -fc-disabled: rgba(244, 244, 244, 0.1);
+    -fc-blue: rgb(71, 63, 247);
+
+    /* Active Colors */
+    -ac-sidebar-selected: rgba(71, 63, 247, 0.85);
+    -ac-sidebar-text: -fc-white;
+
+    -ac-thumb: rgba(137, 137, 137, 0.5);
+    -ac-thumb-hover: rgb(89, 88, 91);
+
+    -ac-item-hover: rgba(71, 63, 247, 0.2);
+    -ac-item-selected: rgba(71, 63, 247, 0.6);
+    -ac-item-text: rgba(71, 63, 247, 0.85);
+
+    /* Button & Border Colors */
+    -bc-close: rgb(255, 80, 78);
+    -bc-minimize: rgb(255, 178, 58);
+    -bc-maximize: rgb(10, 193, 68);
+    -bc-border: rgba(255, 255, 255, 0.1);
+
+    /* Theme Colors */
+    -theme-octet: rgb(44, 44, 59);
+    -theme-main-background: rgb(29, 29, 38);
+    -theme-main-border: rgba(29, 29, 38, 0.8);
+    -theme-font-color: -fc-white;
+    -theme-toolbar-icon: -fc-white;
+    -theme-toolbar-icon-hover: -blues-gradient;
+    -theme-logo-text: -blues-gradient;
+    -theme-um-background: transparent;
+    -theme-am-background: rgba(35, 36, 51, 1.0);
+
+    /* Markdown colors */
+    -md-font-color: -theme-font-color;
+    -md-code-fc: -fc-white;
+    -md-code-block: rgba(0, 0, 0, 0.5);
+    -md-quote-block: rgba(71, 63, 247, 0.1);
+    -md-table-header: rgba(0, 0, 0, 0.6);
+    -md-table-even: rgba(0, 0, 0, 0.1);
+    -md-table-odd: rgba(0, 0, 0, 0.3);
+
+    /* Overrides theme colors    */
+    -fx-focus-color: -fc-blue;
+    -fx-faint-focus-color: -fc-blue;
+    -fx-accent: -ac-item-selected;
+}
+
+.root {
+    -fx-font-family: "Alibaba PuHuiTi";
+}
+
+.rootPane {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-border-color: -theme-main-border;
+    -fx-border-radius: 10;
+    -fx-font-size: 14;
+}
+
+.window-content-pane {
+    -fx-background-color: -theme-octet;
+    -fx-background-radius: 0 0 10 0;
+    -fx-border-color: null;
+}
+
+.window-control-tabs {
+    -fx-background-color: -theme-octet;
+    -fx-background-radius: 0 10 0 0;
+    -fx-border-color: null;
+}
+
+.mini-sidebar {
+    -fx-min-width: 59;
+    -fx-max-width: 59;
+}
+
+.mini-sidebar-logo {
+     -fx-min-height: 80;
+     -fx-alignment: center;
+}
+
+.mini-sidebar-toolbar {
+    -fx-spacing: 20;
+    -fx-alignment: bottom-center;
+}
+
+.sidebar-menu {
+    -fx-background-color: transparent;
+}
+
+/**************************************************
+ * Window Header
+**************************************************/
+.rootPane .close-icon {
+    -mfx-color: -bc-close;
+    -fx-opacity: 0.5;
+}
+
+.rootPane .close-icon:hover {
+    -fx-opacity: 1.0;
+}
+
+.rootPane .minimize-icon {
+    -mfx-color: -bc-minimize;
+    -fx-opacity: 0.5;
+}
+
+.rootPane .minimize-icon:hover {
+    -fx-opacity: 1.0;
+}
+
+.rootPane .always-on-top-icon {
+    -mfx-color: -bc-maximize;
+    -fx-opacity: 0.5;
+}
+
+.rootPane .always-on-top-icon:hover {
+    -fx-opacity: 1.0;
+}
+
+.rootPane .always-on-top-icon:always-on-top {
+    -fx-opacity: 1.0;
+}
+
+.rootPane .toolbar-btn-icon {
+    -mfx-color: -theme-toolbar-icon;
+    -fx-opacity: 0.5;
+}
+
+.rootPane .toolbar-btn-icon:hover {
+    -mfx-color: -theme-toolbar-icon-hover;
+    -fx-opacity: 1.0;
+}
+
+.rootPane .toolbar-btn-icon:always-on-top {
+    -fx-opacity: 1.0;
+}
+
+/**************************************************
+ * Sidebar
+**************************************************/
+.rootPane .sidebar {
+    -fx-background-color: rgba(0, 0, 0, 0.85);
+    -fx-background-insets: 0;
+    -fx-background-radius: 10 0 0 10;
+}
+
+.rootPane .sidebar .header {
+    -fx-font-family: "Phosphate";
+    -fx-font-weight: 800;
+    -fx-font-size: 28;
+    -fx-text-fill: -theme-logo-text;
+}
+
+.mfx-font-icon {
+    -mfx-color: -theme-font-color;
+}
+
+.rootPane .app-setting-icon {
+    -mfx-color: -theme-font-color;
+    -fx-opacity: 0.5;
+}
+
+.rootPane .app-setting-icon:hover {
+    -mfx-color: -theme-toolbar-icon-hover;
+    -fx-opacity: 1.0;
+}
+
+.rootPane .sidebar #sidebarScrollPane {
+    -fx-background-color: transparent;
+    -track-color: transparent;
+    -thumb-color: -ac-thumb;
+    -thumb-hover-color: -ac-thumb-hover;
+}
+
+.rootPane .sidebar .menu-label {
+    -fx-font-size: 14;
+    -fx-text-fill: -theme-font-color;
+    -fx-font-family: "Alibaba PuHuiTi Medium";
+}
+
+.rootPane .sidebar .navbar .mfx-rectangle-toggle-node {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 0;
+    -fx-pref-height: 40;
+
+    -fx-font-size: 13;
+    -fx-text-fill: -theme-font-color;
+    -fx-pref-width: 215;
+    -fx-max-width: 215;
+    -fx-alignment: center-left;
+}
+
+.rootPane .sidebar .navbar .mfx-rectangle-toggle-node .mfx-ripple-generator {
+    -mfx-auto-clip: true;
+    -mfx-background-opacity: 0.3;
+    -mfx-ripple-radius: 50;
+}
+
+.rootPane .sidebar .navbar .mfx-rectangle-toggle-node .mfx-icon-wrapper .mfx-font-icon {
+    -mfx-color: -theme-font-color;
+}
+
+.rootPane .sidebar .navbar .mfx-rectangle-toggle-node:selected {
+    -fx-background-color: -ac-sidebar-selected;
+    -fx-background-radius: 5;
+    -fx-text-fill: -ac-sidebar-text;
+}
+
+.rootPane .sidebar .navbar .mfx-rectangle-toggle-node:selected .selection-rectangle {
+    -fx-stroke: transparent;
+    -fx-fill: -ac-sidebar-text;
+}
+
+.rootPane .sidebar .navbar .mfx-rectangle-toggle-node:selected .mfx-icon-wrapper .mfx-font-icon {
+    -mfx-color: -ac-sidebar-text;
+}
+
+/**************************************/
+
+.chat-message {
+    -fx-padding: 15;
+}
+
+.chat-session-status {
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+
+.chat-session-status .mfx-progress-spinner {
+    -fx-pref-width: 18;
+    -fx-pref-height: 18;
+
+    -mfx-color1: #2196F3;
+    -mfx-color2: #1A6DFF;
+    -mfx-color3: #7A0ED9;
+    -mfx-color4: #C822FF;
+}
+
+.chat-message .chat-content {
+    /*
+    -fx-border-color: white;
+    -fx-border-width: 0.5;
+    */
+    -fx-pref-width: 2048;
+    -fx-padding: 5;
+}
+
+.user-message {
+    -fx-background-color: -theme-um-background;
+}
+
+.assistant-message {
+    -fx-background-color: -theme-am-background;
+}
+
+.system-message {
+    -fx-background-color: -theme-am-background;
+}
+
+.chat-message-tips {
+    -fx-padding: 10 0;
+    -fx-text-fill: -fc-prompt;
+    -fx-alignment: center;
+    -fx-pref-width: Infinity;
+}
+
+/* App setting */
+
+.app-setting-title {
+    -fx-font-family: "Alibaba PuHuiTi Bold";
+    -fx-text-fill: -theme-font-color;
+    -fx-font-size: 16;
+    -fx-padding: 0 0 0 10;
+
+    -fx-pref-width: 500;
+    -fx-pref-height: 30;
+}
+
+.app-setting-scroll-pane {
+    -fx-pref-width: 500;
+    -fx-max-width: 500;
+}
+
+.app-setting-container {
+    -fx-padding: 10;
+}
+
+.app-setting-container .app-setting-item {
+    -fx-alignment: center-left;
+    -fx-padding: 5 0;
+}
+
+.app-setting-container .character-setting-item {
+    -fx-alignment: center-left;
+    -fx-border-color: -bc-border;
+    -fx-border-width: 0 0 0.5 0;
+    -fx-padding: 15 10;
+}
+
+.app-setting-container .character-setting-item .label {
+    -fx-text-fill: -theme-font-color;
+    -fx-pref-width: 450;
+}
+
+.app-setting-container .app-setting-item .text-area {
+    -fx-border-color: -bc-border;
+    -fx-border-radius: 10;
+}
+
+.app-setting-container .app-setting-item .text-area:focused {
+    -fx-border-color: -ac-item-selected;
+}
+
+.app-toolbar-container .primary-button {
+    -fx-background-color: -fc-blue;
+    -fx-text-fill: derive(-fc-white, 20%);
+}
+
+.app-toolbar-container .second-button {
+    -fx-background-color: rgb(69, 64, 92);
+    -fx-text-fill: derive(-fc-white, 20%);
+}
+
+.app-toolbar-container .mfx-button {
+    -fx-border-color: -bc-border;
+    -fx-border-radius: 3;
+}
+
+.app-toolbar-container .mfx-button .mfx-ripple-generator {
+    -mfx-ripple-color: derive(-fc-blue, 80%);
+    -mfx-auto-clip: true;
+    -mfx-ripple-radius: 50;
+}
+
+.app-toolbar-container .mfx-button:hover {
+    -fx-border-color: -bc-border;
+}
+
+.form-validate-message {
+    -fx-border-color: rgba(255, 58, 68, 0.9);
+    -fx-background-color: rgba(255, 58, 68, 0.3);
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+
+    -fx-text-fill: -theme-font-color;
+
+    -fx-pref-width: 500;
+    -fx-pref-height: 35;
+    -fx-alignment: center;
+}
+
+
+.home-page-scroll {
+    -fx-padding: 20;
+}

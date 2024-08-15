@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="chat.octet.app.controller.CharacterConfigController">
+    <padding>
+        <Insets left="10" right="10"/>
+    </padding>
+    <top>
+        <VBox spacing="5" alignment="CENTER">
+            <Label alignment="BASELINE_LEFT" text="%ui.character.config.title" styleClass="app-setting-title"/>
+            <MFXScrollPane fitToWidth="true" fitToHeight="true" styleClass="app-setting-scroll-pane">
+                <VBox spacing="5" fx:id="appSettingContainer" styleClass="app-setting-container">
+                    <HBox styleClass="app-setting-item">
+                        <MFXTextField fx:id="nameInputText" textLimit="20" floatMode="BORDER" floatingText="%ui.character.config.name"/>
+                    </HBox>
+                    <HBox styleClass="app-setting-item">
+                        <MFXComboBox fx:id="configTypeCombo" floatMode="BORDER" floatingText="%ui.character.config.type"/>
+                    </HBox>
+                    <HBox styleClass="app-setting-item">
+                        <MFXComboBox fx:id="iconCombo" floatMode="BORDER" floatingText="%ui.character.config.icon"/>
+                    </HBox>
+                    <HBox styleClass="app-setting-item">
+                        <MFXTextField fx:id="modelPathInputText" floatMode="BORDER"
+                                      floatingText="%ui.character.config.model"/>
+                    </HBox>
+                    <!--                    <HBox styleClass="app-setting-item" fx:id="aiAPIBox">-->
+                    <!--                        <MFXTextField fx:id="apiInputText" floatMode="BORDER" floatingText="%ui.character.config.api"/>-->
+                    <!--                    </HBox>-->
+                    <!--                    <HBox styleClass="app-setting-item" fx:id="aiKeyBox">-->
+                    <!--                        <MFXTextField fx:id="keyInputText" floatMode="BORDER" floatingText="%ui.character.config.key"/>-->
+                    <!--                    </HBox>-->
+                    <HBox styleClass="app-setting-item">
+                        <TextArea fx:id="promptTextInput" prefWidth="500" maxWidth="500" wrapText="true"
+                                  prefHeight="120.0" promptText="%ui.character.config.prompt"/>
+                    </HBox>
+                    <HBox styleClass="app-setting-item">
+                        <TextArea fx:id="modelConfigTextInput" prefWidth="500" maxWidth="500" wrapText="true"
+                                  prefHeight="180.0" promptText="%ui.character.config.params"/>
+                    </HBox>
+                </VBox>
+            </MFXScrollPane>
+
+            <HBox prefWidth="500" maxWidth="500" spacing="10" alignment="TOP_RIGHT" styleClass="app-toolbar-container">
+                <padding>
+                    <Insets top="15"/>
+                </padding>
+                <MFXButton fx:id="deleteConfigBtn" alignment="TOP_LEFT" text="%ui.character.config.delete" styleClass="second-button"/>
+                <MFXButton fx:id="cancelConfigBtn" text="%ui.character.config.cancel" styleClass="second-button"/>
+                <MFXButton fx:id="saveConfigBtn" text="%ui.character.config.save" styleClass="primary-button"/>
+            </HBox>
+        </VBox>
+    </top>
+
+
+</BorderPane>

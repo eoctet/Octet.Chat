@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="5" styleClass="chat-message">
+    <HBox spacing="5">
+        <ImageView fx:id="messageAvatar" fitWidth="32" fitHeight="32" styleClass="chat-avatar"/>
+        <Label fx:id="messageContent" wrapText="true" styleClass="chat-content"/>
+    </HBox>
+</VBox>

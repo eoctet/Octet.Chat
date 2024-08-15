@@ -1,0 +1,171 @@
+.md-content {
+    -fx-spacing: 8;
+    -fx-font-family: "Alibaba PuHuiTi";
+}
+
+.md-text {
+    -fx-fill: -theme-font-color;
+    -fx-text-fill: -theme-font-color;
+}
+
+.md-font-italic {
+    -fx-font-style: italic;
+}
+
+.md-font-bold {
+    -fx-font-weight: bold;
+}
+
+.md-font-strikethrough {
+    -fx-strikethrough: true;
+}
+
+.md-heading {
+    -fx-font-family: "Alibaba PuHuiTi Medium";
+    -fx-text-fill: -theme-font-color;
+    -fx-padding: 10 0;
+}
+
+.md-heading-1 {
+    -fx-font-size: 2em;
+    -fx-border-width: 0 0 0.5 0;
+    -fx-border-color: -bc-border;
+}
+
+.md-heading-2 {
+    -fx-font-size: 1.5em;
+    -fx-border-width: 0 0 0.5 0;
+    -fx-border-color: -bc-border;
+}
+
+.md-heading-3 {
+    -fx-font-size: 1.25em;
+}
+
+.md-heading-4 {
+    -fx-font-size: 1em;
+}
+
+.md-heading-5 {
+    -fx-font-size: 0.875em;
+}
+
+.md-heading-6 {
+    -fx-font-size: 0.75em;
+}
+
+.md-text-line {
+    -fx-alignment: center-left;
+    -fx-padding: 2.5 0;
+}
+
+.md-thematic-break {
+    -fx-padding: 0;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -bc-border;
+}
+
+.md-code-snippet {
+    -fx-font-family: "Alibaba PuHuiTi Medium";
+    -fx-fill: -fc-blue;
+    -fx-text-fill: -fc-blue;
+}
+
+.md-code-block {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.md-code-block .label {
+    -fx-wrap-text: true;
+    -fx-font-size: 13;
+    -fx-text-fill: -md-code-fc;
+}
+
+.md-code-block-container {
+    -fx-border-radius: 5;
+    -fx-border-color: -bc-border;
+    -fx-border-width: 0.5;
+    -fx-background-radius: 5;
+    -fx-background-color: -md-code-block;
+}
+
+.md-code-toolbar {
+    -fx-alignment: top-right;
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}
+
+.md-code-toolbar .md-code-lang {
+    -fx-text-fill: -theme-font-color;
+    -fx-font-size: 13;
+    -fx-padding: 0 5;
+    -fx-background-color: -bc-border;
+    -fx-background-radius: 3;
+}
+
+.md-code-toolbar .md-code-copy {
+    -mfx-color: -theme-font-color;
+    -fx-opacity: 0.5;
+    -fx-cursor: hand;
+}
+
+.md-code-toolbar .md-code-copy:hover {
+    -mfx-color: -theme-toolbar-icon-hover;
+    -fx-opacity: 1.0;
+}
+
+.md-list {
+    -fx-spacing: 3;
+}
+
+.md-list-item {}
+
+.md-list-order {
+    -fx-text-fill: -md-font-color;
+    -fx-alignment: baseline-center;
+    -fx-padding: 2.5 0;
+    -fx-min-width: 30;
+}
+
+.md-list-content {
+    -fx-spacing: 5;
+    -fx-padding: 0;
+    -fx-alignment: center-left;
+    -fx-pref-width: 2048;
+}
+
+.md-block-quote {
+    -fx-background-color: -md-quote-block;
+    -fx-border-color: -fc-blue;
+    -fx-border-width: 0 0 0 3;
+    -fx-padding: 10;
+}
+
+.md-link {
+    -fx-text-fill: -fc-blue;
+    -fx-cursor: hand;
+}
+
+.md-link:hover {
+    -fx-underline: true;
+}
+
+.md-table-cell {
+    -fx-padding: 10;
+    -fx-border-color: -bc-border;
+    -fx-border-width: 0.5;
+}
+
+.md-table-even {
+    -fx-background-color: -md-table-even;
+}
+
+.md-table-odd {
+    -fx-background-color: -md-table-odd;
+}
+
+.md-table-header {
+    -fx-font-weight: bold;
+    -fx-background-color: -md-table-header;
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.*?>
+<?import io.github.palexdev.mfxresources.fonts.MFXFontIcon?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<BorderPane fx:id="appConfigPane" xmlns:fx="http://javafx.com/fxml" fx:controller="chat.octet.app.controller.AppSettingController">
+    <padding>
+        <Insets left="10" right="10"/>
+    </padding>
+    <top>
+        <VBox spacing="5" alignment="CENTER">
+            <Label alignment="BASELINE_LEFT" text="%ui.setting.app.title" styleClass="app-setting-title"/>
+            <MFXScrollPane fitToWidth="true" fitToHeight="true" styleClass="app-setting-scroll-pane">
+                <VBox spacing="5" styleClass="app-setting-container">
+                    <HBox styleClass="app-setting-item">
+                        <MFXComboBox fx:id="appLanguageCombo" floatMode="BORDER" floatingText="%ui.setting.app.lang"/>
+                    </HBox>
+                    <HBox styleClass="app-setting-item">
+                        <MFXComboBox fx:id="appThemeCombo" floatMode="BORDER" floatingText="%ui.setting.app.theme"/>
+                    </HBox>
+                    <HBox styleClass="app-setting-item">
+                        <MFXComboBox fx:id="appCharacterCombo" floatMode="BORDER" floatingText="%ui.setting.app.character"/>
+                    </HBox>
+                </VBox>
+            </MFXScrollPane>
+            <padding>
+                <Insets bottom="20"/>
+            </padding>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="5" alignment="TOP_CENTER">
+            <HBox prefWidth="500" maxWidth="500" alignment="CENTER_LEFT">
+                <Label text="%ui.setting.character.title" styleClass="app-setting-title"/>
+                <MFXFontIcon fx:id="addNewCharacterIcon" description="fas-square-plus" size="20.0" styleClass="app-setting-icon"/>
+            </HBox>
+            <MFXScrollPane fx:id="characterScrollPane" fitToWidth="true" fitToHeight="true" styleClass="app-setting-scroll-pane" maxHeight="400"/>
+        </VBox>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
+<?import io.github.palexdev.mfxresources.fonts.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            stylesheets="@../css/light.css" styleClass="rootPane" fx:id="rootPane"
+            xmlns:fx="http://javafx.com/fxml" fx:controller="chat.octet.app.controller.AppMainController">
+
+    <HBox fx:id="windowControlTabs" styleClass="window-control-tabs" alignment="CENTER_RIGHT" layoutY="6.0"
+          prefHeight="50.0" prefWidth="600.0" spacing="8"
+          AnchorPane.leftAnchor="245.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets right="10.0"/>
+        </padding>
+        <MFXFontIcon fx:id="alwaysOnTopIcon" description="fas-circle" size="15.0" styleClass="always-on-top-icon"/>
+        <MFXFontIcon fx:id="minimizeIcon" description="fas-circle" size="15.0" styleClass="minimize-icon"/>
+        <MFXFontIcon fx:id="closeIcon" description="fas-circle" size="15.0" styleClass="close-icon"/>
+    </HBox>
+
+    <HBox fx:id="sidebarPane" layoutX="227.0" layoutY="51.0" prefWidth="245.0" styleClass="sidebar"
+          AnchorPane.bottomAnchor="0.0"
+          AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox fx:id="miniSidebar" styleClass="mini-sidebar">
+            <VBox styleClass="mini-sidebar-logo">
+                <ImageView fitWidth="40" fitHeight="40" styleClass="logo">
+                    <Image url="@../static/logo.png"/>
+                </ImageView>
+            </VBox>
+
+            <VBox fx:id="miniSidebarToolbar" styleClass="mini-sidebar-toolbar" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets bottom="20.0"/>
+                </padding>
+            </VBox>
+        </VBox>
+
+        <VBox fx:id="sidebarMenu" styleClass="sidebar-menu">
+            <padding>
+                <Insets bottom="10.0" left="10.0" top="60.0"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT">
+                <ImageView fitWidth="60" fitHeight="60" styleClass="logo">
+                    <Image url="@../static/logo.png"/>
+                </ImageView>
+                <Label graphicTextGap="15.0" styleClass="header" text="Octet.chat"/>
+            </HBox>
+
+            <Label styleClass="menu-label" text="%ui.main.sidebar.list">
+                <VBox.margin>
+                    <Insets left="5.0" top="40.0"/>
+                </VBox.margin>
+                <graphic>
+                    <MFXFontIcon description="fas-rectangle-list" size="16.0" styleClass="mfx-font-icon"/>
+                </graphic>
+            </Label>
+
+            <MFXScrollPane fx:id="sidebarScrollPane" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                <VBox.margin>
+                    <Insets bottom="10.0" left="5.0" top="15.0"/>
+                </VBox.margin>
+                <padding>
+                    <Insets right="10.0"/>
+                </padding>
+                <VBox fx:id="sidebarNav" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" styleClass="navbar"/>
+            </MFXScrollPane>
+            <HBox fx:id="sidebarToolbar" alignment="CENTER_LEFT" spacing="20.0">
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0"/>
+                </VBox.margin>
+                <MFXFontIcon fx:id="createChatSessionIcon" description="fas-message" size="20.0" styleClass="app-setting-icon"/>
+                <MFXFontIcon fx:id="deleteChatSessionIcon" description="fas-trash-arrow-up" size="20.0" styleClass="app-setting-icon"/>
+                <MFXFontIcon fx:id="miniSidebarIcon" description="fas-pager" size="20.0" styleClass="app-setting-icon"/>
+                <MFXFontIcon fx:id="appSettingIcon" description="fas-sliders" size="20.0" styleClass="app-setting-icon"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <StackPane fx:id="windowContentPane" styleClass="window-content-pane" layoutX="245.0" layoutY="50.0"
+               prefHeight="150.0" prefWidth="200.0"
+               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="245.0" AnchorPane.rightAnchor="0"
+               AnchorPane.topAnchor="50.0"/>
+
+</AnchorPane>
