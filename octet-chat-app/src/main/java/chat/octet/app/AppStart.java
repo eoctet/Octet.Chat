@@ -5,7 +5,6 @@ import chat.octet.app.core.constants.AppConstants;
 import chat.octet.app.service.AppService;
 import chat.octet.app.service.ChatService;
 import chat.octet.app.utils.MessageI18N;
-import fr.brouillard.oss.cssfx.CSSFX;
 import io.github.palexdev.materialfx.theming.JavaFXThemes;
 import io.github.palexdev.materialfx.theming.MaterialFXStylesheets;
 import io.github.palexdev.materialfx.theming.UserAgentBuilder;

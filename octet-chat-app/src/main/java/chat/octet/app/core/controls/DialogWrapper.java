@@ -2,6 +2,7 @@ package chat.octet.app.core.controls;
 
 
 import chat.octet.app.AppResourcesLoader;
+import chat.octet.app.core.constants.AppConstants;
 import chat.octet.app.core.enums.ThemeType;
 import chat.octet.app.utils.MessageI18N;
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -10,8 +11,6 @@ import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.materialfx.enums.ScrimPriority;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
@@ -121,10 +120,7 @@ public final class DialogWrapper {
 
             this.dialogContent.addActions(Map.entry(copyBtn, event -> {
                 try {
-                    ClipboardContent content = new ClipboardContent();
-                    content.putString(this.dialogContent.getContentText());
-                    Clipboard clipboard = Clipboard.getSystemClipboard();
-                    clipboard.setContent(content);
+                    AppConstants.clipboardContent(this.dialogContent.getContentText());
                 } catch (Exception e) {
                     log.error("Failed to copy message", e);
                 } finally {
