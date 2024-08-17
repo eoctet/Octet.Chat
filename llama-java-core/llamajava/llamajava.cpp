@@ -597,8 +597,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
     if (Check_Context_Is_Null(env)) return -1;
     llama_lora_adapter* adapter = llama_lora_adapter_init(main_ctx->model, env->GetStringUTFChars(lora_path, JNI_FALSE));
     if (adapter != nullptr) {
-        llama_lora_adapter_set(main_ctx->llama_ctx, adapter, scale);
-        return 0;
+        return llama_lora_adapter_set(main_ctx->llama_ctx, adapter, scale);
     }
     return -1;
 }
@@ -612,6 +611,11 @@ JNIEXPORT jfloatArray JNICALL Java_chat_octet_model_LlamaService_getLogits
     UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return nullptr;
 
+    llama_context_params params = main_ctx->params;
+    int n_batch = params.n_batch;
+    if (index >= n_batch) {
+        index = index % n_batch;
+    }
     float *logits = llama_get_logits_ith(main_ctx->llama_ctx, index);
     const int vocab_size = llama_n_vocab(main_ctx->model);
     jfloatArray arrays = env->NewFloatArray(vocab_size);
