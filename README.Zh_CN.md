@@ -9,10 +9,9 @@
 这是一个Java实现的LLMs项目。你可以用它部署自己的私有服务，支持 `Llama3` 和 `GPT` 模型及其他开源模型。
 
 #### 提供
-- 简单易用的Java库 `llama-java-core`
-- 完整的应用服务 `octet-chat-app`
-  - `服务端部署`，快速实现私有化服务
-  - `命令行交互`，简单的本地聊天交互
+- `llama-java-core` 简单易用的Java库
+- `octet-chat-app` 桌面聊天助手
+- `octet-chat-app` API 服务
 
 #### 主要特点
 - 🦙 基于  [`llama.cpp`](https://github.com/ggerganov/llama.cpp) 构建
@@ -43,99 +42,16 @@
 > 你可以自行量化原始模型或搜索 `huggingface` 获取开源模型。
 
 
-### 🤖 命令行交互
+### 🖥 Octet desktop
+
+![Octet Agent](docs/desktop_ui.png)
+
+
+### 💡 API servers
 
 __如何使用__
 
-编辑 `characters.template.json` 设置一个自定义的AI角色。
-
-<details>
-
-<summary>示例角色</summary>
-
-```json
-{
-  "name": "Assistant Octet",
-  "function_call": false,
-  "prompt": "Answer the questions.",
-  "model_parameter": {
-    "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
-    "context_size": 4096,
-    "threads": 6,
-    "threads_batch": 6,
-    "mmap": true,
-    "mlock": false,
-    "verbose": true
-  },
-  "generate_parameter": {
-    "temperature": 0.85,
-    "repeat_penalty": 1.2,
-    "top_k": 40,
-    "top_p": 0.9,
-    "verbose_prompt": true,
-    "user": "User",
-    "assistant": "Octet"
-  }
-}
-```
-
-</details>
-
-运行命令行交互并指定刚才设置的角色名称，开始聊天：
-
-```bash
-java -jar octet-chat-app.jar --character YOUR_CHARACTER
-```
-
-> [!TIP]
->
-> 使用 `help` 查看更多参数，示例如下：
-
-```bash
-java -jar octet-chat-app.jar --help
-
-usage: Octet.Chat
-    --app <arg>          App launch type: cli | api (default: cli).
- -c,--completions        Use completions mode.
- -ch,--character <arg>   Load the specified AI character, default:
-                         llama2-chat.
- -h,--help               Show this help message and exit.
- -q,--questions <arg>    Load the specified user question list, example:
-                         /PATH/questions.txt.
- -f,--function           Enable the function call in chat.      
-```
-
-
-### 🚀 函数调用
-
-> [!NOTE]
->
-> 实现基于 `Qwen-chat` 系列模型，更多信息请参考：[Qwen Github](https://github.com/QwenLM/Qwen)
-
-__如何使用__
-
-下载 `Qwen-chat` 模型，编辑 [`octet.json`](octet-chat-app/characters/octet.json) 设置模型文件路径，将 `function_call` 修改为 `true` 开启函数调用。
-
-
-* 目前实现了两个函数，作为示例你可以继续丰富扩展它们。
-
-| 插件   | 描述                                 |
-|------|------------------------------------|
-| 时间查询 | 可以查询当前系统时间的函数。                     |
-| 接口调用 | 通用的接口调用函数，基于此你可以实现天气、文生图、搜索等服务的接入。 |
-
-> 函数配置文件示例：[functions.json](octet-chat-app/characters/functions.json)
-
-![Octet Agent](docs/agent.png)
-
-
-### 🖥 Web UI
-
-__如何使用__
-
-和命令行交互一样，首先设置一个自定义的AI角色。
-
-启动服务，打开浏览器开始聊天，默认地址：`http://YOUR_IP_ADDR:8152/`
+首先设置一个自定义的AI角色，启动服务，打开浏览器开始聊天，默认地址：`http://YOUR_IP_ADDR:8152/`
 
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
@@ -143,9 +59,6 @@ __如何使用__
 cd <YOUR_PATH>/octet-chat-app
 bash app_server.sh start YOUR_CHARACTER
 ```
-
-![webui.png](docs/webui.png)
-
 
 > [!TIP]
 >

@@ -10,10 +10,9 @@ This is a LLMs project implemented in Java.
 You can use it to deploy your own private services, supports the `Llama3` and `GPT` models and other open-source models.
 
 #### Provides
-- Simple Java library `llama-java-core`
-- Complete application `octet-chat-app`
-  - `API Services` Quickly realize privatized services
-  - `CLI Interaction` Simple local chat interaction
+- `llama-java-core` Simple Java library
+- `octet-chat-app`  Octet desktop
+- `octet-chat-app` API servers
 
 #### Features
 - 🦙 Built on [`llama.cpp`](https://github.com/ggerganov/llama.cpp)
@@ -44,97 +43,16 @@ You can use it to deploy your own private services, supports the `Llama3` and `G
 > You can quantify the original model yourself or search for `huggingface` to obtain open-source models.
 
 
-### 🤖 CLI interaction
+### 🖥 Octet desktop
+
+![Octet Agent](docs/desktop_ui2.png)
+
+
+### 💡 API servers
 
 __How to use__
 
-Edit `characters.template.json` to set a custom AI character. Run command line interaction and specify the set AI character name.
-
-<details>
-
-<summary>Example</summary>
-
-```json
-{
-  "name": "Assistant Octet",
-  "function_call": false,
-  "prompt": "Answer the questions.",
-  "model_parameter": {
-    "model_path": "/models/ggml-model-7b_m-q6_k.gguf",
-    "context_size": 4096,
-    "threads": 6,
-    "threads_batch": 6,
-    "mmap": true,
-    "mlock": false,
-    "verbose": true
-  },
-  "generate_parameter": {
-    "temperature": 0.85,
-    "repeat_penalty": 1.2,
-    "top_k": 40,
-    "top_p": 0.9,
-    "verbose_prompt": true,
-    "user": "User",
-    "assistant": "Octet"
-  }
-}
-```
-
-</details>
-
-```bash
-java -jar octet-chat-app.jar --character YOUR_CHARACTER
-```
-
-> [!TIP]
->
-> Use `help` to view more parameters, for example:
-
-```bash
-java -jar octet-chat-app.jar --help
-
-usage: Octet.Chat
-    --app <arg>          App launch type: cli | api (default: cli).
- -c,--completions        Use completions mode.
- -ch,--character <arg>   Load the specified AI character, default:
-                         llama2-chat.
- -h,--help               Show this help message and exit.
- -q,--questions <arg>    Load the specified user question list, example:
-                         /PATH/questions.txt.
- -f,--function           Enable the function call in chat.                  
-```
-
-
-### 🚀 Function Calling
-
-> [!NOTE]
->
-> Implementation based on the `Qwen-chat` series model. For more information, please refer to: [Qwen Github](https://github.com/QwenLM/Qwen)
-
-__How to use__
-
-Download the `Qwen-chat` model, edit [`octet.json`](octet-chat-app/characters/octet.json) to set the model file path, and change `function_call` to `true`.
-
-
-* Two functions are currently implemented, and as examples you can continue to enrich them.
-
-| Plugin   | Description                                                                                                                     |
-|----------|---------------------------------------------------------------------------------------------------------------------------------|
-| DateTime | A function that can query the current system time.                                                                              |
-| API      | A universal API calling function, based on which you can achieve access to services such as weather, text to image, and search. |
-
-> function configuration file example: [functions.json](octet-chat-app/characters/functions.json)
-
-![Octet Agent](docs/agent.png)
-
-
-### 🖥 Web UI
-
-__How to use__
-
-Just like CLI interaction, set a custom AI character and Launch the app.
-
-open browser enjoy it now `http://YOUR_IP_ADDR:8152/`
+Set a custom AI character and Launch the app, open browser enjoy it now `http://YOUR_IP_ADDR:8152/`
 
 ```bash
 # Default URL: http://YOUR_IP_ADDR:8152/
@@ -142,9 +60,6 @@ open browser enjoy it now `http://YOUR_IP_ADDR:8152/`
 cd <YOUR_PATH>/octet-chat-app
 bash app_server.sh start YOUR_CHARACTER
 ```
-
-![webui.png](docs/webui.png)
-
 
 > [!TIP]
 >
