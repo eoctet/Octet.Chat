@@ -200,10 +200,11 @@ public class LlamaService {
      * @param token        Token id.
      * @param buf          Input byte buffer.
      * @param bufferLength Input byte buffer length.
+     * @param lstripLength User can skip up to 'lstrip' leading spaces before copying.
      * @param special      If true, special tokens are rendered in the output.
      * @return int, Returns byte buffer length of the piece.
      */
-    public static native int tokenToPiece(int token, byte[] buf, int bufferLength, boolean special);
+    public static native int tokenToPiece(int token, byte[] buf, int bufferLength, int lstripLength, boolean special);
 
     /**
      * Get sampling metrics

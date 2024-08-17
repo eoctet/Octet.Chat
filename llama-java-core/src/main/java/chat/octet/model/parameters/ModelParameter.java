@@ -3,10 +3,7 @@ package chat.octet.model.parameters;
 import chat.octet.model.beans.LlamaContextParams;
 import chat.octet.model.beans.LlamaModelParams;
 import chat.octet.model.components.prompt.ChatTemplateFormatter;
-import chat.octet.model.enums.LlamaNumaStrategy;
-import chat.octet.model.enums.LlamaPoolingType;
-import chat.octet.model.enums.LlamaRoPEScalingType;
-import chat.octet.model.enums.LlamaSplitMode;
+import chat.octet.model.enums.*;
 import chat.octet.model.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -136,6 +133,14 @@ public class ModelParameter {
      */
     @Builder.Default
     private int poolingType = LlamaPoolingType.LLAMA_POOLING_TYPE_UNSPECIFIED.getType();
+
+    /**
+     * Attention type for embeddings, use model default if unspecified.
+     *
+     * @see LlamaAttentionType
+     */
+    @Builder.Default
+    private int attentionType = LlamaAttentionType.LLAMA_ATTENTION_TYPE_UNSPECIFIED.getType();
 
     /**
      * Base frequency for RoPE sampling.

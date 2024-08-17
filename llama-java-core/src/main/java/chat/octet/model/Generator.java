@@ -335,7 +335,7 @@ public class Generator implements Iterable<Token> {
          */
         private String tokenToText(int token) {
             byte[] buffer = new byte[64];
-            int length = LlamaService.tokenToPiece(token, buffer, buffer.length, generateParams.isSpecial());
+            int length = LlamaService.tokenToPiece(token, buffer, buffer.length, 0, generateParams.isSpecial());
             if (length == 0) {
                 return StringUtils.EMPTY;
             }

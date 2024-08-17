@@ -103,6 +103,7 @@ static jfieldID FIELD_THREADS;
 static jfieldID FIELD_THREADS_BATCH;
 static jfieldID FIELD_ROPE_SCALING_TYPE;
 static jfieldID FIELD_POOLING_TYPE;
+static jfieldID FIELD_ATTENTION_TYPE;
 static jfieldID FIELD_YARN_EXT_FACTOR;
 static jfieldID FIELD_YARN_ATTN_FACTOR;
 static jfieldID FIELD_YARN_BETA_FAST;
@@ -219,6 +220,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     FIELD_THREADS_BATCH = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "threadsBatch", "I");
     FIELD_ROPE_SCALING_TYPE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "ropeScalingType", "I");
     FIELD_POOLING_TYPE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "poolingType", "I");
+    FIELD_ATTENTION_TYPE = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "attentionType", "I");
     FIELD_YARN_EXT_FACTOR = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnExtFactor", "F");
     FIELD_YARN_ATTN_FACTOR = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnAttnFactor", "F");
     FIELD_YARN_BETA_FAST = env->GetFieldID(LLAMA_CONTEXT_PARAMS_CLASS, "yarnBetaFast", "F");
@@ -351,6 +353,7 @@ JNIEXPORT jobject JNICALL Java_chat_octet_model_LlamaService_getLlamaContextDefa
     env->SetIntField(llama_context_params, FIELD_THREADS_BATCH, defaults.n_threads_batch);
     env->SetIntField(llama_context_params, FIELD_ROPE_SCALING_TYPE, defaults.rope_scaling_type);
     env->SetIntField(llama_context_params, FIELD_POOLING_TYPE, defaults.pooling_type);
+    env->SetIntField(llama_context_params, FIELD_ATTENTION_TYPE, defaults.attention_type);
     env->SetFloatField(llama_context_params, FIELD_YARN_EXT_FACTOR, defaults.yarn_ext_factor);
     env->SetFloatField(llama_context_params, FIELD_YARN_ATTN_FACTOR, defaults.yarn_attn_factor);
     env->SetFloatField(llama_context_params, FIELD_YARN_BETA_FAST, defaults.yarn_beta_fast);
@@ -468,6 +471,7 @@ JNIEXPORT void JNICALL Java_chat_octet_model_LlamaService_loadLlamaModelFromFile
             /*.n_threads_batch             =*/ (uint32_t) env->GetIntField(jllama_context_params, FIELD_THREADS_BATCH),
             /*.rope_scaling_type           =*/ static_cast<enum llama_rope_scaling_type>(env->GetIntField(jllama_context_params, FIELD_ROPE_SCALING_TYPE)),
             /*.pooling_type                =*/ static_cast<enum llama_pooling_type>(env->GetIntField(jllama_context_params, FIELD_POOLING_TYPE)),
+            /*.attention_type              =*/ static_cast<enum llama_attention_type>(env->GetIntField(jllama_context_params, FIELD_ATTENTION_TYPE)),
             /*.rope_freq_base              =*/ env->GetFloatField(jllama_context_params, FIELD_ROPE_FREQ_BASE),
             /*.rope_freq_scale             =*/ env->GetFloatField(jllama_context_params, FIELD_ROPE_FREQ_SCALE),
             /*.yarn_ext_factor             =*/ env->GetFloatField(jllama_context_params, FIELD_YARN_EXT_FACTOR),
@@ -591,14 +595,12 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_loadLoraModelFromFile
          jint threads) {
     UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
-    int status = llama_model_apply_lora_from_file(main_ctx->model,
-                                                  env->GetStringUTFChars(lora_path, JNI_FALSE),
-                                                  scale,
-                                                  env->GetStringUTFChars(base_model_path, JNI_FALSE),
-                                                  threads
-    );
-    JLOG_DEBUG("Successfully loaded lora model, status: %d.", status);
-    return status;
+    llama_lora_adapter* adapter = llama_lora_adapter_init(main_ctx->model, env->GetStringUTFChars(lora_path, JNI_FALSE));
+    if (adapter != nullptr) {
+        llama_lora_adapter_set(main_ctx->llama_ctx, adapter, scale);
+        return 0;
+    }
+    return -1;
 }
 
 /*
@@ -672,12 +674,12 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
  * Method:    tokenToPiece
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenToPiece
-        (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint buffer_length, jboolean special) {
+        (JNIEnv *env, jclass thisClass, jint token, jbyteArray buf, jint buffer_length, jint lstrip_length, jboolean special) {
     UNUSED(thisClass);
     if (Check_Context_Is_Null(env)) return -1;
 
     jbyte *buffer = new jbyte[buffer_length];
-    int size = llama_token_to_piece(main_ctx->model, token, (char *) buffer, buffer_length, To_CBool(special));
+    int size = llama_token_to_piece(main_ctx->model, token, (char *) buffer, buffer_length, lstrip_length, To_CBool(special));
     env->ReleaseByteArrayElements(buf, buffer, 0);
     return size;
 }
@@ -785,7 +787,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     }
 
     if (main_ctx->grammar != nullptr) {
-        llama_sample_grammar(main_ctx->llama_ctx, &candidates_p, main_ctx->grammar);
+        llama_grammar_sample(main_ctx->grammar, main_ctx->llama_ctx, &candidates_p);
     }
 
     llama_token token;
@@ -819,7 +821,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_sampling
     }
 
     if (main_ctx->grammar != nullptr) {
-        llama_grammar_accept_token(main_ctx->llama_ctx, main_ctx->grammar, token);
+        llama_grammar_accept_token(main_ctx->grammar, main_ctx->llama_ctx, token);
     }
 
     //decode the next new token

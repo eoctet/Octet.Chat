@@ -20,7 +20,7 @@ public enum ModelFileType {
     /**
      * tok_embeddings.weight and output.weight are F16
      */
-    LLAMA_FTYPE_MOSTLY_Q4_1_SOME_F16(4),
+    //LLAMA_FTYPE_MOSTLY_Q4_1_SOME_F16(4),
     LLAMA_FTYPE_MOSTLY_Q8_0(7),
     LLAMA_FTYPE_MOSTLY_Q5_0(8),
     LLAMA_FTYPE_MOSTLY_Q5_1(9),
@@ -47,6 +47,9 @@ public enum ModelFileType {
     LLAMA_FTYPE_MOSTLY_IQ4_XS(30),
     LLAMA_FTYPE_MOSTLY_IQ1_M(31),
     LLAMA_FTYPE_MOSTLY_BF16(32),
+    LLAMA_FTYPE_MOSTLY_Q4_0_4_4(33),
+    LLAMA_FTYPE_MOSTLY_Q4_0_4_8(34),
+    LLAMA_FTYPE_MOSTLY_Q4_0_8_8(35),
     /**
      * not specified in the model file
      */

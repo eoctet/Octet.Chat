@@ -132,7 +132,7 @@ JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenize
  * Method:    tokenToPiece
  */
 JNIEXPORT jint JNICALL Java_chat_octet_model_LlamaService_tokenToPiece
-        (JNIEnv *, jclass, jint, jbyteArray, jint, jboolean);
+        (JNIEnv *, jclass, jint, jbyteArray, jint, jint, jboolean);
 
 /*
  * Class:     chat_octet_model_LlamaService

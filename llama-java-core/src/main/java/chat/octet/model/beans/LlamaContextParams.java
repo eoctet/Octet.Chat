@@ -1,5 +1,6 @@
 package chat.octet.model.beans;
 
+import chat.octet.model.enums.LlamaAttentionType;
 import chat.octet.model.enums.LlamaPoolingType;
 import chat.octet.model.enums.LlamaRoPEScalingType;
 import lombok.ToString;
@@ -51,6 +52,12 @@ public class LlamaContextParams {
      * @see LlamaPoolingType
      */
     public int poolingType;
+    /**
+     * attention type.
+     *
+     * @see LlamaAttentionType
+     */
+    public int attentionType;
     /**
      * YaRN extrapolation mix factor, NaN = from model.
      */

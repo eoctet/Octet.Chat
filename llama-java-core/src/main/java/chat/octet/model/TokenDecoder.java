@@ -18,7 +18,7 @@ public class TokenDecoder {
         int length = 0;
         for (int token : tokens) {
             byte[] bytes = new byte[64];
-            int size = LlamaService.tokenToPiece(token, bytes, bytes.length, special);
+            int size = LlamaService.tokenToPiece(token, bytes, bytes.length, 0, special);
             System.arraycopy(bytes, 0, buffer, length, size);
             length += size;
         }
